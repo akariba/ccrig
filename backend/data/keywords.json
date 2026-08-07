@@ -1,0 +1,452 @@
+{
+  "keywords": [
+    {
+      "id": "AI",
+      "label": "AI",
+      "synonyms": [
+        "ai",
+        "artificial intelligence",
+        "genai",
+        "generative ai",
+        "gen ai"
+      ]
+    },
+    {
+      "id": "AI_BUBBLE",
+      "label": "AI bubble",
+      "synonyms": [
+        "ai bubble",
+        "ai valuation bubble",
+        "ai overbuild",
+        "tech bubble",
+        "data center bubble"
+      ]
+    },
+    {
+      "id": "SEMICONDUCTORS",
+      "label": "semiconductors",
+      "synonyms": [
+        "semiconductor",
+        "semiconductors",
+        "chip",
+        "chips",
+        "chipmaker",
+        "chipmakers"
+      ]
+    },
+    {
+      "id": "FOUNDRY",
+      "label": "foundry",
+      "synonyms": [
+        "foundry",
+        "fabrication",
+        "fab",
+        "fabs",
+        "advanced node",
+        "advanced packaging",
+        "cowos"
+      ]
+    },
+    {
+      "id": "GPU",
+      "label": "GPU",
+      "synonyms": [
+        "gpu",
+        "gpus",
+        "graphics processing unit",
+        "ai accelerator",
+        "ai accelerators"
+      ]
+    },
+    {
+      "id": "MEMORY",
+      "label": "memory chips",
+      "synonyms": [
+        "memory",
+        "dram",
+        "nand",
+        "memory chips"
+      ]
+    },
+    {
+      "id": "HBM",
+      "label": "HBM",
+      "synonyms": [
+        "hbm",
+        "high bandwidth memory",
+        "hbm4"
+      ]
+    },
+    {
+      "id": "LITHOGRAPHY",
+      "label": "lithography equipment",
+      "synonyms": [
+        "euv",
+        "lithography",
+        "litho tools",
+        "wafer fab equipment"
+      ]
+    },
+    {
+      "id": "DATA_CENTERS",
+      "label": "data centres",
+      "synonyms": [
+        "data centre",
+        "data centres",
+        "datacenter",
+        "datacenters",
+        "data center"
+      ]
+    },
+    {
+      "id": "HYPERSCALERS",
+      "label": "hyperscalers",
+      "synonyms": [
+        "hyperscaler",
+        "hyperscalers",
+        "cloud provider",
+        "cloud providers"
+      ]
+    },
+    {
+      "id": "CLOUD",
+      "label": "cloud computing",
+      "synonyms": [
+        "cloud",
+        "cloud computing",
+        "azure",
+        "hybrid cloud"
+      ]
+    },
+    {
+      "id": "CAPEX",
+      "label": "capex",
+      "synonyms": [
+        "capex",
+        "capital expenditure",
+        "infrastructure spend"
+      ]
+    },
+    {
+      "id": "AI_MONETIZATION",
+      "label": "AI monetisation",
+      "synonyms": [
+        "ai monetisation",
+        "ai monetization",
+        "ai roi",
+        "ai returns"
+      ]
+    },
+    {
+      "id": "EXPORT_CONTROLS",
+      "label": "export controls",
+      "synonyms": [
+        "export control",
+        "export controls",
+        "export restriction",
+        "export restrictions",
+        "chip ban"
+      ]
+    },
+    {
+      "id": "SANCTIONS",
+      "label": "sanctions",
+      "synonyms": [
+        "sanction",
+        "sanctions"
+      ]
+    },
+    {
+      "id": "TAIWAN",
+      "label": "Taiwan",
+      "synonyms": [
+        "taiwan",
+        "taiwanese",
+        "taiwan strait",
+        "hsinchu"
+      ]
+    },
+    {
+      "id": "CHINA",
+      "label": "China",
+      "synonyms": [
+        "china",
+        "chinese"
+      ]
+    },
+    {
+      "id": "SOUTH_KOREA",
+      "label": "South Korea",
+      "synonyms": [
+        "south korea",
+        "korea",
+        "korean"
+      ]
+    },
+    {
+      "id": "GERMANY",
+      "label": "Germany",
+      "synonyms": [
+        "germany",
+        "german"
+      ]
+    },
+    {
+      "id": "EUROPE",
+      "label": "Europe",
+      "synonyms": [
+        "europe",
+        "european",
+        "eu"
+      ]
+    },
+    {
+      "id": "GEOPOLITICS",
+      "label": "geopolitics",
+      "synonyms": [
+        "geopolitical",
+        "geopolitics",
+        "geopolitical risk",
+        "geopolitical tension"
+      ]
+    },
+    {
+      "id": "EARTHQUAKE",
+      "label": "earthquake",
+      "synonyms": [
+        "earthquake",
+        "seismic",
+        "seismic activity",
+        "natural disaster"
+      ]
+    },
+    {
+      "id": "SUPPLY_DISRUPTION",
+      "label": "supply chain disruption",
+      "synonyms": [
+        "supply disruption",
+        "supply chain disruption",
+        "supply chain risk",
+        "disrupted",
+        "disruption"
+      ]
+    },
+    {
+      "id": "ENERGY",
+      "label": "energy",
+      "synonyms": [
+        "energy",
+        "energy markets",
+        "energy security"
+      ]
+    },
+    {
+      "id": "OIL",
+      "label": "oil",
+      "synonyms": [
+        "oil",
+        "crude oil",
+        "petroleum"
+      ]
+    },
+    {
+      "id": "NATURAL_GAS",
+      "label": "natural gas",
+      "synonyms": [
+        "natural gas",
+        "lng",
+        "gas supply"
+      ]
+    },
+    {
+      "id": "OPEC",
+      "label": "OPEC",
+      "synonyms": [
+        "opec",
+        "opec+"
+      ]
+    },
+    {
+      "id": "DEFENSE",
+      "label": "defense",
+      "synonyms": [
+        "defense",
+        "defence",
+        "military",
+        "military spending"
+      ]
+    },
+    {
+      "id": "AEROSPACE",
+      "label": "aerospace",
+      "synonyms": [
+        "aerospace"
+      ]
+    },
+    {
+      "id": "NATO",
+      "label": "NATO",
+      "synonyms": [
+        "nato"
+      ]
+    },
+    {
+      "id": "UKRAINE",
+      "label": "Ukraine",
+      "synonyms": [
+        "ukraine",
+        "ukrainian"
+      ]
+    },
+    {
+      "id": "RUSSIA",
+      "label": "Russia",
+      "synonyms": [
+        "russia",
+        "russian"
+      ]
+    },
+    {
+      "id": "BANKING",
+      "label": "banking",
+      "synonyms": [
+        "bank",
+        "banks",
+        "banking"
+      ]
+    },
+    {
+      "id": "CREDIT_CRISIS",
+      "label": "credit crisis",
+      "synonyms": [
+        "credit crisis",
+        "credit crunch",
+        "banking crisis",
+        "counterparty credit risk"
+      ]
+    },
+    {
+      "id": "BANK_FUNDING",
+      "label": "bank funding stress",
+      "synonyms": [
+        "funding stress",
+        "deposit run",
+        "bank run",
+        "liquidity stress"
+      ]
+    },
+    {
+      "id": "INTEREST_RATES",
+      "label": "interest rates",
+      "synonyms": [
+        "interest rate",
+        "interest rates",
+        "rate hike",
+        "rate hikes",
+        "fed funds rate"
+      ]
+    },
+    {
+      "id": "INFLATION",
+      "label": "inflation",
+      "synonyms": [
+        "inflation"
+      ]
+    },
+    {
+      "id": "RECESSION",
+      "label": "recession",
+      "synonyms": [
+        "recession"
+      ]
+    },
+    {
+      "id": "INSURANCE",
+      "label": "insurance",
+      "synonyms": [
+        "insurance",
+        "insurer",
+        "insurers",
+        "reinsurance"
+      ]
+    },
+    {
+      "id": "TARIFFS",
+      "label": "tariffs",
+      "synonyms": [
+        "tariff",
+        "tariffs",
+        "trade tariff"
+      ]
+    },
+    {
+      "id": "TRADE_WAR",
+      "label": "trade war",
+      "synonyms": [
+        "trade war",
+        "trade tension",
+        "trade tensions"
+      ]
+    },
+    {
+      "id": "CHIPS_ACT",
+      "label": "CHIPS Act",
+      "synonyms": [
+        "chips act",
+        "chip subsidies",
+        "chips act subsidies"
+      ]
+    },
+    {
+      "id": "CYBERSECURITY",
+      "label": "cybersecurity",
+      "synonyms": [
+        "cybersecurity",
+        "cyber attack",
+        "cyberattack",
+        "cyber risk"
+      ]
+    },
+    {
+      "id": "SHIPPING",
+      "label": "shipping",
+      "synonyms": [
+        "shipping",
+        "logistics",
+        "maritime shipping",
+        "container shipping"
+      ]
+    },
+    {
+      "id": "MNA",
+      "label": "M&A",
+      "synonyms": [
+        "m&a",
+        "merger",
+        "mergers",
+        "acquisition",
+        "acquisitions"
+      ]
+    },
+    {
+      "id": "MINING",
+      "label": "mining / metals",
+      "synonyms": [
+        "mining",
+        "copper",
+        "metals",
+        "critical minerals"
+      ]
+    },
+    {
+      "id": "POWER_GRID",
+      "label": "power grid / electricity",
+      "synonyms": [
+        "power grid",
+        "electricity demand",
+        "grid capacity",
+        "power constraints"
+      ]
+    }
+  ]
+}

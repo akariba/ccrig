@@ -1,0 +1,564 @@
+{
+  "exposure_edges": [
+    {
+      "counterparty": "CP_ALPHA",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.32,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ALPHA",
+      "issuer": "AMD",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ALPHA",
+      "issuer": "TSM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ALPHA",
+      "issuer": "MSFT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.15,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ALPHA",
+      "issuer": "AVGO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.15,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_PACIFIC",
+      "issuer": "TSM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_PACIFIC",
+      "issuer": "SKHY",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.22,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_PACIFIC",
+      "issuer": "SSNLF",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.22,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_PACIFIC",
+      "issuer": "AAPL",
+      "relation": "HOLDS_VIA_FUND",
+      "exposure_pct": 0.13,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_PACIFIC",
+      "issuer": "ASML",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.13,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_MERIDIAN",
+      "issuer": "XOM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.28,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_MERIDIAN",
+      "issuer": "SHEL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.22,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_MERIDIAN",
+      "issuer": "LMT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.22,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_MERIDIAN",
+      "issuer": "BA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.16,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_MERIDIAN",
+      "issuer": "RTX",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.12,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_NORTHBRIDGE",
+      "issuer": "JPM",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.35,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_NORTHBRIDGE",
+      "issuer": "C",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.28,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_NORTHBRIDGE",
+      "issuer": "DBK",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.24,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_NORTHBRIDGE",
+      "issuer": "AIG",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.13,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "MSFT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.14,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "AAPL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.14,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "JPM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.12,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "XOM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.12,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "GOOGL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.12,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "LMT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.1,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "BA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.1,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "RIO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.1,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_SUMMIT",
+      "issuer": "HSBC",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.06,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HELIX",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HELIX",
+      "issuer": "AVGO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HELIX",
+      "issuer": "MU",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HELIX",
+      "issuer": "ASML",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HELIX",
+      "issuer": "ARM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.15,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_CASCADE",
+      "issuer": "JPM",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_CASCADE",
+      "issuer": "BAC",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_CASCADE",
+      "issuer": "WFC",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_CASCADE",
+      "issuer": "C",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_IRONGATE",
+      "issuer": "LMT",
+      "relation": "LENDS_TO",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_IRONGATE",
+      "issuer": "RTX",
+      "relation": "LENDS_TO",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_IRONGATE",
+      "issuer": "GD",
+      "relation": "LENDS_TO",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_IRONGATE",
+      "issuer": "CAT",
+      "relation": "LENDS_TO",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_LATTICE",
+      "issuer": "TSM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.24,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_LATTICE",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.22,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_LATTICE",
+      "issuer": "MSFT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_LATTICE",
+      "issuer": "ASML",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_LATTICE",
+      "issuer": "GOOGL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "SHEL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "DBK",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "ASML",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.18,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "TTE",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.16,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "RIO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.15,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_VANTAGE",
+      "issuer": "UBS",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.15,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HARBOR",
+      "issuer": "XOM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HARBOR",
+      "issuer": "SHEL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HARBOR",
+      "issuer": "BP",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_HARBOR",
+      "issuer": "MAERSK",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_KESTREL",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.45,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_KESTREL",
+      "issuer": "AAPL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_KESTREL",
+      "issuer": "MSFT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ORION",
+      "issuer": "AIG",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.35,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ORION",
+      "issuer": "HSBC",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ORION",
+      "issuer": "UBS",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.35,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_DELTA",
+      "issuer": "GS",
+      "relation": "HOLDS_VIA_FUND",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_DELTA",
+      "issuer": "MS",
+      "relation": "HOLDS_VIA_FUND",
+      "exposure_pct": 0.3,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_DELTA",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.4,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ANCHOR",
+      "issuer": "JPM",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.28,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ANCHOR",
+      "issuer": "WFC",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.24,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ANCHOR",
+      "issuer": "BAC",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.24,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_ANCHOR",
+      "issuer": "UBS",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.24,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_TRIREME",
+      "issuer": "MAERSK",
+      "relation": "LENDS_TO",
+      "exposure_pct": 0.5,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_TRIREME",
+      "issuer": "SHEL",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_TRIREME",
+      "issuer": "XOM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.25,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_EQUINOX",
+      "issuer": "LMT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_EQUINOX",
+      "issuer": "XOM",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_EQUINOX",
+      "issuer": "NVDA",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_EQUINOX",
+      "issuer": "DBK",
+      "relation": "HOLDS_BONDS",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_EQUINOX",
+      "issuer": "RIO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_GRANITE",
+      "issuer": "RIO",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.45,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_GRANITE",
+      "issuer": "FCX",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.35,
+      "is_synthetic": true
+    },
+    {
+      "counterparty": "CP_GRANITE",
+      "issuer": "CAT",
+      "relation": "HOLDS_EQUITY",
+      "exposure_pct": 0.2,
+      "is_synthetic": true
+    }
+  ]
+}
