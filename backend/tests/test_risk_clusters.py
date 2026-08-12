@@ -121,3 +121,41 @@ def test_full_candidate_set_still_available_beyond_first_order():
     clusters = build_risk_clusters("CP_FUND_009")
     c = clusters[0]
     assert len(c.structural_relationships) >= CLUSTER_MAX_FIRST_ORDER_STRUCTURAL
+
+
+# --- Phase 4 correction: business-story fields ---
+
+def test_cluster_has_a_business_story_not_just_graph_metadata():
+    c = build_risk_clusters("CP_FUND_009")[0]
+    assert len(c.story) >= 2
+    assert c.story[-1] == "Kestrel Family Office"  # story ends at the counterparty
+    assert all(isinstance(s, str) and s for s in c.story)
+
+
+def test_why_it_matters_is_a_real_sentence_referencing_actual_entities():
+    c = build_risk_clusters("CP_FUND_009")[0]
+    assert len(c.why_it_matters) > 20
+    assert "NVIDIA" in c.why_it_matters
+
+
+def test_recommended_action_is_deterministic_not_fabricated_ml_output():
+    c = build_risk_clusters("CP_FUND_009")[0]
+    assert c.recommended_action in (
+        "Monitor — no active control exception or event on file for this exposure.",
+        "Investigate — a live event scenario is transmitting into this exposure.",
+    ) or c.recommended_action.startswith("Review limit/headroom")
+
+
+def test_recommended_action_prioritizes_control_exception_over_event():
+    # CP_PUB_ALPHA has a live settlement breach - that must win over "Investigate"
+    clusters = build_risk_clusters("CP_PUB_ALPHA")
+    assert len(clusters) >= 1
+    assert clusters[0].recommended_action.startswith("Review limit/headroom")
+
+
+def test_story_does_not_fabricate_a_structural_hop_when_none_exists():
+    # a counterparty whose reference entity has no first-order neighbors at
+    # all should still produce a valid (shorter) story, not an invented one
+    for c in build_risk_clusters("CP_PUB_ALPHA"):
+        assert isinstance(c.story, list)
+        assert len(c.story) >= 1

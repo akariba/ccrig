@@ -3,84 +3,68 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RiskPath, pathFromChain } from "../components/RiskPath";
-import type { GraphPath } from "../graph/types";
 
-function clusterFocusedPath(cluster: any, counterpartyLabel: string): GraphPath | null {
-  const product = cluster.products?.[0];
-  const referenceEntity = cluster.direct_members?.[0];
-  if (!referenceEntity) return null;
-  const nodes = [
-    { id: "cp", type: "COUNTERPARTY" as const, label: counterpartyLabel },
-    { id: referenceEntity.id, type: "ENTITY" as const, label: referenceEntity.label },
-  ];
-  const edges = [{ edgeType: product ?? "HAS_EXPOSURE", traversedReverse: false }];
-  const topStructural = cluster.structural_relationships?.[0];
-  if (topStructural) {
-    nodes.push({ id: `${referenceEntity.id}:struct`, type: "ENTITY" as const, label: topStructural.entity });
-    edges.push({ edgeType: topStructural.type, traversedReverse: topStructural.reverse });
-  }
-  return { nodes, edges };
-}
-
-function ClusterInspector({ cluster, counterpartyLabel }: { cluster: any; counterpartyLabel: string }) {
-  const [showContextual, setShowContextual] = useState(false);
-  const path = clusterFocusedPath(cluster, counterpartyLabel);
+function ClusterInspector({ cluster }: { cluster: any }) {
+  const [showDetail, setShowDetail] = useState(false);
   return (
     <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
-      <div className="section-title" style={{ fontSize: 11 }}>Direct exposure</div>
-      <div style={{ fontSize: 12.5, marginBottom: 8 }}>{cluster.direct_members.map((m: any) => m.label).join(", ") || "—"}</div>
+      {/* Business story leads - this is the answer, not the graph algorithm's output. */}
+      <div className="section-title" style={{ fontSize: 11 }}>Story</div>
+      <div style={{ marginBottom: 10 }}><RiskPath path={pathFromChain(cluster.story)} /></div>
 
-      {cluster.first_order_members?.length > 0 && (
-        <>
-          <div className="section-title" style={{ fontSize: 11 }}>First-order relationships</div>
-          <div style={{ fontSize: 12.5, marginBottom: 8 }}>{cluster.first_order_members.map((m: any) => m.label).join(", ")}</div>
-        </>
-      )}
+      <div className="section-title" style={{ fontSize: 11 }}>Why it matters</div>
+      <p style={{ fontSize: 12.5, marginTop: 2, marginBottom: 10 }}>{cluster.why_it_matters}</p>
 
-      {cluster.contextual_members?.length > 0 && (
-        <div style={{ marginBottom: 12 }}>
-          <button className="btn secondary" style={{ padding: "2px 8px", fontSize: 10.5 }} onClick={() => setShowContextual(!showContextual)}>
-            {showContextual ? "Hide" : `Show ${cluster.contextual_members.length} more contextual relationships`}
-          </button>
-          {showContextual && (
-            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>
-              {cluster.contextual_members.map((m: any) => m.label).join(", ")}
-            </div>
-          )}
-        </div>
-      )}
-
-      <div className="section-title" style={{ fontSize: 11 }}>Why grouped</div>
-      <ul style={{ margin: "4px 0 12px 18px", fontSize: 12.5 }}>
-        {cluster.evidence.map((e: string, i: number) => <li key={i}>{e}</li>)}
-      </ul>
-
-      {path && (
-        <>
-          <div className="section-title" style={{ fontSize: 11 }}>Focused path</div>
-          <div style={{ marginBottom: 12 }}><RiskPath path={path} /></div>
-        </>
-      )}
-
-      {cluster.statistical_relationships?.length > 0 && (
-        <>
-          <div className="section-title" style={{ fontSize: 11 }}>Correlation evidence (signed)</div>
-          <div style={{ fontSize: 12.5, marginBottom: 12 }}>
-            {cluster.statistical_relationships.map((s: any, i: number) => (
-              <div key={i}>{s.entity}: <span className="mono">{s.signed_correlation > 0 ? "+" : ""}{s.signed_correlation}</span> ({s.method})</div>
-            ))}
-          </div>
-        </>
-      )}
+      <div className="ai-box" style={{ marginBottom: 10 }}>
+        <div className="ai-label">Next action</div>
+        {cluster.recommended_action}
+      </div>
 
       {cluster.relevant_events?.length > 0 && (
-        <div style={{ fontSize: 12.5, marginBottom: 8 }}>
-          <strong>Relevant event:</strong> {cluster.relevant_events.map((e: any) => e.label).join(", ")}
+        <div style={{ fontSize: 12.5, marginBottom: 6 }}>
+          <strong>Potential event trigger:</strong> {cluster.relevant_events.map((e: any) => e.label).join(", ")}
         </div>
       )}
-      {cluster.relevant_controls?.length > 0 && (
-        <div style={{ fontSize: 12.5 }}>
-          <strong>Relevant control:</strong> {cluster.relevant_controls.map((c: any) => c.label).join(", ")}
+
+      <button className="btn secondary" style={{ padding: "2px 8px", fontSize: 10.5, marginTop: 4 }} onClick={() => setShowDetail(!showDetail)}>
+        {showDetail ? "Hide evidence detail" : "Show evidence detail"}
+      </button>
+
+      {showDetail && (
+        <div style={{ marginTop: 10, fontSize: 12.5 }}>
+          <div className="section-title" style={{ fontSize: 11 }}>Direct exposure</div>
+          <div style={{ marginBottom: 8 }}>{cluster.direct_members.map((m: any) => m.label).join(", ") || "—"}</div>
+
+          {cluster.first_order_members?.length > 0 && (
+            <>
+              <div className="section-title" style={{ fontSize: 11 }}>Connected risks (first-order)</div>
+              <div style={{ marginBottom: 8 }}>{cluster.first_order_members.map((m: any) => m.label).join(", ")}</div>
+            </>
+          )}
+          {cluster.contextual_members?.length > 0 && (
+            <div style={{ marginBottom: 8, color: "var(--text-muted)" }}>
+              Also contextually connected: {cluster.contextual_members.map((m: any) => m.label).join(", ")}
+            </div>
+          )}
+
+          <div className="section-title" style={{ fontSize: 11 }}>Evidence</div>
+          <ul style={{ margin: "4px 0 8px 18px" }}>
+            {cluster.evidence.map((e: string, i: number) => <li key={i}>{e}</li>)}
+          </ul>
+
+          {cluster.statistical_relationships?.length > 0 && (
+            <>
+              <div className="section-title" style={{ fontSize: 11 }}>Correlation evidence (signed)</div>
+              <div style={{ marginBottom: 8 }}>
+                {cluster.statistical_relationships.map((s: any, i: number) => (
+                  <div key={i}>{s.entity}: <span className="mono">{s.signed_correlation > 0 ? "+" : ""}{s.signed_correlation}</span> ({s.method})</div>
+                ))}
+              </div>
+            </>
+          )}
+          {cluster.relevant_controls?.length > 0 && (
+            <div><strong>Relevant control:</strong> {cluster.relevant_controls.map((c: any) => c.label).join(", ")}</div>
+          )}
         </div>
       )}
     </div>
@@ -245,22 +229,22 @@ export function Counterparty360() {
                   <>
                     <div className="section-title">Key risk clusters</div>
                     <p className="subtitle" style={{ marginTop: -6, marginBottom: 10 }}>
-                      Derived from the counterparty's actual exposure graph — structural relationships, market
-                      correlation, and risk-factor transmission — never a hardcoded label.
+                      What hidden business stories is this counterparty exposed to — derived from actual exposure,
+                      relationships and transmission, never a hardcoded label.
                     </p>
                     {clusters.map((c) => (
                       <div key={c.id} style={{ marginBottom: 10, padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
                         <div className="hstack" style={{ justifyContent: "space-between" }}>
                           <div>
                             <div style={{ fontWeight: 600, fontSize: 13.5 }}>{c.label}</div>
-                            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{c.summary}</div>
+                            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{c.story.join(" → ")}</div>
                           </div>
                           <button className="btn secondary" style={{ padding: "3px 10px", fontSize: 11 }}
                             onClick={() => setOpenCluster(openCluster === c.id ? null : c.id)}>
-                            {openCluster === c.id ? "Hide" : "View path"}
+                            {openCluster === c.id ? "Hide" : "View story"}
                           </button>
                         </div>
-                        {openCluster === c.id && <ClusterInspector cluster={c} counterpartyLabel={name} />}
+                        {openCluster === c.id && <ClusterInspector cluster={c} />}
                       </div>
                     ))}
                   </>

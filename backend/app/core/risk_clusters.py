@@ -36,6 +36,13 @@ class RiskCluster:
     counterparty_id: str
     label: str
     summary: str
+    # Business-narrative fields (Phase 4 correction: the analyst-facing
+    # output of a cluster is a STORY, not a graph-algorithm result). Each
+    # is synthesized only from evidence already gathered below - never
+    # fabricated, never a separate opaque score.
+    story: list[str] = field(default_factory=list)
+    why_it_matters: str = ""
+    recommended_action: str = ""
     direct_members: list[dict] = field(default_factory=list)
     first_order_members: list[dict] = field(default_factory=list)
     contextual_members: list[dict] = field(default_factory=list)
@@ -101,12 +108,59 @@ def _derive_label(rf_chain: list[GraphNode], reference_entity: GraphNode | None,
     return "Mixed market-risk cluster"
 
 
+def _build_story(counterparty_name: str, product, reference_entity, top_first_order,
+                  rf_chain: list[GraphNode]) -> list[str]:
+    """The business narrative chain, e.g.:
+    ["Taiwan / foundry risk", "TSMC", "NVIDIA", "TRS exposure", "Kestrel Family Office"]
+    Built only from evidence already established below (transmission chain,
+    structural neighbor, reference entity, product, counterparty) - never
+    an invented economic narrative."""
+    steps = []
+    if rf_chain:
+        steps.append(f"{rf_chain[0].label} risk")
+    if top_first_order and reference_entity and top_first_order.id != reference_entity.id:
+        steps.append(top_first_order.label)
+    if reference_entity:
+        steps.append(reference_entity.label)
+    if product:
+        steps.append(f"{product.label} exposure")
+    steps.append(counterparty_name)
+    return steps
+
+
+def _why_it_matters(counterparty_name: str, reference_entity, product,
+                     top_structural: dict | None, top_statistical: dict | None) -> str:
+    if reference_entity is None:
+        return f"{counterparty_name} has an exposure position with no linked reference entity on file."
+    base = f"{counterparty_name} has {product.label if product else 'an'} exposure referencing {reference_entity.label}."
+    if top_structural:
+        relation = top_structural["type"].replace("_", " ").lower()
+        return (f"{base} {reference_entity.label} has a structural {relation} relationship with "
+                f"{top_structural['entity']} - risk affecting {top_structural['entity']} can reach this exposure "
+                f"even though the position only directly references {reference_entity.label}.")
+    if top_statistical:
+        direction = "moves with" if top_statistical["signed_correlation"] >= 0 else "moves inversely to"
+        return (f"{base} {reference_entity.label} historically {direction} {top_statistical['entity']} "
+                f"({top_statistical['signed_correlation']:+.2f} correlation) - a shock to one may be reflected in the other.")
+    return f"{base} No first-order structural or statistical neighbors were found on the current graph."
+
+
+def _recommended_action(controls: list[dict], relevant_events: list[dict]) -> str:
+    # Deterministic, evidence-based - never a generated/ML suggestion.
+    if any(c["type"] == "CONTROL_EXCEPTION" for c in controls):
+        return "Review limit/headroom — an active control exception sits behind this exposure."
+    if relevant_events:
+        return "Investigate — a live event scenario is transmitting into this exposure."
+    return "Monitor — no active control exception or event on file for this exposure."
+
+
 def build_risk_clusters(counterparty_id: str, max_clusters: int = 5) -> list[RiskCluster]:
     qs = get_query_service()
     cp_id = counterparty_node_id(counterparty_id)
     if cp_id not in qs.graph.nodes:
         return []
 
+    counterparty_name = qs.get_node(cp_id).label
     exposure_neighbors = qs.get_neighbors(cp_id, domains={"EXPOSURE"})
     positions = [n for n, e, rev in exposure_neighbors if n.type == "EXPOSURE_POSITION" and e.type == "HAS_EXPOSURE"]
     collateral = [n.label for n, e, rev in exposure_neighbors if n.type == "COLLATERAL"]
@@ -178,12 +232,20 @@ def build_risk_clusters(counterparty_id: str, max_clusters: int = 5) -> list[Ris
         if product:
             evidence.append(f"Reached via {product.label} exposure.")
 
+        top_structural = first_order_structural[0] if first_order_structural else None
+        top_statistical = first_order_statistical[0] if first_order_statistical else None
+        top_first_order_node = first_order_nodes[0] if first_order_nodes else None
+        cluster_events = _relevant_events(qs, first_risk_factor)
+
         cluster = RiskCluster(
             id=f"CLUSTER:{counterparty_id}:{pos.id}",
             counterparty_id=counterparty_id,
             label=_derive_label(rf_chain, reference_entity, first_order_nodes),
             summary=f"{len(direct_nodes)} direct, {len(first_order_nodes)} first-order, {len(contextual_nodes)} contextual — "
                     f"{1 if product else 0} product channel, {len(collateral)} collateral linkage(s)",
+            story=_build_story(counterparty_name, product, reference_entity, top_first_order_node, rf_chain),
+            why_it_matters=_why_it_matters(counterparty_name, reference_entity, product, top_structural, top_statistical),
+            recommended_action=_recommended_action(controls, cluster_events),
             direct_members=[{"id": _bare_id(n.id), "label": n.label} for n in direct_nodes],
             first_order_members=[{"id": _bare_id(n.id), "label": n.label} for n in first_order_nodes],
             contextual_members=[{"id": _bare_id(n.id), "label": n.label} for n in contextual_nodes],
@@ -193,7 +255,7 @@ def build_risk_clusters(counterparty_id: str, max_clusters: int = 5) -> list[Ris
             statistical_relationships=[{k: v for k, v in e.items() if k != "node"} for e in all_statistical],
             transmission_path=[n.label for n in rf_chain],
             collateral_links=collateral,
-            relevant_events=_relevant_events(qs, first_risk_factor),
+            relevant_events=cluster_events,
             relevant_controls=controls,
             evidence=evidence,
             provenance=sorted({"SYNTHETIC_BUSINESS_SCENARIO_DATA"}
