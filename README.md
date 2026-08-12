@@ -1,5 +1,7 @@
 # CCRIG · AI Analyst Platform (POC)
 
+https://akariba.github.io/ccrig/
+
 A working proof-of-concept for a **Counterparty Credit Risk Intelligence Graph (CCRIG)** analyst platform: a candidate-generation-first, feature-vector relationship engine over three logically separate data layers (factual relations, derived relatedness, synthetic counterparty exposure), with an AI Copilot used for parsing/labelling/explanation only — never for bulk pairwise scoring.
 
 This is a strong proof of concept intended to demonstrate the complete business vision described in `BUILD_MANDATE.md`. It is **not** a production architecture decision. See `BUILD_REPORT.md` (repo root) for what is real, what is synthetic, and what remains out of scope, and `docs/LIMITATIONS.md` for known gaps.
