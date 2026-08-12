@@ -1,4 +1,6 @@
-"""Phase 3: Counterparty Risk Clusters - derived views over the canonical graph."""
+"""Phase 3/4: Counterparty Risk Clusters - derived views over the canonical graph,
+with bounded, tiered member expansion (Phase 4 workstream D)."""
+from app.core.config import CLUSTER_MAX_FIRST_ORDER_STRUCTURAL, CLUSTER_MAX_FIRST_ORDER_STATISTICAL
 from app.core.risk_clusters import build_risk_clusters
 
 
@@ -22,9 +24,6 @@ def test_cluster_explains_why_members_are_grouped():
 def test_structural_and_statistical_evidence_kept_separate():
     clusters = build_risk_clusters("CP_FUND_009")
     c = clusters[0]
-    structural_entities = {s["entity"] for s in c.structural_relationships}
-    statistical_entities = {s["entity"] for s in c.statistical_relationships}
-    # both may mention TSMC, but via clearly distinct evidence records, not one merged field
     for s in c.structural_relationships:
         assert "type" in s and "signed_correlation" not in s
     for s in c.statistical_relationships:
@@ -35,15 +34,13 @@ def test_negative_correlation_is_not_dropped_or_treated_as_positive():
     clusters = build_risk_clusters("CP_FUND_009")
     c = clusters[0]
     for s in c.statistical_relationships:
-        # sign must be a real float, not an abs()'d magnitude silently relabeled
         assert isinstance(s["signed_correlation"], float)
 
 
 def test_cluster_does_not_aggregate_pfe_nse_rc_into_one_number():
-    clusters = build_risk_clusters("CP_FUND_009")
-    c = clusters[0]
     import dataclasses
-    fields = dataclasses.asdict(c)
+    clusters = build_risk_clusters("CP_FUND_009")
+    fields = dataclasses.asdict(clusters[0])
     assert "risk_score" not in fields
     assert "total_pfe" not in fields
     assert "aggregate_exposure" not in fields
@@ -53,14 +50,14 @@ def test_cluster_deterministic_across_calls():
     a = build_risk_clusters("CP_FUND_009")
     b = build_risk_clusters("CP_FUND_009")
     assert [c.label for c in a] == [c.label for c in b]
-    assert [c.entities for c in a] == [c.entities for c in b]
+    assert [c.direct_members for c in a] == [c.direct_members for c in b]
+    assert [c.first_order_members for c in a] == [c.first_order_members for c in b]
+    assert [c.contextual_members for c in a] == [c.contextual_members for c in b]
 
 
 def test_relevant_controls_attached_only_from_real_graph_path():
     clusters = build_risk_clusters("CP_PUB_ALPHA")  # has a settlement breach
     assert len(clusters) >= 1
-    # control context comes from the counterparty's own CONTROL edges, not
-    # invented for a market cluster with no real limit/exception on file
     for c in clusters:
         assert isinstance(c.relevant_controls, list)
 
@@ -72,8 +69,55 @@ def test_unknown_counterparty_returns_no_clusters_not_fabricated_ones():
 def test_provenance_reflects_actual_evidence_sources():
     clusters = build_risk_clusters("CP_FUND_009")
     c = clusters[0]
-    assert "SYNTHETIC_BUSINESS_SCENARIO_DATA" in c.provenance  # the exposure position itself
+    assert "SYNTHETIC_BUSINESS_SCENARIO_DATA" in c.provenance
     if c.structural_relationships:
         assert "REAL_PUBLIC_DATA" in c.provenance
     if c.statistical_relationships:
         assert "DERIVED_DATA" in c.provenance
+
+
+# --- Phase 4: member tiering ---
+
+def test_members_are_tiered_direct_first_order_contextual():
+    clusters = build_risk_clusters("CP_FUND_009")  # NVDA has 10 structural + 5+ statistical neighbors
+    c = clusters[0]
+    assert len(c.direct_members) == 1
+    assert c.direct_members[0]["id"] == "NVDA"
+    assert len(c.first_order_members) > 0
+    assert len(c.contextual_members) > 0  # NVDA has enough neighbors to overflow first-order
+
+
+def test_first_order_expansion_is_bounded():
+    clusters = build_risk_clusters("CP_FUND_009")
+    c = clusters[0]
+    # first-order can hold at most structural-cap + statistical-cap distinct entities
+    assert len(c.first_order_members) <= CLUSTER_MAX_FIRST_ORDER_STRUCTURAL + CLUSTER_MAX_FIRST_ORDER_STATISTICAL
+
+
+def test_direct_and_first_order_and_contextual_are_disjoint():
+    clusters = build_risk_clusters("CP_FUND_009")
+    c = clusters[0]
+    direct_ids = {m["id"] for m in c.direct_members}
+    first_order_ids = {m["id"] for m in c.first_order_members}
+    contextual_ids = {m["id"] for m in c.contextual_members}
+    assert direct_ids.isdisjoint(first_order_ids)
+    assert first_order_ids.isdisjoint(contextual_ids)
+    assert direct_ids.isdisjoint(contextual_ids)
+
+
+def test_first_order_prioritizes_strongest_structural_relationship():
+    # NVDA's strongest structural edge (by fact criticality) is TSMC at 0.95 -
+    # the real primary foundry dependency - not whichever supply edge
+    # happened to be inserted first into the source data.
+    clusters = build_risk_clusters("CP_FUND_009")
+    c = clusters[0]
+    first_order_labels = {m["label"] for m in c.first_order_members}
+    assert "Taiwan Semiconductor Manufacturing Co (TSMC)" in first_order_labels
+
+
+def test_full_candidate_set_still_available_beyond_first_order():
+    # bounding the TIER doesn't mean discarding evidence - the full ranked
+    # list remains in structural_relationships/statistical_relationships
+    clusters = build_risk_clusters("CP_FUND_009")
+    c = clusters[0]
+    assert len(c.structural_relationships) >= CLUSTER_MAX_FIRST_ORDER_STRUCTURAL

@@ -67,6 +67,7 @@ export const api = {
   },
   priorityDetail: (id: string) => req<any>(`/api/priority-queue/${id}`),
   riskClusters: (id: string) => req<any>(`/api/priority-queue/${id}/risk-clusters`),
+  metricDefinition: (id: string) => req<any>(`/api/metric-definitions/${id}`),
   breaches: (params: Record<string, string> = {}) => {
     const qs = new URLSearchParams(params).toString();
     return req<any>(`/api/breaches${qs ? "?" + qs : ""}`);

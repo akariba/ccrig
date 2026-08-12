@@ -6,6 +6,7 @@ import { RelatednessWaterfall } from "../components/Waterfall";
 import { RiskPath, pathFromHops } from "../components/RiskPath";
 import { useInvestigation } from "../context/InvestigationContext";
 import { RANKED_ONLY } from "../graph/edgeLabels";
+import { MetricDefinitionLink } from "../components/MetricDefinition";
 
 const EXAMPLES = ["NVDA", "TSM", "interest rate volatility", "Meridian Alpha Rates Fund"];
 
@@ -227,7 +228,10 @@ export function RelationshipWorkbench() {
 
               {explain.pair.vector.market_detail && (
                 <>
-                  <div className="section-title" style={{ fontSize: 11, marginTop: 18 }}>Correlation (signed — never absolute-valued)</div>
+                  <div className="hstack" style={{ justifyContent: "space-between", marginTop: 18 }}>
+                    <div className="section-title" style={{ marginBottom: 0 }}>Correlation (signed — never absolute-valued)</div>
+                    <MetricDefinitionLink id="MARKET_CORRELATION" />
+                  </div>
                   <div className="grid-3" style={{ fontSize: 12.5 }}>
                     <Field label="Full-sample" value={explain.pair.vector.market_detail.full_sample_corr} />
                     <Field label={`Rolling (${explain.pair.vector.market_detail.rolling_window_days}d)`} value={explain.pair.vector.market_detail.rolling_corr} />
@@ -242,7 +246,10 @@ export function RelationshipWorkbench() {
 
               {explain.pair.composite.score != null && (
                 <>
-                  <div className="section-title" style={{ fontSize: 11, marginTop: 18 }}>Score waterfall</div>
+                  <div className="hstack" style={{ justifyContent: "space-between", marginTop: 18 }}>
+                    <div className="section-title" style={{ marginBottom: 0 }}>Score waterfall</div>
+                    <MetricDefinitionLink id="COMPOSITE_RELATEDNESS" label="How calculated?" />
+                  </div>
                   <RelatednessWaterfall
                     waterfall={explain.pair.composite.waterfall}
                     excluded={explain.pair.composite.excluded_components}

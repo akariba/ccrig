@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { api } from "../api/client";
 import { DataBadge, EvidenceBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
+import { MetricDefinitionLink } from "../components/MetricDefinition";
 import { RiskPath, pathFromHops } from "../components/RiskPath";
 
 function PriorityTag({ priority }: { priority: string }) {
@@ -103,6 +104,9 @@ export function Entity360() {
               </div>
               <div className="grid-2" style={{ marginTop: 10 }}>
                 <div>
+                  <div className="hstack" style={{ justifyContent: "flex-end", marginBottom: 4 }}>
+                    <MetricDefinitionLink id="COMPOSITE_RELATEDNESS" label="How calculated?" />
+                  </div>
                   {explain.pair.composite.score != null ? (
                     <RelatednessWaterfall
                       waterfall={explain.pair.composite.waterfall}
@@ -131,7 +135,10 @@ export function Entity360() {
                   )}
                   {explain.pair.vector.market_detail && (
                     <div style={{ marginTop: 10, fontSize: 12 }}>
-                      <div className="section-title">Correlation (signed)</div>
+                      <div className="hstack" style={{ justifyContent: "space-between" }}>
+                        <div className="section-title" style={{ marginBottom: 0 }}>Correlation (signed)</div>
+                        <MetricDefinitionLink id="MARKET_CORRELATION" />
+                      </div>
                       Full-sample <span className="mono">{explain.pair.vector.market_detail.full_sample_corr}</span>
                       {" · "}rolling <span className="mono">{explain.pair.vector.market_detail.rolling_corr ?? "n/a"}</span>
                       {" · "}stress-window <span className="mono">{explain.pair.vector.market_detail.stress_window_corr ?? "n/a"}</span>

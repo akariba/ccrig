@@ -1,4 +1,4 @@
-"""Phase 3: Counterparty Risk Clusters - derived views over the canonical
+"""Phase 3/4: Counterparty Risk Clusters - derived views over the canonical
 Connected Risk Graph (graph_query.py), never a manually curated dashboard
 section. A cluster answers "what common economic risk theme concentrates
 this counterparty's existing exposure?", built by traversing outward from
@@ -12,11 +12,21 @@ No cluster is invented where the graph has no evidence for it - a
 counterparty with one exposure record and no structural/statistical
 neighbors gets one small, honestly labeled cluster, not a fabricated
 "Semiconductor / AI" just because that phrase is expected somewhere.
+
+Phase 4 addition: members are tiered (DIRECT / FIRST_ORDER / CONTEXTUAL)
+rather than dumped as one flat list - a broad equity exposure can nominate
+a dozen+ statistically/structurally adjacent names, and presenting all of
+them as equally relevant buries the two or three that actually matter.
+Expansion is bounded by explicit config (CLUSTER_* in config.py), never
+an unbounded graph walk.
 """
 from dataclasses import dataclass, field
-from typing import Any
 
-from .graph_model import GraphNode, GraphEdge, counterparty_node_id
+from .config import (
+    CLUSTER_MAX_FIRST_ORDER_STRUCTURAL, CLUSTER_MAX_FIRST_ORDER_STATISTICAL,
+    CLUSTER_MAX_CONTEXTUAL_MEMBERS, CLUSTER_SECTOR_LABEL_MIN_SHARE,
+)
+from .graph_model import GraphNode, counterparty_node_id
 from .graph_query import get_query_service
 
 
@@ -26,8 +36,10 @@ class RiskCluster:
     counterparty_id: str
     label: str
     summary: str
+    direct_members: list[dict] = field(default_factory=list)
+    first_order_members: list[dict] = field(default_factory=list)
+    contextual_members: list[dict] = field(default_factory=list)
     risk_factors: list[str] = field(default_factory=list)
-    entities: list[dict] = field(default_factory=list)
     products: list[str] = field(default_factory=list)
     structural_relationships: list[dict] = field(default_factory=list)
     statistical_relationships: list[dict] = field(default_factory=list)
@@ -71,12 +83,21 @@ def _relevant_events(qs, first_risk_factor: GraphNode | None) -> list[dict]:
     return events
 
 
-def _derive_label(risk_factor_chain: list[GraphNode], reference_entity: GraphNode | None) -> str:
-    if risk_factor_chain:
-        return " / ".join(n.label for n in risk_factor_chain[:2])
+def _derive_label(rf_chain: list[GraphNode], reference_entity: GraphNode | None,
+                   first_order_entities: list[GraphNode]) -> str:
+    # Prefer a sector label ONLY when a real majority of the first-order
+    # neighborhood actually shares it with the reference entity - otherwise
+    # a label like "Semiconductors" would overstate consensus that isn't
+    # there (e.g. one supplier out of five unrelated correlated names).
+    if reference_entity and reference_entity.metadata.get("sector") and first_order_entities:
+        sector = reference_entity.metadata["sector"]
+        share = sum(1 for n in first_order_entities if n.metadata.get("sector") == sector) / len(first_order_entities)
+        if share >= CLUSTER_SECTOR_LABEL_MIN_SHARE:
+            return sector
+    if rf_chain:
+        return " / ".join(n.label for n in rf_chain[:2])
     if reference_entity:
-        sector = reference_entity.metadata.get("sector")
-        return sector if sector else reference_entity.label
+        return reference_entity.label
     return "Mixed market-risk cluster"
 
 
@@ -101,29 +122,54 @@ def build_risk_clusters(counterparty_id: str, max_clusters: int = 5) -> list[Ris
                                    if n.type == "RISK_FACTOR" and e.type == "EXPOSED_TO_RISK_FACTOR"), None)
         rf_chain = _transmission_chain(qs, first_risk_factor) if first_risk_factor else []
 
-        structural, statistical, related_entities = [], [], []
+        all_structural, all_statistical = [], []
         if reference_entity:
             bare = _bare_id(reference_entity.id)
-            for n, e, rev in qs.get_structural_relationships(bare):
-                if n.type != "ENTITY":
-                    continue
-                structural.append({"entity": n.label, "type": e.type, "reverse": rev,
-                                    "evidence_url": (e.evidence or {}).get("evidence_url")})
-                related_entities.append(n)
-            for s in qs.get_statistical_relationships(bare)[:5]:
+            # Ranked by strength (fact criticality) - NOT insertion order -
+            # so e.g. TSMC (0.95, the actual primary foundry dependency)
+            # outranks a weaker/incidental supply edge.
+            struct_neighbors = sorted(
+                (t for t in qs.get_structural_relationships(bare) if t[0].type == "ENTITY"),
+                key=lambda t: -(t[1].strength or 0),
+            )
+            for n, e, rev in struct_neighbors:
+                all_structural.append({"node": n, "entity": n.label, "type": e.type, "reverse": rev,
+                                        "strength": e.strength, "evidence_url": (e.evidence or {}).get("evidence_url")})
+            for s in qs.get_statistical_relationships(bare):  # already sorted by |correlation| desc
                 other = qs.get_node(s["target_node_id"])
-                statistical.append({"entity": other.label if other else s["target_node_id"],
-                                     "signed_correlation": round(s["signed_value"], 3), "method": s["evidence"]["method"]})
                 if other:
-                    related_entities.append(other)
+                    all_statistical.append({"node": other, "entity": other.label,
+                                             "signed_correlation": round(s["signed_value"], 3), "method": s["evidence"]["method"]})
 
-        entities = ([reference_entity] if reference_entity else []) + related_entities
+        # --- bounded tiering: DIRECT -> FIRST_ORDER (capped) -> CONTEXTUAL (capped) ---
+        # Dedup keyed by node.id in a plain dict (insertion-order preserving)
+        # rather than a set of nodes - GraphNode isn't hashable (it carries a
+        # dict `metadata` field) and, separately, Python's string-hash
+        # randomization would otherwise make ordering non-deterministic
+        # across process runs even if it were.
+        def _dedup(items: list[dict]) -> list[GraphNode]:
+            seen: dict[str, GraphNode] = {}
+            for e in items:
+                seen.setdefault(e["node"].id, e["node"])
+            return list(seen.values())
+
+        direct_nodes = [reference_entity] if reference_entity else []
+        first_order_structural = all_structural[:CLUSTER_MAX_FIRST_ORDER_STRUCTURAL]
+        first_order_statistical = all_statistical[:CLUSTER_MAX_FIRST_ORDER_STATISTICAL]
+        first_order_nodes = _dedup(first_order_structural + first_order_statistical)
+        first_order_ids = {n.id for n in first_order_nodes}
+
+        contextual_structural = all_structural[CLUSTER_MAX_FIRST_ORDER_STRUCTURAL:]
+        contextual_statistical = all_statistical[CLUSTER_MAX_FIRST_ORDER_STATISTICAL:]
+        contextual_nodes = [n for n in _dedup(contextual_structural + contextual_statistical)
+                             if n.id not in first_order_ids][:CLUSTER_MAX_CONTEXTUAL_MEMBERS]
+
         evidence = []
-        if structural:
+        if first_order_structural:
             evidence.append(f"{reference_entity.label} has a documented structural relationship with "
-                             f"{', '.join(s['entity'] for s in structural[:3])}.")
-        if statistical:
-            top = statistical[0]
+                             f"{', '.join(e['entity'] for e in first_order_structural)}.")
+        if first_order_statistical:
+            top = first_order_statistical[0]
             evidence.append(f"{reference_entity.label} and {top['entity']} show "
                              f"{'positive' if top['signed_correlation'] >= 0 else 'inverse'} market correlation "
                              f"({top['signed_correlation']:+.2f}).")
@@ -135,22 +181,24 @@ def build_risk_clusters(counterparty_id: str, max_clusters: int = 5) -> list[Ris
         cluster = RiskCluster(
             id=f"CLUSTER:{counterparty_id}:{pos.id}",
             counterparty_id=counterparty_id,
-            label=_derive_label(rf_chain, reference_entity),
-            summary=f"{len(entities)} related entit{'y' if len(entities) == 1 else 'ies'}, "
+            label=_derive_label(rf_chain, reference_entity, first_order_nodes),
+            summary=f"{len(direct_nodes)} direct, {len(first_order_nodes)} first-order, {len(contextual_nodes)} contextual — "
                     f"{1 if product else 0} product channel, {len(collateral)} collateral linkage(s)",
+            direct_members=[{"id": _bare_id(n.id), "label": n.label} for n in direct_nodes],
+            first_order_members=[{"id": _bare_id(n.id), "label": n.label} for n in first_order_nodes],
+            contextual_members=[{"id": _bare_id(n.id), "label": n.label} for n in contextual_nodes],
             risk_factors=[n.label for n in rf_chain],
-            entities=[{"id": _bare_id(n.id), "label": n.label} for n in {e.id: e for e in entities}.values()],
             products=[product.label] if product else [],
-            structural_relationships=structural,
-            statistical_relationships=statistical,
+            structural_relationships=[{k: v for k, v in e.items() if k != "node"} for e in all_structural],
+            statistical_relationships=[{k: v for k, v in e.items() if k != "node"} for e in all_statistical],
             transmission_path=[n.label for n in rf_chain],
             collateral_links=collateral,
             relevant_events=_relevant_events(qs, first_risk_factor),
             relevant_controls=controls,
             evidence=evidence,
             provenance=sorted({"SYNTHETIC_BUSINESS_SCENARIO_DATA"}
-                               | ({"REAL_PUBLIC_DATA"} if structural else set())
-                               | ({"DERIVED_DATA"} if statistical else set())),
+                               | ({"REAL_PUBLIC_DATA"} if all_structural else set())
+                               | ({"DERIVED_DATA"} if all_statistical else set())),
         )
         clusters.append(cluster)
 

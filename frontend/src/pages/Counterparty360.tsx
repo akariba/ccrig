@@ -7,7 +7,7 @@ import type { GraphPath } from "../graph/types";
 
 function clusterFocusedPath(cluster: any, counterpartyLabel: string): GraphPath | null {
   const product = cluster.products?.[0];
-  const referenceEntity = cluster.entities?.[0];
+  const referenceEntity = cluster.direct_members?.[0];
   if (!referenceEntity) return null;
   const nodes = [
     { id: "cp", type: "COUNTERPARTY" as const, label: counterpartyLabel },
@@ -23,9 +23,33 @@ function clusterFocusedPath(cluster: any, counterpartyLabel: string): GraphPath 
 }
 
 function ClusterInspector({ cluster, counterpartyLabel }: { cluster: any; counterpartyLabel: string }) {
+  const [showContextual, setShowContextual] = useState(false);
   const path = clusterFocusedPath(cluster, counterpartyLabel);
   return (
     <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
+      <div className="section-title" style={{ fontSize: 11 }}>Direct exposure</div>
+      <div style={{ fontSize: 12.5, marginBottom: 8 }}>{cluster.direct_members.map((m: any) => m.label).join(", ") || "—"}</div>
+
+      {cluster.first_order_members?.length > 0 && (
+        <>
+          <div className="section-title" style={{ fontSize: 11 }}>First-order relationships</div>
+          <div style={{ fontSize: 12.5, marginBottom: 8 }}>{cluster.first_order_members.map((m: any) => m.label).join(", ")}</div>
+        </>
+      )}
+
+      {cluster.contextual_members?.length > 0 && (
+        <div style={{ marginBottom: 12 }}>
+          <button className="btn secondary" style={{ padding: "2px 8px", fontSize: 10.5 }} onClick={() => setShowContextual(!showContextual)}>
+            {showContextual ? "Hide" : `Show ${cluster.contextual_members.length} more contextual relationships`}
+          </button>
+          {showContextual && (
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 6 }}>
+              {cluster.contextual_members.map((m: any) => m.label).join(", ")}
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="section-title" style={{ fontSize: 11 }}>Why grouped</div>
       <ul style={{ margin: "4px 0 12px 18px", fontSize: 12.5 }}>
         {cluster.evidence.map((e: string, i: number) => <li key={i}>{e}</li>)}

@@ -1,10 +1,12 @@
 """Scenario Replay / Backtest Prototype, Data & Provenance Explorer,
 Scalability simulator, and health/AI-mode endpoints grouped together since
 each is a small, mostly read-only surface over its core module."""
+from dataclasses import asdict
 from fastapi import APIRouter, HTTPException
 from ..core import backtest as backtest_mod
 from ..core import provenance as provenance_mod
 from ..core import scalability as scalability_mod
+from ..core import metric_definitions as metric_definitions_mod
 from ..ai.provider import PROVIDER
 from ..core.config import AI_ENABLED, AI_MODEL
 
@@ -43,3 +45,19 @@ def provenance_coverage():
 @router.get("/scalability/simulate")
 def scalability_simulate():
     return scalability_mod.full_report()
+
+
+@router.get("/metric-definitions")
+def metric_definitions():
+    """The single canonical source every 'Definition' / 'How calculated?'
+    UI affordance reads from - a metric must never be explained differently
+    on two different pages."""
+    return {"results": [asdict(d) for d in metric_definitions_mod.list_metric_definitions()]}
+
+
+@router.get("/metric-definitions/{metric_id}")
+def metric_definition(metric_id: str):
+    d = metric_definitions_mod.get_metric_definition(metric_id)
+    if not d:
+        raise HTTPException(404, f"No metric definition for '{metric_id}'")
+    return asdict(d)

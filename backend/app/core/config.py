@@ -75,6 +75,21 @@ STRESS_WINDOW_DAYS = 10
 # validated production threshold; purely a POC candidate-surfacing cutoff.
 STATISTICAL_EDGE_MIN_ABS_CORRELATION = 0.3
 
+# POC_HEURISTIC: bounds on risk-cluster member expansion (core/risk_clusters.py).
+# A broad equity exposure can nominate a dozen+ structurally/statistically
+# adjacent names - these caps keep the DEFAULT view to what's actually
+# analyst-relevant; the full candidate set is still computed and available
+# via structural_relationships/statistical_relationships, just not all
+# presented as equally important FIRST_ORDER members.
+CLUSTER_MAX_FIRST_ORDER_STRUCTURAL = 3
+CLUSTER_MAX_FIRST_ORDER_STATISTICAL = 2
+CLUSTER_MAX_CONTEXTUAL_MEMBERS = 10
+# Minimum share of the first-order neighborhood that must share the
+# reference entity's sector before the cluster label uses that sector name
+# (e.g. "Semiconductors") - below this, a sector label would overstate a
+# consensus that isn't actually there.
+CLUSTER_SECTOR_LABEL_MIN_SHARE = 0.5
+
 # --- CCR Daily Review priority-engine thresholds ---
 # EXPLICITLY POC_HEURISTIC: these are illustrative POC cut-offs for this
 # demo dataset, NOT a real institution's risk appetite. Centralised here
