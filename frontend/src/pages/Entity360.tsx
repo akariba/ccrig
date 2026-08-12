@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { api } from "../api/client";
 import { DataBadge, EvidenceBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
+import { RiskPath, pathFromHops } from "../components/RiskPath";
 
 function PriorityTag({ priority }: { priority: string }) {
   const color = priority === "CRITICAL" ? "var(--error)" : priority === "HIGH" ? "var(--warning)" : priority === "MEDIUM" ? "var(--chart-6)" : "var(--success)";
@@ -117,12 +118,10 @@ export function Entity360() {
                     <div className="ai-label">Explanation</div>
                     {explain.ai_explanation}
                   </div>
-                  {explain.typed_path && (
+                  {explain.typed_path?.hops?.length > 0 && (
                     <div style={{ marginTop: 10, fontSize: 12 }}>
                       <div className="section-title">Typed path (deterministic, not AI)</div>
-                      <span className="mono">
-                        {explain.typed_path.pattern} — {explain.typed_path.hops?.map((hop: any) => `${hop.from} --${hop.relation}--> ${hop.to}`).join(", ")}
-                      </span>
+                      <RiskPath {...pathFromHops(explain.typed_path.hops)} />
                       {explain.typed_path.hops?.[0]?.evidence_url && (
                         <div style={{ marginTop: 4 }}>
                           <a href={explain.typed_path.hops[0].evidence_url} target="_blank" rel="noreferrer">evidence source</a>

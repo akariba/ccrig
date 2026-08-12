@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
+import { RiskPath, pathFromChain } from "../components/RiskPath";
 
 const PRIORITY_COLOR: Record<string, string> = {
   CRITICAL: "var(--error)", HIGH: "var(--warning)", MEDIUM: "var(--chart-6)", LOW: "var(--success)",
@@ -158,8 +159,9 @@ export function Counterparty360() {
                   <Field label="Watchlist" value={r.watchlist ? "Yes" : "No"} />
                 </div>
                 {r.risk_factor_path?.length > 0 && (
-                  <div style={{ fontSize: 12.5, marginTop: 6 }}>
-                    <strong>Risk-factor transmission path:</strong> {r.risk_factor_path.join(" → ")}
+                  <div style={{ marginTop: 10 }}>
+                    <div style={{ fontSize: 11, color: "var(--text-faint)", marginBottom: 6 }}>Risk-factor transmission path</div>
+                    <RiskPath {...pathFromChain(r.risk_factor_path)} />
                   </div>
                 )}
                 {r.reference_entity_id && (
@@ -231,8 +233,12 @@ export function Counterparty360() {
             {r && tab === "exposure" && (
               <>
                 {r.decision.economic_exposure_paths?.length > 0 && (
-                  <div className="mono" style={{ fontSize: 12.5, marginBottom: 8, color: "var(--primary)" }}>
-                    {r.decision.economic_exposure_paths.join("  ·  ")}
+                  <div style={{ marginBottom: 12 }}>
+                    {r.decision.economic_exposure_paths.map((p: string, i: number) => (
+                      <div key={i} style={{ marginBottom: 6 }}>
+                        <RiskPath {...pathFromChain(p.split(" → "))} />
+                      </div>
+                    ))}
                   </div>
                 )}
                 <div className="grid-3">

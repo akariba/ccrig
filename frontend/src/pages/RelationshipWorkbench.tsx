@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
+import { RiskPath, pathFromHops } from "../components/RiskPath";
 
 const EXAMPLES = ["NVDA", "TSM", "interest rate volatility", "Meridian Alpha Rates Fund"];
 
@@ -166,9 +167,10 @@ export function RelationshipWorkbench() {
 
               <div className="section-title" style={{ fontSize: 11, marginTop: 4 }}>Why connected</div>
               <div className="ai-box">{explain.ai_explanation}</div>
-              {explain.typed_path && (
-                <div style={{ marginTop: 8, fontSize: 12 }}>
-                  <strong>Structural path (typed, deterministic):</strong> <span className="mono">{explain.typed_path.pattern}</span>
+              {explain.typed_path?.hops?.length > 0 && (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ fontSize: 11, color: "var(--text-faint)", marginBottom: 6 }}>Structural path (typed, deterministic)</div>
+                  <RiskPath {...pathFromHops(explain.typed_path.hops)} />
                 </div>
               )}
 

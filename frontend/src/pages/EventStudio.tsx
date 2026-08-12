@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
+import { RiskPath, pathFromChain } from "../components/RiskPath";
 
 const SAMPLES = [
   "A major earthquake in Taiwan disrupts semiconductor fabrication facilities.",
@@ -101,17 +102,23 @@ export function EventStudio() {
               <div className="warning-box" style={{ marginTop: 8 }}>{result.materiality_join.note}</div>
 
               {(() => {
-                const paths = Array.from(new Set(
-                  result.materiality_join.results
-                    .filter((r: any) => r.risk_factor_path?.length > 0)
-                    .map((r: any) => r.risk_factor_path.join(" → "))
-                )) as string[];
+                const seen = new Set<string>();
+                const paths: string[][] = [];
+                for (const r of result.materiality_join.results) {
+                  if (!r.risk_factor_path?.length) continue;
+                  const key = r.risk_factor_path.join(" → ");
+                  if (seen.has(key)) continue;
+                  seen.add(key);
+                  paths.push(r.risk_factor_path);
+                }
                 if (paths.length === 0) return null;
                 return (
                   <div style={{ marginTop: 10 }}>
                     <div className="section-title" style={{ fontSize: 11 }}>Transmission — how the risk actually propagates</div>
                     {paths.map((p, i) => (
-                      <div key={i} className="mono" style={{ fontSize: 12.5, color: "var(--primary)", marginBottom: 4 }}>{p}</div>
+                      <div key={i} style={{ marginBottom: 8 }}>
+                        <RiskPath {...pathFromChain(p)} />
+                      </div>
                     ))}
                   </div>
                 );
