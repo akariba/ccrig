@@ -3,26 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { api } from "../api/client";
 import { DataBadge, EvidenceBadge } from "../components/Badge";
-
-const COMPONENT_LABEL: Record<string, string> = {
-  sector: "Sector match", geography: "Geography", supply_chain: "Supply chain",
-  ownership: "Ownership", semantic: "Semantic (TF-IDF)", news: "News co-occurrence",
-  market_positive: "Market corr. (+)", market_negative: "Market corr. (–)",
-};
-
-function ScoreBar({ label, value }: { label: string; value: number | null }) {
-  return (
-    <div style={{ marginBottom: 8 }}>
-      <div className="hstack" style={{ justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)" }}>
-        <span>{label}</span>
-        <span className="mono">{value === null ? "n/a" : value.toFixed(2)}</span>
-      </div>
-      <div className="score-bar-track">
-        <div className="score-bar-fill" style={{ width: `${value === null ? 0 : value * 100}%`, opacity: value === null ? 0.15 : 1 }} />
-      </div>
-    </div>
-  );
-}
+import { RelatednessWaterfall } from "../components/Waterfall";
 
 function PriorityTag({ priority }: { priority: string }) {
   const color = priority === "CRITICAL" ? "var(--error)" : priority === "HIGH" ? "var(--warning)" : priority === "MEDIUM" ? "var(--chart-6)" : "var(--success)";
@@ -121,9 +102,15 @@ export function Entity360() {
               </div>
               <div className="grid-2" style={{ marginTop: 10 }}>
                 <div>
-                  {Object.entries(explain.pair.composite.component_values).map(([k, v]) => (
-                    <ScoreBar key={k} label={COMPONENT_LABEL[k] || k} value={v as number | null} />
-                  ))}
+                  {explain.pair.composite.score != null ? (
+                    <RelatednessWaterfall
+                      waterfall={explain.pair.composite.waterfall}
+                      excluded={explain.pair.composite.excluded_components}
+                      score={explain.pair.composite.score}
+                    />
+                  ) : (
+                    <div className="empty-state">No components available for this pair.</div>
+                  )}
                 </div>
                 <div>
                   <div className="ai-box">
@@ -141,6 +128,14 @@ export function Entity360() {
                           <a href={explain.typed_path.hops[0].evidence_url} target="_blank" rel="noreferrer">evidence source</a>
                         </div>
                       )}
+                    </div>
+                  )}
+                  {explain.pair.vector.market_detail && (
+                    <div style={{ marginTop: 10, fontSize: 12 }}>
+                      <div className="section-title">Correlation (signed)</div>
+                      Full-sample <span className="mono">{explain.pair.vector.market_detail.full_sample_corr}</span>
+                      {" · "}rolling <span className="mono">{explain.pair.vector.market_detail.rolling_corr ?? "n/a"}</span>
+                      {" · "}stress-window <span className="mono">{explain.pair.vector.market_detail.stress_window_corr ?? "n/a"}</span>
                     </div>
                   )}
                 </div>

@@ -13,6 +13,17 @@ from .config import DEFAULT_WEIGHTS
 SUPPLY_RELATIONS = {"SUPPLIES", "CUSTOMER_OF", "LICENSES_TO", "LICENSES_FROM"}
 OWNERSHIP_RELATIONS = {"PARENT_OF", "SUBSIDIARY_OF"}
 
+COMPONENT_LABELS = {
+    "sector": "Sector match",
+    "geography": "Geography",
+    "supply_chain": "Supply chain",
+    "ownership": "Ownership",
+    "semantic": "Semantic (TF-IDF)",
+    "news": "News co-occurrence",
+    "market_positive": "Market corr. (+)",
+    "market_negative": "Market corr. (–)",
+}
+
 
 def _sector_similarity(a, b):
     ea, eb = STORE.entity(a), STORE.entity(b)
@@ -151,6 +162,29 @@ def composite_score(vec, weights=None, round_output=True):
         return {"score": None, "missing_components": missing, "used_weights": {}, "ownership_status": ownership_status}
     used_weights = {k: w.get(k, 0) / weight_sum for k in available}
     score = sum(available[k] * used_weights[k] for k in available)
+    # Exact decomposition of the weighted average above - each entry's
+    # contribution is component_value * renormalized_weight, and the entries
+    # sum EXACTLY to `score` (mod display rounding). This is a direct
+    # decomposition of an explicit formula, not a SHAP/feature-attribution
+    # estimate - it reconciles precisely because the formula is linear once
+    # weights are renormalized over available components.
+    waterfall = sorted(
+        (
+            {
+                "component": k,
+                "label": COMPONENT_LABELS[k],
+                "raw_value": round(available[k], 4),
+                "weight": round(used_weights[k], 4),
+                "contribution": round(available[k] * used_weights[k], 4),
+            }
+            for k in available
+        ),
+        key=lambda entry: -entry["contribution"],
+    )
+    excluded = [
+        {"component": k, "label": COMPONENT_LABELS[k], "reason": ownership_status if k == "ownership" else "unavailable for this pair"}
+        for k in missing
+    ]
     return {
         "score": round(score, 4) if round_output else score,
         "component_values": component_map,
@@ -158,6 +192,8 @@ def composite_score(vec, weights=None, round_output=True):
         "used_weights": {k: (round(v, 4) if round_output else v) for k, v in used_weights.items()},
         "raw_weights": w,
         "ownership_status": ownership_status,
+        "waterfall": waterfall,
+        "excluded_components": excluded,
     }
 
 

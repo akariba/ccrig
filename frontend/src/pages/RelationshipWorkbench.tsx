@@ -2,25 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
-
-const COMPONENT_LABEL: Record<string, string> = {
-  sector: "Sector match", geography: "Geography", supply_chain: "Supply chain",
-  ownership: "Ownership", semantic: "Semantic (TF-IDF)", news: "News co-occurrence",
-  market_positive: "Market corr. (+)", market_negative: "Market corr. (–)",
-};
+import { RelatednessWaterfall } from "../components/Waterfall";
 
 const EXAMPLES = ["NVDA", "TSM", "interest rate volatility", "Meridian Alpha Rates Fund"];
 
-function ScoreBar({ label, value }: { label: string; value: number | null }) {
+function Field({ label, value }: { label: string; value: number | null | undefined }) {
   return (
-    <div style={{ marginBottom: 8 }}>
-      <div className="hstack" style={{ justifyContent: "space-between", fontSize: 11.5, color: "var(--text-muted)" }}>
-        <span>{label}</span>
-        <span className="mono">{value === null ? "n/a" : value.toFixed(2)}</span>
-      </div>
-      <div className="score-bar-track">
-        <div className="score-bar-fill" style={{ width: `${value === null ? 0 : value * 100}%`, opacity: value === null ? 0.15 : 1 }} />
-      </div>
+    <div>
+      <div style={{ color: "var(--text-muted)", fontSize: 11 }}>{label}</div>
+      <div className="mono" style={{ fontWeight: 600 }}>{value == null ? "n/a" : (value > 0 ? "+" : "") + value.toFixed(3)}</div>
     </div>
   );
 }
@@ -173,30 +163,54 @@ export function RelationshipWorkbench() {
           {explain && inspecting && (
             <div className="card">
               <div className="section-title">Relationship inspector — {entityData.header.id} ↔ {inspecting}</div>
-              <div className="grid-2">
-                <div>
-                  {Object.entries(explain.pair.composite.component_values).map(([k, v]) => (
-                    <ScoreBar key={k} label={COMPONENT_LABEL[k] || k} value={v as number | null} />
-                  ))}
+
+              <div className="section-title" style={{ fontSize: 11, marginTop: 4 }}>Why connected</div>
+              <div className="ai-box">{explain.ai_explanation}</div>
+              {explain.typed_path && (
+                <div style={{ marginTop: 8, fontSize: 12 }}>
+                  <strong>Structural path (typed, deterministic):</strong> <span className="mono">{explain.typed_path.pattern}</span>
                 </div>
-                <div>
-                  <div className="ai-box">
-                    <div className="ai-label">Why connected</div>
-                    {explain.ai_explanation}
+              )}
+
+              {explain.pair.vector.market_detail && (
+                <>
+                  <div className="section-title" style={{ fontSize: 11, marginTop: 18 }}>Correlation (signed — never absolute-valued)</div>
+                  <div className="grid-3" style={{ fontSize: 12.5 }}>
+                    <Field label="Full-sample" value={explain.pair.vector.market_detail.full_sample_corr} />
+                    <Field label={`Rolling (${explain.pair.vector.market_detail.rolling_window_days}d)`} value={explain.pair.vector.market_detail.rolling_corr} />
+                    <Field label={`Stress window (${explain.pair.vector.market_detail.stress_window_days}d)`} value={explain.pair.vector.market_detail.stress_window_corr} />
                   </div>
-                  {explain.typed_path && (
-                    <div style={{ marginTop: 10, fontSize: 12 }}>
-                      <div className="section-title">Structural path (typed, deterministic)</div>
-                      <span className="mono">{explain.typed_path.pattern}</span>
-                    </div>
-                  )}
+                  <p style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 4 }}>
+                    This signed value is not the same as the market-correlation bar below — the waterfall contribution is a
+                    directional channel derived from it (positive channel = max(ρ,0), inverse channel = max(-ρ,0)).
+                  </p>
+                </>
+              )}
+
+              {explain.pair.composite.score != null && (
+                <>
+                  <div className="section-title" style={{ fontSize: 11, marginTop: 18 }}>Score waterfall</div>
+                  <RelatednessWaterfall
+                    waterfall={explain.pair.composite.waterfall}
+                    excluded={explain.pair.composite.excluded_components}
+                    score={explain.pair.composite.score}
+                  />
+                </>
+              )}
+
+              {entityData.counterparty_materiality?.results?.length > 0 && (
+                <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+                  <a style={{ cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}
+                    onClick={() => document.getElementById("business-exposure")?.scrollIntoView({ behavior: "smooth" })}>
+                    View exposure implications ↓
+                  </a>
                 </div>
-              </div>
+              )}
             </div>
           )}
 
           {entityData.counterparty_materiality?.results?.length > 0 && (
-            <div className="card">
+            <div className="card" id="business-exposure">
               <div className="section-title">Business exposure — asked only after the relationship is established</div>
               <table className="table">
                 <thead><tr><th>Counterparty</th><th>Priority</th><th>PFE</th></tr></thead>
