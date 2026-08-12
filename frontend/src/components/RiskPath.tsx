@@ -40,3 +40,13 @@ export function pathFromHops(hops: { from: string; to: string; relation: string 
 export function pathFromChain(labels: string[]): { nodes: string[]; edgeLabels: (string | null)[] } {
   return { nodes: labels, edgeLabels: labels.slice(0, -1).map(() => null) };
 }
+
+// Renders the analyst's InvestigationContext (see context/InvestigationContext.tsx)
+// as a typed RiskPath - each step already carries the edge type that led to
+// it (relationFromPrevious), so "TSMC > NVIDIA > Counterparty" in the
+// breadcrumb and "TSMC --SUPPLIES--> NVIDIA --TRS--> Counterparty" here are
+// two views of the exact same underlying investigation object, not two
+// separately-maintained representations.
+export function pathFromInvestigation(steps: { label: string; relationFromPrevious: string | null }[]): { nodes: string[]; edgeLabels: (string | null)[] } {
+  return { nodes: steps.map((s) => s.label), edgeLabels: steps.slice(1).map((s) => s.relationFromPrevious) };
+}

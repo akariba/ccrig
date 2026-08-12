@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { InvestigationProvider } from "./context/InvestigationContext";
 import { DailyReview } from "./pages/DailyReview";
 import { RelationshipWorkbench } from "./pages/RelationshipWorkbench";
 import { ThemeRadar } from "./pages/ThemeRadar";
@@ -16,6 +17,7 @@ import { ExposureMovers } from "./pages/ExposureMovers";
 export default function App() {
   return (
     <BrowserRouter>
+      <InvestigationProvider>
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<RelationshipWorkbench />} />
@@ -32,6 +34,7 @@ export default function App() {
           <Route path="/provenance" element={<Provenance />} />
         </Route>
       </Routes>
+      </InvestigationProvider>
     </BrowserRouter>
   );
 }

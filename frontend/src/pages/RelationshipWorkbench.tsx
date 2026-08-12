@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
 import { RiskPath, pathFromHops } from "../components/RiskPath";
+import { useInvestigation } from "../context/InvestigationContext";
 
 const EXAMPLES = ["NVDA", "TSM", "interest rate volatility", "Meridian Alpha Rates Fund"];
+
+const linklikeBtn: React.CSSProperties = {
+  background: "none", border: "none", padding: 0, color: "var(--primary)", cursor: "pointer", font: "inherit",
+};
 
 function Field({ label, value }: { label: string; value: number | null | undefined }) {
   return (
@@ -27,8 +32,10 @@ export function RelationshipWorkbench() {
   const [entityData, setEntityData] = useState<any>(null);
   const [inspecting, setInspecting] = useState<string | null>(null);
   const [explain, setExplain] = useState<any>(null);
+  const [pairMateriality, setPairMateriality] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const nav = useNavigate();
+  const [showExposure, setShowExposure] = useState(false);
+  const { resetInvestigation, pushStep } = useInvestigation();
 
   async function runSearch(query: string) {
     if (!query.trim()) return;
@@ -37,22 +44,63 @@ export function RelationshipWorkbench() {
     setEntityData(null);
     setExplain(null);
     setInspecting(null);
+    setShowExposure(false);
     const r = await api.search(query).catch(() => null);
     setResult(r);
     if (r && (r.resolved_as === "entity" || r.resolved_as === "counterparty")) {
       const d = await api.entity360(r.resolved_id).catch(() => null);
       setEntityData(d);
+      if (d) {
+        resetInvestigation({
+          nodeId: d.header.id,
+          nodeType: r.resolved_as === "counterparty" ? "COUNTERPARTY" : "ENTITY",
+          label: d.header.name,
+          route: `/?q=${encodeURIComponent(query)}`,
+        });
+      }
     }
     setLoading(false);
   }
 
-  async function inspect(otherId: string) {
+  async function inspect(otherId: string, otherName: string) {
     if (!entityData) return;
     setInspecting(otherId);
     setExplain(null);
-    const e = await api.explainRelationship(entityData.header.id, otherId).catch(() => null);
+    setShowExposure(false);
+    setPairMateriality([]);
+    const [e, otherEntityData] = await Promise.all([
+      api.explainRelationship(entityData.header.id, otherId).catch(() => null),
+      api.entity360(otherId).catch(() => null),
+    ]);
     setExplain(e);
+    // Portfolio relevance for a PAIR must include counterparties connected
+    // to either side of it - a counterparty whose typed exposure references
+    // only the inspected entity (not the root) is still relevant to this
+    // relationship, so we union both entities' materiality rather than
+    // showing only the root entity's (which would silently miss it).
+    const rootResults = entityData.counterparty_materiality?.results ?? [];
+    const otherResults = otherEntityData?.counterparty_materiality?.results ?? [];
+    const byId = new Map<string, any>();
+    for (const r of [...rootResults, ...otherResults]) byId.set(r.id, r);
+    setPairMateriality([...byId.values()]);
+    // Push only once we know the typed relation (if any). A single-hop
+    // structural path's relation directly connects the two nodes and is
+    // safe to use as the edge label; a multi-hop path (e.g. TSM -SUPPLIES->
+    // NVDA -SUPPLIES-> SSNLF) does NOT mean TSM's relation to SSNLF is
+    // "SUPPLIES" - that would misrepresent an indirect chain as a direct
+    // edge, so multi-hop (or absent) paths fall back to the generic,
+    // honest label instead of fabricating a direct relation type.
+    const hops = e?.typed_path?.hops;
+    const relation = hops?.length === 1 ? hops[0].relation : "correlated with";
+    pushStep({
+      nodeId: otherId, nodeType: "ENTITY", label: otherName,
+      route: `/?q=${encodeURIComponent(entityData.header.id)}`,
+      relationFromPrevious: relation, evidenceRef: e,
+    });
   }
+
+  const productChannelCount = new Set(pairMateriality.map((r: any) => r.product).filter(Boolean)).size;
+  const collateralLinkageCount = pairMateriality.filter((r: any) => r.collateral).length;
 
   return (
     <div className="stack">
@@ -91,12 +139,17 @@ export function RelationshipWorkbench() {
           <div className="section-title">Multiple or no exact matches</div>
           {result.entity_matches.length > 0 ? (
             <div className="link-list">
-              {result.entity_matches.map((m: any) => (
-                <a key={m.id} style={{ cursor: "pointer" }}
-                  onClick={() => (m.node_type === "Counterparty" ? nav(`/counterparty?id=${m.id}`) : runSearch(m.id))}>
-                  {m.name} <span style={{ color: "var(--text-faint)", fontSize: 11 }}>({m.node_type})</span>
-                </a>
-              ))}
+              {result.entity_matches.map((m: any) =>
+                m.node_type === "Counterparty" ? (
+                  <Link key={m.id} to={`/counterparty?id=${m.id}`}>
+                    {m.name} <span style={{ color: "var(--text-faint)", fontSize: 11 }}>({m.node_type})</span>
+                  </Link>
+                ) : (
+                  <button key={m.id} style={linklikeBtn} onClick={() => runSearch(m.id)}>
+                    {m.name} <span style={{ color: "var(--text-faint)", fontSize: 11 }}>({m.node_type})</span>
+                  </button>
+                )
+              )}
             </div>
           ) : (
             <div className="empty-state">No match. Try a different name, or a full sentence for an event/narrative query.</div>
@@ -107,18 +160,14 @@ export function RelationshipWorkbench() {
       {result && result.resolved_as === "theme" && (
         <div className="card">
           <div className="section-title">Theme match</div>
-          <a style={{ cursor: "pointer" }} onClick={() => nav(`/theme-radar?theme=${result.theme_match.theme_id}`)}>
-            {result.theme_match.label} — open Theme Radar →
-          </a>
+          <Link to={`/theme-radar?theme=${result.theme_match.theme_id}`}>{result.theme_match.label} — open Theme Radar →</Link>
         </div>
       )}
 
       {result && result.resolved_as === "event" && (
         <div className="card">
           <div className="section-title">Reads as an event / narrative query</div>
-          <a style={{ cursor: "pointer" }} onClick={() => nav(`/event-studio?text=${encodeURIComponent(q)}`)}>
-            Open in Event Studio →
-          </a>
+          <Link to={`/event-studio?text=${encodeURIComponent(q)}`}>Open in Event Studio →</Link>
         </div>
       )}
 
@@ -146,7 +195,7 @@ export function RelationshipWorkbench() {
                     <td>{r.name}</td>
                     <td className="mono">{r.composite_score.toFixed(3)}</td>
                     <td>
-                      <button className="btn secondary" style={{ padding: "3px 10px", fontSize: 11 }} onClick={() => inspect(r.entity_id)}>
+                      <button className="btn secondary" style={{ padding: "3px 10px", fontSize: 11 }} onClick={() => inspect(r.entity_id, r.name)}>
                         Inspect
                       </button>
                     </td>
@@ -155,9 +204,7 @@ export function RelationshipWorkbench() {
               </tbody>
             </table>
             <div style={{ marginTop: 8, fontSize: 12 }}>
-              <a style={{ cursor: "pointer" }} onClick={() => nav(`/entity?id=${entityData.header.id}`)}>
-                Open full Entity 360 (all relationships, diagnostics, price history) →
-              </a>
+              <Link to={`/entity?id=${entityData.header.id}`}>Open full Entity 360 (all relationships, diagnostics, price history) →</Link>
             </div>
           </div>
 
@@ -200,26 +247,52 @@ export function RelationshipWorkbench() {
                 </>
               )}
 
-              {entityData.counterparty_materiality?.results?.length > 0 && (
-                <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
-                  <a style={{ cursor: "pointer", fontSize: 12.5, fontWeight: 600 }}
-                    onClick={() => document.getElementById("business-exposure")?.scrollIntoView({ behavior: "smooth" })}>
-                    View exposure implications ↓
-                  </a>
+              {/* Relationship -> exposure bridge: answers "does this relationship intersect
+                  the portfolio?" before any PFE is shown, per business requirement. */}
+              <div style={{ marginTop: 16, paddingTop: 12, borderTop: "1px solid var(--border)" }}>
+                <div className="hstack" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+                  <div style={{ fontSize: 12.5 }}>
+                    <strong>Portfolio relevance</strong>
+                    {pairMateriality.length > 0 ? (
+                      <ul style={{ margin: "4px 0 0 18px" }}>
+                        <li>{pairMateriality.length} counterpart{pairMateriality.length === 1 ? "y" : "ies"} connected</li>
+                        {productChannelCount > 0 && <li>{productChannelCount} product channel{productChannelCount === 1 ? "" : "s"}</li>}
+                        {collateralLinkageCount > 0 && <li>{collateralLinkageCount} collateral linkage{collateralLinkageCount === 1 ? "" : "s"}</li>}
+                      </ul>
+                    ) : (
+                      <div style={{ color: "var(--text-faint)", marginTop: 2 }}>No connected counterparties on file.</div>
+                    )}
+                  </div>
+                  {pairMateriality.length > 0 && !showExposure && (
+                    <button style={{ ...linklikeBtn, fontWeight: 600 }} onClick={() => setShowExposure(true)}>
+                      View exposure implications →
+                    </button>
+                  )}
                 </div>
-              )}
+              </div>
             </div>
           )}
 
-          {entityData.counterparty_materiality?.results?.length > 0 && (
-            <div className="card" id="business-exposure">
+          {showExposure && pairMateriality.length > 0 && (
+            <div className="card">
               <div className="section-title">Business exposure — asked only after the relationship is established</div>
               <table className="table">
-                <thead><tr><th>Counterparty</th><th>Priority</th><th>PFE</th></tr></thead>
+                <thead><tr><th>Counterparty</th><th>Product</th><th>Priority</th><th>PFE</th></tr></thead>
                 <tbody>
-                  {entityData.counterparty_materiality.results.slice(0, 5).map((r: any) => (
+                  {pairMateriality.slice(0, 5).map((r: any) => (
                     <tr key={r.id}>
-                      <td><a style={{ cursor: "pointer" }} onClick={() => nav(`/counterparty?id=${r.id}`)}>{r.name}</a></td>
+                      <td>
+                        <Link
+                          to={`/counterparty?id=${r.id}`}
+                          onClick={() => pushStep({
+                            nodeId: r.id, nodeType: "COUNTERPARTY", label: r.name,
+                            route: `/counterparty?id=${r.id}`, relationFromPrevious: r.product ?? "exposed via",
+                          })}
+                        >
+                          {r.name}
+                        </Link>
+                      </td>
+                      <td style={{ fontSize: 11.5 }}>{r.product ?? "—"}</td>
                       <td style={{ fontSize: 11.5 }}>{r.priority}</td>
                       <td className="mono">{r.exposure?.pfe_current ?? "Unavailable"}</td>
                     </tr>

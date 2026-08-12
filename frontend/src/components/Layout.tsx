@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { api } from "../api/client";
+import { InvestigationBreadcrumb } from "./InvestigationBreadcrumb";
 
 // Text-only institutional navigation - no decorative icon set. Active state
 // is communicated by a left accent rule + color (see .nav-link.active in
@@ -67,6 +68,7 @@ export function Layout() {
         </div>
       </aside>
       <main className="main-content">
+        <InvestigationBreadcrumb />
         <Outlet />
       </main>
     </div>
