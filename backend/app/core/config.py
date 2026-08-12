@@ -67,6 +67,14 @@ WEIGHT_PRESETS = {
 ROLLING_WINDOW_DAYS = 30
 STRESS_WINDOW_DAYS = 10
 
+# POC_HEURISTIC: minimum |signed correlation| for the Connected Risk Graph
+# to surface a MARKET_CORRELATED_WITH statistical edge for an entity (see
+# core/graph_query.py get_statistical_relationships). Sign is always
+# preserved above this magnitude - a strong inverse relationship (very
+# negative rho) qualifies exactly like a strong positive one. Not a
+# validated production threshold; purely a POC candidate-surfacing cutoff.
+STATISTICAL_EDGE_MIN_ABS_CORRELATION = 0.3
+
 # --- CCR Daily Review priority-engine thresholds ---
 # EXPLICITLY POC_HEURISTIC: these are illustrative POC cut-offs for this
 # demo dataset, NOT a real institution's risk appetite. Centralised here

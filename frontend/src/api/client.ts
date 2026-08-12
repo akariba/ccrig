@@ -66,6 +66,7 @@ export const api = {
     return req<any>(`/api/priority-queue${qs ? "?" + qs : ""}`);
   },
   priorityDetail: (id: string) => req<any>(`/api/priority-queue/${id}`),
+  riskClusters: (id: string) => req<any>(`/api/priority-queue/${id}/risk-clusters`),
   breaches: (params: Record<string, string> = {}) => {
     const qs = new URLSearchParams(params).toString();
     return req<any>(`/api/breaches${qs ? "?" + qs : ""}`);

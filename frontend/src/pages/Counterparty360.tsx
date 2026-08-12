@@ -3,6 +3,65 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RiskPath, pathFromChain } from "../components/RiskPath";
+import type { GraphPath } from "../graph/types";
+
+function clusterFocusedPath(cluster: any, counterpartyLabel: string): GraphPath | null {
+  const product = cluster.products?.[0];
+  const referenceEntity = cluster.entities?.[0];
+  if (!referenceEntity) return null;
+  const nodes = [
+    { id: "cp", type: "COUNTERPARTY" as const, label: counterpartyLabel },
+    { id: referenceEntity.id, type: "ENTITY" as const, label: referenceEntity.label },
+  ];
+  const edges = [{ edgeType: product ?? "HAS_EXPOSURE", traversedReverse: false }];
+  const topStructural = cluster.structural_relationships?.[0];
+  if (topStructural) {
+    nodes.push({ id: `${referenceEntity.id}:struct`, type: "ENTITY" as const, label: topStructural.entity });
+    edges.push({ edgeType: topStructural.type, traversedReverse: topStructural.reverse });
+  }
+  return { nodes, edges };
+}
+
+function ClusterInspector({ cluster, counterpartyLabel }: { cluster: any; counterpartyLabel: string }) {
+  const path = clusterFocusedPath(cluster, counterpartyLabel);
+  return (
+    <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--border)" }}>
+      <div className="section-title" style={{ fontSize: 11 }}>Why grouped</div>
+      <ul style={{ margin: "4px 0 12px 18px", fontSize: 12.5 }}>
+        {cluster.evidence.map((e: string, i: number) => <li key={i}>{e}</li>)}
+      </ul>
+
+      {path && (
+        <>
+          <div className="section-title" style={{ fontSize: 11 }}>Focused path</div>
+          <div style={{ marginBottom: 12 }}><RiskPath path={path} /></div>
+        </>
+      )}
+
+      {cluster.statistical_relationships?.length > 0 && (
+        <>
+          <div className="section-title" style={{ fontSize: 11 }}>Correlation evidence (signed)</div>
+          <div style={{ fontSize: 12.5, marginBottom: 12 }}>
+            {cluster.statistical_relationships.map((s: any, i: number) => (
+              <div key={i}>{s.entity}: <span className="mono">{s.signed_correlation > 0 ? "+" : ""}{s.signed_correlation}</span> ({s.method})</div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {cluster.relevant_events?.length > 0 && (
+        <div style={{ fontSize: 12.5, marginBottom: 8 }}>
+          <strong>Relevant event:</strong> {cluster.relevant_events.map((e: any) => e.label).join(", ")}
+        </div>
+      )}
+      {cluster.relevant_controls?.length > 0 && (
+        <div style={{ fontSize: 12.5 }}>
+          <strong>Relevant control:</strong> {cluster.relevant_controls.map((c: any) => c.label).join(", ")}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const PRIORITY_COLOR: Record<string, string> = {
   CRITICAL: "var(--error)", HIGH: "var(--warning)", MEDIUM: "var(--chart-6)", LOW: "var(--success)",
@@ -74,6 +133,8 @@ export function Counterparty360() {
   const [ccrData, setCcrData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<TabKey>("relationships");
+  const [clusters, setClusters] = useState<any[]>([]);
+  const [openCluster, setOpenCluster] = useState<string | null>(null);
   const nav = useNavigate();
 
   useEffect(() => {
@@ -89,9 +150,12 @@ export function Counterparty360() {
     setLoading(true);
     setPortfolioData(null);
     setCcrData(null);
-    Promise.allSettled([api.counterparty360(id), api.priorityDetail(id)]).then(([portfolio, ccr]) => {
+    setClusters([]);
+    setOpenCluster(null);
+    Promise.allSettled([api.counterparty360(id), api.priorityDetail(id), api.riskClusters(id)]).then(([portfolio, ccr, rc]) => {
       if (portfolio.status === "fulfilled") setPortfolioData(portfolio.value);
       if (ccr.status === "fulfilled") setCcrData(ccr.value);
+      if (rc.status === "fulfilled") setClusters(rc.value.results);
       setLoading(false);
     });
   }, [id]);
@@ -153,6 +217,32 @@ export function Counterparty360() {
 
             {r && tab === "relationships" && (
               <>
+                {clusters.length > 0 && (
+                  <>
+                    <div className="section-title">Key risk clusters</div>
+                    <p className="subtitle" style={{ marginTop: -6, marginBottom: 10 }}>
+                      Derived from the counterparty's actual exposure graph — structural relationships, market
+                      correlation, and risk-factor transmission — never a hardcoded label.
+                    </p>
+                    {clusters.map((c) => (
+                      <div key={c.id} style={{ marginBottom: 10, padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
+                        <div className="hstack" style={{ justifyContent: "space-between" }}>
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: 13.5 }}>{c.label}</div>
+                            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{c.summary}</div>
+                          </div>
+                          <button className="btn secondary" style={{ padding: "3px 10px", fontSize: 11 }}
+                            onClick={() => setOpenCluster(openCluster === c.id ? null : c.id)}>
+                            {openCluster === c.id ? "Hide" : "View path"}
+                          </button>
+                        </div>
+                        {openCluster === c.id && <ClusterInspector cluster={c} counterpartyLabel={name} />}
+                      </div>
+                    ))}
+                  </>
+                )}
+
+                <div className="section-title" style={{ marginTop: clusters.length > 0 ? 20 : 0 }}>Counterparty details</div>
                 <div className="grid-3">
                   <Field label="Counterparty type" value={r.counterparty_type} />
                   <Field label="Rating" value={r.rating} />

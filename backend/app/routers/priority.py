@@ -4,10 +4,12 @@ Synthetic CCR decision data only - never confidential/real bank data.
 Priority is a deterministic rule cascade (core/ccr_priority.py), never a
 naked 0-1 ML/AI score.
 """
+from dataclasses import asdict
 from fastapi import APIRouter, HTTPException
 from typing import Optional
 from ..core import ccr_priority
 from ..core.config import CCR_PRIORITY_THRESHOLDS
+from ..core.risk_clusters import build_risk_clusters
 
 router = APIRouter(prefix="/api", tags=["priority"])
 
@@ -44,6 +46,20 @@ def priority_detail(counterparty_id: str):
     if not match:
         raise HTTPException(404, f"CCR counterparty '{counterparty_id}' not found")
     return match
+
+
+@router.get("/priority-queue/{counterparty_id}/risk-clusters")
+def counterparty_risk_clusters(counterparty_id: str):
+    """Phase 3: derived risk clusters over the canonical Connected Risk
+    Graph (core/risk_clusters.py) - never manually curated, never a
+    fabricated risk score. Empty list is a valid answer (no cluster
+    evidence found), not an error."""
+    counterparty_id = counterparty_id.upper()
+    rows = ccr_priority.build_priority_queue()
+    if not any(r["id"] == counterparty_id for r in rows):
+        raise HTTPException(404, f"CCR counterparty '{counterparty_id}' not found")
+    clusters = build_risk_clusters(counterparty_id)
+    return {"counterparty_id": counterparty_id, "count": len(clusters), "results": [asdict(c) for c in clusters]}
 
 
 @router.get("/breaches")
