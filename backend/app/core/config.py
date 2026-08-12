@@ -66,3 +66,17 @@ WEIGHT_PRESETS = {
 
 ROLLING_WINDOW_DAYS = 30
 STRESS_WINDOW_DAYS = 10
+
+# --- CCR Daily Review priority-engine thresholds ---
+# EXPLICITLY POC_HEURISTIC: these are illustrative POC cut-offs for this
+# demo dataset, NOT a real institution's risk appetite. Centralised here
+# (never scattered as inline magic numbers in core/ccr_priority.py) and
+# always surfaced to the API/UI as heuristic, not authoritative.
+CCR_PRIORITY_THRESHOLDS = {
+    "label": "POC_HEURISTIC",
+    "small_move_abs_pfe": 10,          # $mm - below this, a move is labelled "small" but NEVER asserted as noise
+    "immaterial_abs_pfe": 50,          # $mm - below this AND low utilisation, ranks LOW regardless of event relevance
+    "immaterial_utilisation_pct": 10,  # %
+    "material_delta_abs": 150,         # $mm - Delta PFE/NSE magnitude considered "material" for HIGH
+    "high_utilisation_pct": 85,        # % - utilisation at/above this is "close to limit"
+}

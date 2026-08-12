@@ -3,10 +3,12 @@ import { useSearchParams } from "react-router-dom";
 import cytoscape from "cytoscape";
 import { api } from "../api/client";
 
+// Cytoscape cannot read CSS custom properties, so these mirror index.css's
+// light institutional palette (--primary/--warning/--chart-6) as literals.
 const LAYER_COLOR: Record<string, string> = {
-  FACT: "#4f98a3",
-  DERIVED: "#a84b2f",
-  EXPOSURE: "#ffc553",
+  FACT: "#2c5b6b",
+  DERIVED: "#96591c",
+  EXPOSURE: "#b98a2e",
 };
 
 export function GraphExplorer() {
@@ -44,24 +46,24 @@ export function GraphExplorer() {
         {
           selector: "node",
           style: {
-            "background-color": (ele: any) => (ele.data("id") === centerId ? "#4f98a3" : ele.data("is_synthetic") ? "#bb653b" : "#393836"),
+            "background-color": (ele: any) => (ele.data("id") === centerId ? "#2c5b6b" : ele.data("is_synthetic") ? "#96591c" : "#a8a496"),
             label: "data(label)",
-            color: "#cdccca",
+            color: "#232019",
             "font-size": 9,
             "text-valign": "bottom",
             "text-margin-y": 4,
             width: (ele: any) => (ele.data("id") === centerId ? 34 : 22),
             height: (ele: any) => (ele.data("id") === centerId ? 34 : 22),
             "border-width": 1.5,
-            "border-color": "#171614",
+            "border-color": "#ffffff",
           },
         },
         {
           selector: "edge",
           style: {
             width: (ele: any) => 1 + (ele.data("weight") || 0.3) * 3,
-            "line-color": (ele: any) => LAYER_COLOR[ele.data("layer")] || "#5a5957",
-            "target-arrow-color": (ele: any) => LAYER_COLOR[ele.data("layer")] || "#5a5957",
+            "line-color": (ele: any) => LAYER_COLOR[ele.data("layer")] || "#97948a",
+            "target-arrow-color": (ele: any) => LAYER_COLOR[ele.data("layer")] || "#97948a",
             "target-arrow-shape": (ele: any) => (ele.data("layer") === "DERIVED" ? "none" : "triangle"),
             "line-style": (ele: any) => (ele.data("layer") === "DERIVED" ? "dashed" : ele.data("layer") === "EXPOSURE" ? "dotted" : "solid"),
             "curve-style": "bezier",

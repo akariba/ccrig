@@ -23,11 +23,22 @@ function SourceBadge({ source }: { source: string }) {
   return <DataBadge kind={b.kind} label={b.label} />;
 }
 
+function Collapsible({ label, children, defaultOpen = false }: { label: string; children: any; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="card">
+      <span className="pill" onClick={() => setOpen(!open)}>{open ? "▾" : "▸"} {label}</span>
+      {open && <div style={{ marginTop: 12 }}>{children}</div>}
+    </div>
+  );
+}
+
 export function EventStudio() {
   const [params] = useSearchParams();
   const [text, setText] = useState(params.get("text") || SAMPLES[0]);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [showAllMateriality, setShowAllMateriality] = useState(false);
   const nav = useNavigate();
   // Guards against out-of-order responses (e.g. the mount-time parse of the
   // default sample resolving after a later user-triggered parse) clobbering
@@ -77,16 +88,87 @@ export function EventStudio() {
       {result && !loading && (
         <>
           <div className="card">
-            <div className="hstack" style={{ justifyContent: "space-between" }}>
-              <h2 style={{ margin: 0 }}>Classified as: {result.event_type}</h2>
-              <DataBadge kind="ai" label={result.ai_mode === "ENHANCED_AI" ? "AI summary" : "Deterministic summary"} />
-            </div>
-            <div className="ai-box" style={{ marginTop: 10 }}>
-              <div className="ai-label">AI summary</div>{result.ai_summary}
-            </div>
+            <h2 style={{ margin: 0 }}>{result.event_type}</h2>
+            <p className="subtitle" style={{ marginTop: 4 }}>{result.ai_summary}</p>
+          </div>
 
+          {result.materiality_join && (
+            <div className="card">
+              <div className="hstack" style={{ justifyContent: "space-between" }}>
+                <div className="section-title" style={{ marginBottom: 0 }}>Exposure, materiality &amp; decision</div>
+                <DataBadge kind="fact" label={`${result.materiality_join.nominated_issuer_count} issuers nominated`} />
+              </div>
+              <div className="warning-box" style={{ marginTop: 8 }}>{result.materiality_join.note}</div>
+
+              {(() => {
+                const paths = Array.from(new Set(
+                  result.materiality_join.results
+                    .filter((r: any) => r.risk_factor_path?.length > 0)
+                    .map((r: any) => r.risk_factor_path.join(" → "))
+                )) as string[];
+                if (paths.length === 0) return null;
+                return (
+                  <div style={{ marginTop: 10 }}>
+                    <div className="section-title" style={{ fontSize: 11 }}>Transmission — how the risk actually propagates</div>
+                    {paths.map((p, i) => (
+                      <div key={i} className="mono" style={{ fontSize: 12.5, color: "var(--primary)", marginBottom: 4 }}>{p}</div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {result.materiality_join.results.length === 0 && (
+                <div className="empty-state" style={{ marginTop: 10 }}>
+                  No synthetic CCR counterparty has a typed exposure referencing any nominated issuer.
+                </div>
+              )}
+              {result.materiality_join.results.length > 0 && (
+                <table className="table" style={{ marginTop: 10 }}>
+                  <thead>
+                    <tr>
+                      <th>Priority</th><th>Counterparty</th><th>Reference issuer</th><th>Product</th>
+                      <th>Δ PFE / Δ NSE</th><th>Utilisation</th><th>Headroom</th><th>Driver</th>
+                      <th>Risk-factor path</th><th>Control flags</th><th>Decision</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(showAllMateriality ? result.materiality_join.results : result.materiality_join.results.slice(0, 5)).map((r: any) => (
+                      <tr key={r.id}>
+                        <td>
+                          <span style={{
+                            display: "inline-block", padding: "2px 8px", borderRadius: 999, fontSize: 10.5, fontWeight: 700,
+                            color: r.priority === "CRITICAL" ? "var(--error)" : r.priority === "HIGH" ? "var(--warning)" : r.priority === "MEDIUM" ? "var(--chart-6)" : "var(--text-muted)",
+                            border: `1px solid currentColor`,
+                          }}>{r.priority}</span>
+                        </td>
+                        <td><a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                        <td><a onClick={() => nav(`/entity?id=${r.reference_entity_id}`)} style={{ cursor: "pointer" }}>{r.reference_entity_id}</a></td>
+                        <td style={{ fontSize: 11 }}>{r.product}</td>
+                        <td className="mono">{r.delta_pfe != null ? `${r.delta_pfe > 0 ? "+" : ""}${r.delta_pfe}` : (r.delta_nse != null ? `${r.delta_nse > 0 ? "+" : ""}${r.delta_nse} (NSE)` : "n/a")}</td>
+                        <td className="mono">{r.utilisation_pct != null ? `${r.utilisation_pct}%` : "Unavailable"}</td>
+                        <td className="mono">{r.headroom ?? "Unavailable"}</td>
+                        <td style={{ fontSize: 11 }}>{r.driver}</td>
+                        <td style={{ fontSize: 10.5 }}>{r.risk_factor_path?.join(" → ") || "—"}</td>
+                        <td style={{ fontSize: 10.5 }}>{r.is_overdue ? <span style={{ color: "var(--error)" }}>OVERDUE</span> : r.decision.control_flags.wwr ? <span style={{ color: "var(--warning)" }}>WWR</span> : "OK"}</td>
+                        <td style={{ fontSize: 11 }}>{r.decision.decision}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              {result.materiality_join.results.length > 5 && (
+                <div style={{ marginTop: 8 }}>
+                  <a style={{ cursor: "pointer", fontSize: 12 }} onClick={() => setShowAllMateriality(!showAllMateriality)}>
+                    {showAllMateriality ? "Show top 5 only" : `Show all ${result.materiality_join.results.length}`}
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+
+          <Collapsible label="How was this derived?">
             {result.ai_context_extraction && (
-              <div className="ai-box" style={{ marginTop: 10 }}>
+              <div className="ai-box" style={{ marginBottom: 12 }}>
                 <div className="ai-label">AI context extraction ({result.ai_context_extraction.ai_mode})</div>
                 {result.ai_context_extraction.ai_reasoning_summary}
                 {result.ai_context_extraction.ai_event_type_suggestion && (
@@ -98,7 +180,7 @@ export function EventStudio() {
               </div>
             )}
 
-            <div className="grid-3" style={{ marginTop: 12 }}>
+            <div className="grid-3">
               <div>
                 <div className="section-title">Detected entities</div>
                 <div className="pill-list">
@@ -141,36 +223,33 @@ export function EventStudio() {
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="row">
-            <div className="card" style={{ flex: 1 }}>
-              <div className="section-title">Mode 1 — Bounded typed traversal (decay 0.65/hop)</div>
-              <table className="table">
-                <thead><tr><th>Entity</th><th>Score</th></tr></thead>
-                <tbody>
-                  {result.mode1_bounded_traversal.results.length === 0 && <tr><td colSpan={2} className="empty-state">No hops within bound.</td></tr>}
-                  {result.mode1_bounded_traversal.results.map((r: any) => (
-                    <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.score.toFixed(3)}</td></tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="row" style={{ marginTop: 14 }}>
+              <div style={{ flex: 1 }}>
+                <div className="section-title">Mode 1 — Bounded typed traversal (decay 0.65/hop)</div>
+                <table className="table">
+                  <thead><tr><th>Entity</th><th>Score</th></tr></thead>
+                  <tbody>
+                    {result.mode1_bounded_traversal.results.length === 0 && <tr><td colSpan={2} className="empty-state">No hops within bound.</td></tr>}
+                    {result.mode1_bounded_traversal.results.map((r: any) => (
+                      <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.score.toFixed(3)}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{ flex: 1 }}>
+                <div className="section-title">Mode 2 — Relation-aware Personalized PageRank (units NOT comparable to Mode 1)</div>
+                <table className="table">
+                  <thead><tr><th>Entity</th><th>PPR score</th></tr></thead>
+                  <tbody>
+                    {result.mode2_personalized_pagerank.results.map((r: any) => (
+                      <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.ppr_score.toFixed(4)}</td></tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            <div className="card" style={{ flex: 1 }}>
-              <div className="section-title">Mode 2 — Relation-aware Personalized PageRank (units NOT comparable to Mode 1)</div>
-              <table className="table">
-                <thead><tr><th>Entity</th><th>PPR score</th></tr></thead>
-                <tbody>
-                  {result.mode2_personalized_pagerank.results.map((r: any) => (
-                    <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.ppr_score.toFixed(4)}</td></tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="section-title">Relevant counterparties (exposure joined AFTER relevance is computed)</div>
+            <div className="section-title" style={{ marginTop: 14 }}>Relevant counterparties (exposure joined AFTER relevance is computed — Layer C, not business priority)</div>
             <table className="table">
               <thead><tr><th>Counterparty</th><th>Exposure-weighted relevance</th><th>Issuers</th></tr></thead>
               <tbody>
@@ -183,7 +262,7 @@ export function EventStudio() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </Collapsible>
         </>
       )}
     </div>

@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import Optional
-from ..core import event_parser
+from ..core import event_parser, materiality
+from ..core.data import STORE
 from ..ai.provider import PROVIDER
 
 router = APIRouter(prefix="/api/event", tags=["event"])
@@ -24,6 +25,23 @@ def parse_event(req: EventParseRequest):
     )
     result["ai_summary"] = PROVIDER.summarize_event(result)
     result["ai_mode"] = PROVIDER.mode
+
+    # --- Materiality join (BUILD_MANDATE CCR reorientation) ---
+    # Graph/event relevance (direct mentions + Mode 1 + Mode 2) NOMINATES
+    # candidate issuers; this join then looks up synthetic CCR exposure for
+    # those issuers and re-ranks by business materiality (priority engine),
+    # never by the PPR/traversal score itself.
+    nominated_issuer_ids = set(STORE.issuer_ids) & (
+        {d["entity_id"] for d in result["direct_relevance"]}
+        | {m["entity_id"] for m in result["mode1_bounded_traversal"]["results"]}
+        | {m["entity_id"] for m in result["mode2_personalized_pagerank"]["results"]}
+    )
+    result["materiality_join"] = {
+        "note": "Graph/event relevance nominates candidates. Exposure and limit materiality determine "
+                "investigation priority.",
+        "nominated_issuer_count": len(nominated_issuer_ids),
+        "results": materiality.materiality_join(nominated_issuer_ids),
+    }
     return result
 
 

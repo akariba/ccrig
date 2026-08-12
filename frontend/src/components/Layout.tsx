@@ -3,19 +3,25 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { api } from "../api/client";
 
+// Text-only institutional navigation - no decorative icon set. Active state
+// is communicated by a left accent rule + color (see .nav-link.active in
+// index.css), not by a different glyph per row.
 const NAV = [
-  { section: "Analyst" },
-  { to: "/", label: "Home / Copilot", icon: "◆" },
-  { to: "/theme-radar", label: "Theme Radar", icon: "◇" },
-  { to: "/entity", label: "Entity 360", icon: "●" },
-  { to: "/counterparty", label: "Counterparty 360", icon: "▲" },
-  { to: "/event-studio", label: "Event Studio", icon: "⚡" },
-  { to: "/graph", label: "Graph Explorer", icon: "◈" },
-  { section: "Modeling" },
-  { to: "/model-lab", label: "Model Lab", icon: "⚙" },
-  { to: "/backtest-lab", label: "Backtest Lab", icon: "▦" },
+  { section: "Relationship Intelligence" },
+  { to: "/", label: "Relationships" },
+  { to: "/event-studio", label: "Events" },
+  { to: "/counterparty", label: "Counterparties" },
+  { to: "/breaches", label: "Controls" },
+  { section: "Research" },
+  { to: "/inbox", label: "Inbox" },
+  { to: "/entity", label: "Entity Explorer" },
+  { to: "/exposure-movers", label: "Exposure Movers" },
+  { to: "/graph", label: "Graph Explorer" },
+  { to: "/theme-radar", label: "Theme Radar" },
+  { to: "/model-lab", label: "Model Lab" },
+  { to: "/backtest-lab", label: "Backtest Lab" },
   { section: "System" },
-  { to: "/provenance", label: "Data & Provenance", icon: "▤" },
+  { to: "/provenance", label: "Data Sources" },
 ];
 
 export function Layout() {
@@ -45,7 +51,6 @@ export function Layout() {
                 end={item.to === "/"}
                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
               >
-                <span style={{ width: 14, textAlign: "center" }}>{item.icon}</span>
                 {item.label}
               </NavLink>
             )

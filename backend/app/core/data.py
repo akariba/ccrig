@@ -29,6 +29,22 @@ class DataStore:
         except FileNotFoundError:
             self.gleif = {}
 
+        # Synthetic CCR (Counterparty Credit Risk) decision data - Daily
+        # Priority Queue / Breaches & Actions. Fully separate from Layer C
+        # portfolio-holdings exposure_edges.json; never confidential/real.
+        try:
+            self.ccr_counterparties = _load_json("ccr_counterparties.json")["counterparties"]
+        except FileNotFoundError:
+            self.ccr_counterparties = []
+        try:
+            self.ccr_events = _load_json("ccr_events.json")["events"]
+        except FileNotFoundError:
+            self.ccr_events = []
+        try:
+            self.ccr_model_impacts = _load_json("ccr_model_impacts.json")["runs"]
+        except FileNotFoundError:
+            self.ccr_model_impacts = []
+
         self.entities_by_id = {e["id"]: e for e in self.entities_raw}
         self.issuer_ids = [e["id"] for e in self.entities_raw if e["node_type"] == "Company/Issuer"]
         self.counterparty_ids = [e["id"] for e in self.entities_raw if e["node_type"] == "Counterparty"]

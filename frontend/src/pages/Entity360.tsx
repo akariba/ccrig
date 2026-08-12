@@ -24,6 +24,11 @@ function ScoreBar({ label, value }: { label: string; value: number | null }) {
   );
 }
 
+function PriorityTag({ priority }: { priority: string }) {
+  const color = priority === "CRITICAL" ? "var(--error)" : priority === "HIGH" ? "var(--warning)" : priority === "MEDIUM" ? "var(--chart-6)" : "var(--success)";
+  return <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: 999, fontSize: 10.5, fontWeight: 700, color, border: "1px solid currentColor" }}>{priority}</span>;
+}
+
 export function Entity360() {
   const [params, setParams] = useSearchParams();
   const id = params.get("id") || "TSM";
@@ -31,6 +36,7 @@ export function Entity360() {
   const [data, setData] = useState<any>(null);
   const [explain, setExplain] = useState<any>(null);
   const [explainTarget, setExplainTarget] = useState<string | null>(null);
+  const [showAllRelated, setShowAllRelated] = useState(false);
   const [loading, setLoading] = useState(true);
   const nav = useNavigate();
 
@@ -56,7 +62,8 @@ export function Entity360() {
     <div className="stack">
       <div className="page-header">
         <h1>Entity 360</h1>
-        <div className="searchbar" style={{ maxWidth: 360 }}>
+        <div className="subtitle">The relationship laboratory — what is this issuer connected to, and through which dimensions?</div>
+        <div className="searchbar" style={{ maxWidth: 360, marginTop: 10 }}>
           <input className="input" value={inputId} onChange={(e) => setInputId(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === "Enter" && setParams({ id: inputId })} placeholder="Ticker/ID e.g. NVDA" />
           <button className="btn secondary" onClick={() => setParams({ id: inputId })}>Load</button>
@@ -80,28 +87,18 @@ export function Entity360() {
         )}
       </div>
 
+      {/* ============ MAIN: relationship analysis (left) + compact diagnostics rail (right) ============ */}
       <div className="row">
-        <div className="card" style={{ flex: 1 }}>
-          <div className="section-title">Relationship instrumentation</div>
-          <div className="grid-3">
-            <div className="kpi"><div className="value">{data.relationship_summary.instrumentation.theoretical_pair_count}</div><div className="label">Theoretical pairs</div></div>
-            <div className="kpi"><div className="value">{data.relationship_summary.instrumentation.candidate_count}</div><div className="label">Candidates</div></div>
-            <div className="kpi"><div className="value">{data.relationship_summary.retained_count}</div><div className="label">Retained (top-k)</div></div>
-          </div>
-          <p style={{ fontSize: 11.5, color: "var(--text-faint)", marginTop: 8 }}>
-            Reduction ratio {(data.relationship_summary.instrumentation.reduction_ratio * 100).toFixed(0)}% — candidates generated
-            from 5 blocking sources before any scoring runs.
+        <div className="card" style={{ flex: 2 }}>
+          <div className="section-title">Top related entities</div>
+          <p className="subtitle" style={{ marginTop: -6, marginBottom: 10 }}>
+            Composite relatedness score — a VIEW over the relationship vector below, not the ground truth. Click Explain
+            to see exactly which components drive a given pair.
           </p>
-        </div>
-      </div>
-
-      <div className="row">
-        <div className="card" style={{ flex: 1.3 }}>
-          <div className="section-title">Top related entities (composite relatedness score — a VIEW over the feature vector, not the ground truth)</div>
           <table className="table">
             <thead><tr><th>Entity</th><th>Score</th><th></th></tr></thead>
             <tbody>
-              {data.relationship_summary.top_related.map((r: any) => (
+              {(showAllRelated ? data.relationship_summary.top_related : data.relationship_summary.top_related.slice(0, 5)).map((r: any) => (
                 <tr key={r.entity_id}>
                   <td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
                   <td className="mono">{r.composite_score.toFixed(3)}</td>
@@ -110,40 +107,79 @@ export function Entity360() {
               ))}
             </tbody>
           </table>
+          {data.relationship_summary.top_related.length > 5 && (
+            <span className="pill" onClick={() => setShowAllRelated(!showAllRelated)}>
+              {showAllRelated ? "Show top 5 only" : `Show all ${data.relationship_summary.top_related.length}`}
+            </span>
+          )}
+
+          {explain && (
+            <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--border)" }}>
+              <div className="hstack" style={{ justifyContent: "space-between" }}>
+                <h3 style={{ margin: 0 }}>Why {h.id} ↔ {explainTarget}</h3>
+                <DataBadge kind="ai" label={explain.ai_mode === "ENHANCED_AI" ? "AI explanation" : "Deterministic explanation"} />
+              </div>
+              <div className="grid-2" style={{ marginTop: 10 }}>
+                <div>
+                  {Object.entries(explain.pair.composite.component_values).map(([k, v]) => (
+                    <ScoreBar key={k} label={COMPONENT_LABEL[k] || k} value={v as number | null} />
+                  ))}
+                </div>
+                <div>
+                  <div className="ai-box">
+                    <div className="ai-label">Explanation</div>
+                    {explain.ai_explanation}
+                  </div>
+                  {explain.typed_path && (
+                    <div style={{ marginTop: 10, fontSize: 12 }}>
+                      <div className="section-title">Typed path (deterministic, not AI)</div>
+                      <span className="mono">
+                        {explain.typed_path.pattern} — {explain.typed_path.hops?.map((hop: any) => `${hop.from} --${hop.relation}--> ${hop.to}`).join(", ")}
+                      </span>
+                      {explain.typed_path.hops?.[0]?.evidence_url && (
+                        <div style={{ marginTop: 4 }}>
+                          <a href={explain.typed_path.hops[0].evidence_url} target="_blank" rel="noreferrer">evidence source</a>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {explain && (
-          <div className="card" style={{ flex: 1 }}>
-            <div className="hstack" style={{ justifyContent: "space-between" }}>
-              <h3 style={{ margin: 0 }}>{h.id} ↔ {explainTarget}</h3>
-              <DataBadge kind="ai" label={explain.ai_mode === "ENHANCED_AI" ? "AI explanation" : "Deterministic explanation"} />
-            </div>
-            <div style={{ margin: "10px 0" }}>
-              {Object.entries(explain.pair.composite.component_values).map(([k, v]) => (
-                <ScoreBar key={k} label={COMPONENT_LABEL[k] || k} value={v as number | null} />
-              ))}
-            </div>
-            <div className="ai-box">
-              <div className="ai-label">Explanation</div>
-              {explain.ai_explanation}
-            </div>
-            {explain.typed_path && (
-              <div style={{ marginTop: 10, fontSize: 12 }}>
-                <div className="section-title">Typed path (deterministic, not AI)</div>
-                <span className="mono">
-                  {explain.typed_path.pattern} — {explain.typed_path.hops?.map((hop: any) => `${hop.from} --${hop.relation}--> ${hop.to}`).join(", ")}
-                </span>
-                {explain.typed_path.hops?.[0]?.evidence_url && (
-                  <div style={{ marginTop: 4 }}>
-                    <a href={explain.typed_path.hops[0].evidence_url} target="_blank" rel="noreferrer">evidence source</a>
-                  </div>
-                )}
-              </div>
-            )}
+        {/* compact side rail: diagnostics, not primary business content */}
+        <div className="card" style={{ flex: 1 }}>
+          <div className="section-title">Methodology / diagnostics</div>
+          <div style={{ fontSize: 12, lineHeight: 1.9 }}>
+            <div className="hstack" style={{ justifyContent: "space-between" }}><span style={{ color: "var(--text-muted)" }}>Theoretical pairs</span><span className="mono">{data.relationship_summary.instrumentation.theoretical_pair_count}</span></div>
+            <div className="hstack" style={{ justifyContent: "space-between" }}><span style={{ color: "var(--text-muted)" }}>Candidates</span><span className="mono">{data.relationship_summary.instrumentation.candidate_count}</span></div>
+            <div className="hstack" style={{ justifyContent: "space-between" }}><span style={{ color: "var(--text-muted)" }}>Retained (top-K)</span><span className="mono">{data.relationship_summary.retained_count}</span></div>
+            <div className="hstack" style={{ justifyContent: "space-between" }}><span style={{ color: "var(--text-muted)" }}>Reduction ratio</span><span className="mono">{(data.relationship_summary.instrumentation.reduction_ratio * 100).toFixed(0)}%</span></div>
           </div>
-        )}
+          <p style={{ fontSize: 10.5, color: "var(--text-faint)", marginTop: 6 }}>
+            Candidates generated from 5 blocking sources before any scoring runs — never a dense N×N scan.
+          </p>
+
+          <div className="section-title" style={{ marginTop: 16 }}>Themes</div>
+          <div className="pill-list">
+            {data.theme_exposure.slice(0, 10).map((t: any) => (
+              <span key={t.theme_id} className="pill" onClick={() => nav(`/theme-radar?theme=${t.theme_id}`)}>
+                {t.label} · {t.weight.toFixed(1)}
+              </span>
+            ))}
+          </div>
+
+          <div className="section-title" style={{ marginTop: 16 }}>Quick actions</div>
+          <div className="hstack" style={{ flexWrap: "wrap", gap: 6 }}>
+            <span className="pill" onClick={() => nav(`/graph?id=${h.id}`)}>Open in Graph Explorer</span>
+            <span className="pill" onClick={() => nav(`/event-studio?text=${encodeURIComponent(h.name)}`)}>Use as event subject</span>
+          </div>
+        </div>
       </div>
 
+      {/* ============ Fact relations + corporate hierarchy ============ */}
       <div className="row">
         <div className="card" style={{ flex: 1 }}>
           <div className="section-title">Fact relations · Layer A (directional, sourced)</div>
@@ -166,9 +202,6 @@ export function Entity360() {
             </tbody>
           </table>
         </div>
-      </div>
-
-      <div className="row">
         <div className="card" style={{ flex: 1 }}>
           <div className="hstack" style={{ justifyContent: "space-between" }}>
             <div className="section-title" style={{ marginBottom: 0 }}>Corporate hierarchy</div>
@@ -209,32 +242,50 @@ export function Entity360() {
         </div>
       </div>
 
-      <div className="row">
-        <div className="card" style={{ flex: 1 }}>
-          <div className="section-title">Theme exposure</div>
-          <div className="pill-list">
-            {data.theme_exposure.map((t: any) => (
-              <span key={t.theme_id} className="pill" onClick={() => nav(`/theme-radar?theme=${t.theme_id}`)}>
-                {t.label} · {t.weight.toFixed(1)}
-              </span>
-            ))}
+      {/* ============ Counterparty exposure context — only AFTER relationship analysis ============ */}
+      <div className="card">
+        <div className="section-title">Counterparty exposure context</div>
+        <p className="subtitle" style={{ marginTop: -6 }}>
+          Which business-data counterparties actually have exposure connected to this issuer — direct trade, collateral,
+          reference entity, or portfolio holding. Kept in its own units, never comparable to the relatedness score above.
+        </p>
+        <div className="row" style={{ marginTop: 6 }}>
+          <div style={{ flex: 1 }}>
+            <div className="section-title" style={{ fontSize: 11 }}>CCR counterparties (typed exposure)</div>
+            <table className="table">
+              <thead><tr><th>Counterparty</th><th>Priority</th><th>Product / connection</th><th>PFE</th><th>Utilisation</th></tr></thead>
+              <tbody>
+                {(data.counterparty_materiality?.results || []).map((r: any) => (
+                  <tr key={r.id}>
+                    <td><a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                    <td><PriorityTag priority={r.priority} /></td>
+                    <td style={{ fontSize: 12 }}>{r.product}</td>
+                    <td className="mono">{r.exposure?.pfe_current ?? "Unavailable"}</td>
+                    <td className="mono">{r.utilisation_pct != null ? `${r.utilisation_pct}%` : "Unavailable"}</td>
+                  </tr>
+                ))}
+                {(!data.counterparty_materiality?.results || data.counterparty_materiality.results.length === 0) && (
+                  <tr><td colSpan={5} className="empty-state">No CCR counterparty references this issuer.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div className="card" style={{ flex: 1 }}>
-          <div className="section-title">Counterparties exposed (Layer C — never comparable to relatedness score units)</div>
-          <table className="table">
-            <thead><tr><th>Counterparty</th><th>Relation</th><th>Exposure %</th></tr></thead>
-            <tbody>
-              {data.counterparties_exposed.map((c: any, i: number) => (
-                <tr key={i}>
-                  <td><a onClick={() => nav(`/counterparty?id=${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
-                  <td>{c.relation}</td>
-                  <td className="mono">{(c.exposure_pct * 100).toFixed(0)}%</td>
-                </tr>
-              ))}
-              {data.counterparties_exposed.length === 0 && <tr><td colSpan={3} className="empty-state">No synthetic counterparty holds this issuer.</td></tr>}
-            </tbody>
-          </table>
+          <div style={{ flex: 1 }}>
+            <div className="section-title" style={{ fontSize: 11 }}>Portfolio holdings (Layer C — never comparable to relatedness score units)</div>
+            <table className="table">
+              <thead><tr><th>Counterparty</th><th>Relation</th><th>Exposure %</th></tr></thead>
+              <tbody>
+                {data.counterparties_exposed.map((c: any, i: number) => (
+                  <tr key={i}>
+                    <td><a onClick={() => nav(`/counterparty?id=${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
+                    <td>{c.relation}</td>
+                    <td className="mono">{(c.exposure_pct * 100).toFixed(0)}%</td>
+                  </tr>
+                ))}
+                {data.counterparties_exposed.length === 0 && <tr><td colSpan={3} className="empty-state">No synthetic counterparty holds this issuer.</td></tr>}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 

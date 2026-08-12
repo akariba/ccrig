@@ -1,0 +1,24 @@
+{
+  "runs": [
+    {
+      "id": "MODEL_RUN_2026_08_01",
+      "run_date": "2026-08-01",
+      "total_impact_usd_mm": 4200,
+      "facilities_total": 1850,
+      "facilities_over_1mm_impact": 310,
+      "material_changes": 48,
+      "increases": 31,
+      "decreases": 17,
+      "new_limit_breaches": 3,
+      "approaching_limit": 4,
+      "categories_observed": [
+        "MODEL_RECALIBRATION",
+        "VOLATILITY_UPDATE",
+        "DATA_SOURCING_ISSUE",
+        "MODEL_COVERAGE_CHANGE"
+      ],
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_CCR_DECISION_DATA"
+    }
+  ]
+}

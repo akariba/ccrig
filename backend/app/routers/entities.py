@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from ..core.data import STORE
-from ..core import candidates, scoring, market, paths as path_mod, ownership as ownership_mod
+from ..core import candidates, scoring, market, paths as path_mod, ownership as ownership_mod, materiality
 from ..core.graph_store import fact_neighbors, counterparties_exposed_to
 from ..core.config import DEFAULT_WEIGHTS
 from ..ai.provider import PROVIDER
@@ -110,6 +110,11 @@ def entity_360(entity_id: str, top_k: int = 10):
         "supply_chain": supply_chain,
         "ownership": ownership,
         "corporate_hierarchy": corporate_hierarchy,
+        "counterparty_materiality": {
+            "note": "Synthetic CCR counterparties with a typed exposure referencing this issuer - connects "
+                    "relationship discovery to actual CCR exposure materiality, not relatedness-score ranking.",
+            "results": materiality.counterparties_for_reference_entity(entity_id),
+        },
         "theme_exposure": theme_exposure,
         "market": market_block,
         "counterparties_exposed": cp_exposure,

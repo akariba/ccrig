@@ -1,0 +1,93 @@
+{
+  "_description": "Generic CCR product reference taxonomy (CURATED_REFERENCE_DATA) - domain metadata about product types, NOT any counterparty's actual positions. Used to reason about economic transmission mechanisms without repricing anything.",
+  "source_type": "CURATED_REFERENCE_DATA",
+  "products": {
+    "IRS": {
+      "label": "Interest Rate Swap",
+      "risk_factors": ["INTEREST_RATE"],
+      "sensitivities": ["DV01", "IR01"],
+      "ccr_channels": ["MTM", "PFE", "NETTING", "COLLATERAL"]
+    },
+    "FX_SPOT": {
+      "label": "FX Spot",
+      "risk_factors": ["FX"],
+      "sensitivities": ["FX_DELTA"],
+      "ccr_channels": ["SETTLEMENT"]
+    },
+    "FX_FORWARD": {
+      "label": "FX Forward",
+      "risk_factors": ["FX"],
+      "sensitivities": ["FX_DELTA"],
+      "ccr_channels": ["MTM", "PFE", "SETTLEMENT"]
+    },
+    "FX_SWAP": {
+      "label": "FX Swap",
+      "risk_factors": ["FX", "INTEREST_RATE"],
+      "sensitivities": ["FX_DELTA", "DV01"],
+      "ccr_channels": ["MTM", "PFE", "NETTING"]
+    },
+    "BOND": {
+      "label": "Bond (Fixed Income Cash)",
+      "risk_factors": ["INTEREST_RATE", "CREDIT_SPREAD"],
+      "sensitivities": ["DV01", "CS01"],
+      "ccr_channels": ["MTM", "SETTLEMENT"]
+    },
+    "REPO": {
+      "label": "Repo",
+      "risk_factors": ["INTEREST_RATE", "COLLATERAL", "FUNDING"],
+      "sensitivities": ["DV01"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL", "NETTING"],
+      "important_attributes": ["collateral_asset", "haircut", "maturity", "direction", "netting_treatment"]
+    },
+    "REVERSE_REPO": {
+      "label": "Reverse Repo",
+      "risk_factors": ["INTEREST_RATE", "COLLATERAL", "FUNDING"],
+      "sensitivities": ["DV01"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL", "NETTING"],
+      "important_attributes": ["collateral_asset", "haircut", "maturity", "direction", "netting_treatment"]
+    },
+    "SEC_LENDING": {
+      "label": "Securities Lending",
+      "risk_factors": ["SECURITY_PRICE", "COLLATERAL", "FUNDING"],
+      "sensitivities": ["EQUITY_DELTA", "DV01"],
+      "ccr_channels": ["PFE", "COLLATERAL"]
+    },
+    "TRS": {
+      "label": "Total Return Swap",
+      "risk_factors": ["EQUITY", "CREDIT", "REFERENCE_ENTITY"],
+      "sensitivities": ["EQUITY_DELTA"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL"],
+      "important_attributes": ["reference_asset", "notional", "collateral"]
+    },
+    "CDS": {
+      "label": "Credit Default Swap",
+      "risk_factors": ["CREDIT_SPREAD", "REFERENCE_ENTITY"],
+      "sensitivities": ["CS01"],
+      "ccr_channels": ["MTM", "PFE", "NETTING"]
+    },
+    "EQUITY_CASH": {
+      "label": "Equity Cash",
+      "risk_factors": ["EQUITY"],
+      "sensitivities": ["EQUITY_DELTA"],
+      "ccr_channels": ["SETTLEMENT", "MTM"]
+    },
+    "EQUITY_FUTURE": {
+      "label": "Equity Index/Single-Name Future",
+      "risk_factors": ["EQUITY"],
+      "sensitivities": ["EQUITY_DELTA"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL"]
+    },
+    "EQUITY_OPTION": {
+      "label": "Equity Option",
+      "risk_factors": ["EQUITY", "VOLATILITY"],
+      "sensitivities": ["EQUITY_DELTA", "VEGA"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL"]
+    },
+    "COMMODITY_SWAP": {
+      "label": "Commodity Swap",
+      "risk_factors": ["COMMODITY_PRICE"],
+      "sensitivities": ["COMMODITY_DELTA"],
+      "ccr_channels": ["MTM", "PFE", "COLLATERAL"]
+    }
+  }
+}

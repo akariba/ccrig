@@ -1,0 +1,46 @@
+{
+  "events": [
+    {
+      "id": "JPY_DEPRECIATION_SHOCK",
+      "label": "JPY depreciation / rates shock",
+      "description": "Synthetic scenario: sharp JPY depreciation/intervention drives Japanese rates higher, pressuring UST yields via prospective Treasury selling, transmitting into repo/basis financing markets used by leveraged funds.",
+      "risk_factor_path": [
+        "JPY",
+        "JAPAN_RATES",
+        "UST_YIELD",
+        "REPO_MARKET",
+        "TREASURY_BASIS"
+      ],
+      "is_synthetic": true
+    },
+    {
+      "id": "CREDIT_SPREAD_WIDENING",
+      "label": "Credit spread widening",
+      "description": "Synthetic scenario: broad IG/HY credit spread widening affecting CDS and bond-financing books.",
+      "risk_factor_path": [
+        "CREDIT_SPREAD",
+        "BOND_FINANCING",
+        "REPO_MARKET"
+      ],
+      "is_synthetic": true
+    },
+    {
+      "id": "EQUITY_VOL_SPIKE",
+      "label": "Equity volatility spike",
+      "description": "Synthetic scenario: broad equity vol spike affecting TRS/options-heavy and index-future books.",
+      "risk_factor_path": [
+        "EQUITY_VOL",
+        "EQUITY_INDEX",
+        "MARGIN_CALLS"
+      ],
+      "is_synthetic": true
+    },
+    {
+      "id": "NONE",
+      "label": "No linked event",
+      "description": "No live event nominated this counterparty.",
+      "risk_factor_path": [],
+      "is_synthetic": true
+    }
+  ]
+}
