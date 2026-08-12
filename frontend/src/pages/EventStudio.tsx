@@ -117,7 +117,7 @@ export function EventStudio() {
                     <div className="section-title" style={{ fontSize: 11 }}>Transmission — how the risk actually propagates</div>
                     {paths.map((p, i) => (
                       <div key={i} style={{ marginBottom: 8 }}>
-                        <RiskPath {...pathFromChain(p)} />
+                        <RiskPath path={pathFromChain(p)} />
                       </div>
                     ))}
                   </div>

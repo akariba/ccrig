@@ -161,7 +161,7 @@ export function Counterparty360() {
                 {r.risk_factor_path?.length > 0 && (
                   <div style={{ marginTop: 10 }}>
                     <div style={{ fontSize: 11, color: "var(--text-faint)", marginBottom: 6 }}>Risk-factor transmission path</div>
-                    <RiskPath {...pathFromChain(r.risk_factor_path)} />
+                    <RiskPath path={pathFromChain(r.risk_factor_path)} />
                   </div>
                 )}
                 {r.reference_entity_id && (
@@ -236,7 +236,7 @@ export function Counterparty360() {
                   <div style={{ marginBottom: 12 }}>
                     {r.decision.economic_exposure_paths.map((p: string, i: number) => (
                       <div key={i} style={{ marginBottom: 6 }}>
-                        <RiskPath {...pathFromChain(p.split(" → "))} />
+                        <RiskPath path={pathFromChain(p.split(" → "))} />
                       </div>
                     ))}
                   </div>

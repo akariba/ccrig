@@ -5,6 +5,7 @@ import { DataBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
 import { RiskPath, pathFromHops } from "../components/RiskPath";
 import { useInvestigation } from "../context/InvestigationContext";
+import { RANKED_ONLY } from "../graph/edgeLabels";
 
 const EXAMPLES = ["NVDA", "TSM", "interest rate volatility", "Meridian Alpha Rates Fund"];
 
@@ -85,17 +86,20 @@ export function RelationshipWorkbench() {
     setPairMateriality([...byId.values()]);
     // Push only once we know the typed relation (if any). A single-hop
     // structural path's relation directly connects the two nodes and is
-    // safe to use as the edge label; a multi-hop path (e.g. TSM -SUPPLIES->
-    // NVDA -SUPPLIES-> SSNLF) does NOT mean TSM's relation to SSNLF is
-    // "SUPPLIES" - that would misrepresent an indirect chain as a direct
-    // edge, so multi-hop (or absent) paths fall back to the generic,
-    // honest label instead of fabricating a direct relation type.
+    // safe to use as the canonical edge type, carrying real direction; a
+    // multi-hop path (e.g. TSM -SUPPLIES-> NVDA -SUPPLIES-> SSNLF) does NOT
+    // mean TSM's relation to SSNLF is "SUPPLIES" - that would misrepresent
+    // an indirect chain as a direct edge, so multi-hop (or absent) paths
+    // fall back to RANKED_ONLY (the derived-ranking sentinel, never a
+    // fabricated direct relation type).
     const hops = e?.typed_path?.hops;
-    const relation = hops?.length === 1 ? hops[0].relation : "correlated with";
+    const singleHop = hops?.length === 1 ? hops[0] : null;
     pushStep({
       nodeId: otherId, nodeType: "ENTITY", label: otherName,
       route: `/?q=${encodeURIComponent(entityData.header.id)}`,
-      relationFromPrevious: relation, evidenceRef: e,
+      edgeType: singleHop ? singleHop.relation : RANKED_ONLY,
+      traversedReverse: singleHop?.direction === "REVERSE",
+      evidenceRef: e,
     });
   }
 
@@ -217,7 +221,7 @@ export function RelationshipWorkbench() {
               {explain.typed_path?.hops?.length > 0 && (
                 <div style={{ marginTop: 10 }}>
                   <div style={{ fontSize: 11, color: "var(--text-faint)", marginBottom: 6 }}>Structural path (typed, deterministic)</div>
-                  <RiskPath {...pathFromHops(explain.typed_path.hops)} />
+                  <RiskPath path={pathFromHops(explain.typed_path.hops)} />
                 </div>
               )}
 
@@ -286,7 +290,8 @@ export function RelationshipWorkbench() {
                           to={`/counterparty?id=${r.id}`}
                           onClick={() => pushStep({
                             nodeId: r.id, nodeType: "COUNTERPARTY", label: r.name,
-                            route: `/counterparty?id=${r.id}`, relationFromPrevious: r.product ?? "exposed via",
+                            route: `/counterparty?id=${r.id}`,
+                            edgeType: r.product ?? "HAS_EXPOSURE", traversedReverse: false,
                           })}
                         >
                           {r.name}

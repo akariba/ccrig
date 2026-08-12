@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useState } from "react";
-
-export type NodeType = "ENTITY" | "COUNTERPARTY" | "EVENT" | "RISK_FACTOR" | "PRODUCT" | "THEME" | "COUNTRY";
+import type { NodeType } from "../graph/types";
 
 export type InvestigationStep = {
   /** Stable identity - the entity/counterparty id, event slug, etc. Two
@@ -10,22 +9,23 @@ export type InvestigationStep = {
   nodeType: NodeType;
   label: string;
   route: string;
-  /** The typed graph edge from the previous step to this one, e.g.
-   * "SUPPLIES", "TRS", "MARKET_CORRELATED_WITH" - null when the hop isn't
-   * a typed graph relation (a bare navigational move). This is what lets
-   * RiskPath render the investigation as a real typed path, not just a
-   * page-history breadcrumb. */
-  relationFromPrevious: string | null;
-  /** Optional pointer to the evidence behind this hop (a typed_path hop,
-   * an explain() response, etc.) - carried through for inspectors that
-   * want to re-show why this step was taken, never required. */
+  /** Canonical edge type from the previous step to this one (e.g.
+   * "SUPPLIES", "TRS"), or null for an untyped/ranking-based hop. This is
+   * a GraphPathEdge in miniature - see graph/types.ts - so the breadcrumb
+   * and RiskPath (via pathFromInvestigation) render the exact same
+   * underlying path object rather than maintaining separate semantics. */
+  edgeType: string | null;
+  /** True when the analyst traversed this hop against the edge's stored
+   * semantic direction. The underlying fact is never rewritten - only its
+   * presentation (via graph/edgeLabels.ts) inverts. */
+  traversedReverse: boolean;
   evidenceRef?: unknown;
 };
 
 type InvestigationContextValue = {
   steps: InvestigationStep[];
   /** Start a new investigation, discarding any prior path. */
-  resetInvestigation: (step: Omit<InvestigationStep, "relationFromPrevious">) => void;
+  resetInvestigation: (step: Omit<InvestigationStep, "edgeType" | "traversedReverse">) => void;
   /** Continue the current investigation with one more typed hop. */
   pushStep: (step: InvestigationStep) => void;
   /** Pure state truncation back to a prior step - callers that need to
@@ -45,13 +45,13 @@ const InvestigationCtx = createContext<InvestigationContextValue | null>(null);
 export function InvestigationProvider({ children }: { children: React.ReactNode }) {
   const [steps, setSteps] = useState<InvestigationStep[]>([]);
 
-  const resetInvestigation = useCallback((step: Omit<InvestigationStep, "relationFromPrevious">) => {
-    setSteps([{ ...step, relationFromPrevious: null }]);
+  const resetInvestigation = useCallback((step: Omit<InvestigationStep, "edgeType" | "traversedReverse">) => {
+    setSteps([{ ...step, edgeType: null, traversedReverse: false }]);
   }, []);
 
   const pushStep = useCallback((step: InvestigationStep) => {
     setSteps((prev) => {
-      if (prev.length === 0) return [{ ...step, relationFromPrevious: null }];
+      if (prev.length === 0) return [step];
       const last = prev[prev.length - 1];
       // Identity is (nodeId, nodeType, route) - never label, so two
       // distinct nodes that happen to share a display name are never

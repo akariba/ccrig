@@ -1,11 +1,15 @@
 import { Link } from "react-router-dom";
 import { useInvestigation } from "../context/InvestigationContext";
+import { edgeLabel } from "../graph/edgeLabels";
 
 // Subtle by design: renders nothing when there's no active investigation,
 // a single quiet line when there is. Never a card, never competing with
 // the page header for attention. Every entry is a real <a href> (router
 // Link), not a click-only span, so it's keyboard- and screen-reader-
 // reachable and works with cmd-click/open-in-new-tab like any other link.
+// Edge labels come from the same canonical registry RiskPath uses - this
+// breadcrumb and a typed RiskPath render the same underlying investigation
+// path, they just never disagree on what a hop is called.
 export function InvestigationBreadcrumb() {
   const { steps, truncateTo, clearInvestigation } = useInvestigation();
 
@@ -16,7 +20,7 @@ export function InvestigationBreadcrumb() {
       <span>Investigation:</span>
       {steps.map((step, i) => (
         <span key={`${step.nodeType}:${step.nodeId}:${i}`} className="hstack" style={{ gap: 4 }}>
-          {i > 0 && <span>{step.relationFromPrevious ? step.relationFromPrevious.replace(/_/g, " ").toLowerCase() : "›"}</span>}
+          {i > 0 && <span>{edgeLabel(step.edgeType, step.traversedReverse)}</span>}
           {i === steps.length - 1 ? (
             <span style={{ color: "var(--text)", fontWeight: 600 }}>{step.label}</span>
           ) : (

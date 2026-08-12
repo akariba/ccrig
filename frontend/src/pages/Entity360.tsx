@@ -121,7 +121,7 @@ export function Entity360() {
                   {explain.typed_path?.hops?.length > 0 && (
                     <div style={{ marginTop: 10, fontSize: 12 }}>
                       <div className="section-title">Typed path (deterministic, not AI)</div>
-                      <RiskPath {...pathFromHops(explain.typed_path.hops)} />
+                      <RiskPath path={pathFromHops(explain.typed_path.hops)} />
                       {explain.typed_path.hops?.[0]?.evidence_url && (
                         <div style={{ marginTop: 4 }}>
                           <a href={explain.typed_path.hops[0].evidence_url} target="_blank" rel="noreferrer">evidence source</a>

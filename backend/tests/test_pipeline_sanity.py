@@ -45,3 +45,21 @@ def test_typed_path_between_tsm_and_nvda_is_directional_and_sourced():
     assert p is not None
     assert p["hops"][0]["relation"] == "SUPPLIES"
     assert p["hops"][0]["evidence_url"]
+
+
+def test_reverse_traversal_does_not_flip_the_stored_edge_semantic():
+    """The canonical fact is TSM --SUPPLIES--> NVDA. Querying the path
+    starting from the OTHER end (NVDA -> TSM) must not silently relabel it
+    as "NVDA supplies TSM" - traversal direction and edge semantic
+    direction are two different things. The relation type must stay
+    SUPPLIES either way; only `direction` flips, so a caller can tell it's
+    reading the edge backward and invert the *display* label, never the
+    underlying fact. (This exact confusion shipped once already: the API
+    always returned `direction` correctly, but a frontend consumer ignored
+    it and rendered the inverse relation as if it were canonical.)"""
+    forward = path_mod.fact_path_between("TSM", "NVDA")
+    reverse = path_mod.fact_path_between("NVDA", "TSM")
+    assert forward["hops"][0]["relation"] == "SUPPLIES"
+    assert reverse["hops"][0]["relation"] == "SUPPLIES"  # never rewritten to a fake "SUPPLIED_BY" type
+    assert forward["hops"][0]["direction"] == "FORWARD"
+    assert reverse["hops"][0]["direction"] == "REVERSE"
