@@ -1,0 +1,148 @@
+{
+  "counterparties": [
+    {
+      "id": "CP_ALPHA",
+      "name": "Alpha Quant Capital LP",
+      "industry": "Hedge Fund - Tech/AI Long-Short",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_PACIFIC",
+      "name": "Pacific Tech Partners",
+      "industry": "Asset Manager - Asia Tech/Supply Chain",
+      "country": "Hong Kong",
+      "region": "APAC",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_MERIDIAN",
+      "name": "Meridian Global Macro LP",
+      "industry": "Hedge Fund - Global Macro (Energy/Defense)",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_NORTHBRIDGE",
+      "name": "Northbridge Insurance Group",
+      "industry": "Insurer - Fixed Income Book",
+      "country": "United Kingdom",
+      "region": "Europe",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_SUMMIT",
+      "name": "Summit State Pension Fund",
+      "industry": "Pension Fund - Diversified Public Equity",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_HELIX",
+      "name": "Helix Multi-Strategy Partners",
+      "industry": "Hedge Fund - Quant Multi-Strategy",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_CASCADE",
+      "name": "Cascade Regional Bank Treasury",
+      "industry": "Bank Treasury / ALM Book",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_IRONGATE",
+      "name": "Irongate Private Credit Fund",
+      "industry": "Private Credit - Industrials/Defense Lending",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_LATTICE",
+      "name": "Lattice Sovereign Growth Fund",
+      "industry": "Sovereign Wealth Fund - Tech Allocation",
+      "country": "Singapore",
+      "region": "APAC",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_VANTAGE",
+      "name": "Vantage European Equity Partners",
+      "industry": "Asset Manager - Broad European Equities",
+      "country": "Germany",
+      "region": "Europe",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_HARBOR",
+      "name": "Harbor Commodities Trading SA",
+      "industry": "Commodity Trading Firm - Energy/Shipping",
+      "country": "Switzerland",
+      "region": "Europe",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_KESTREL",
+      "name": "Kestrel Family Office",
+      "industry": "Family Office - Concentrated Tech Bets",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_ORION",
+      "name": "Orion Re Group",
+      "industry": "Reinsurer - Catastrophe & Credit Book",
+      "country": "Bermuda",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_DELTA",
+      "name": "Delta Prime Brokerage Client Book",
+      "industry": "Broker-Dealer Client - Prime Brokerage",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_ANCHOR",
+      "name": "Anchor Money Market Fund",
+      "industry": "Money Market Fund - Short-Term Bank Funding",
+      "country": "United States",
+      "region": "North America",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_TRIREME",
+      "name": "Trireme Shipping Finance",
+      "industry": "Shipping/Logistics Financier",
+      "country": "Greece",
+      "region": "Europe",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_EQUINOX",
+      "name": "Equinox Global Multi-Asset Fund",
+      "industry": "Hedge Fund - Diversified Multi-Asset",
+      "country": "United Kingdom",
+      "region": "Europe",
+      "is_synthetic": true
+    },
+    {
+      "id": "CP_GRANITE",
+      "name": "Granite Resources Capital",
+      "industry": "Fund - Mining/Commodities Focus",
+      "country": "Australia",
+      "region": "APAC",
+      "is_synthetic": true
+    }
+  ]
+}

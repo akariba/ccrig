@@ -1,0 +1,694 @@
+{
+  "fact_edges": [
+    {
+      "source": "TSM",
+      "target": "NVDA",
+      "relation": "SUPPLIES",
+      "criticality": 0.95,
+      "note": "Primary advanced-node foundry (CoWoS packaging) for NVIDIA AI GPUs.",
+      "evidence_status": "REPORTED_NEWS",
+      "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years"
+    },
+    {
+      "source": "TSM",
+      "target": "AMD",
+      "relation": "SUPPLIES",
+      "criticality": 0.88,
+      "note": "Primary foundry for AMD CPU/GPU dies.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "AAPL",
+      "relation": "SUPPLIES",
+      "criticality": 0.8,
+      "note": "Primary foundry for Apple silicon (A-series / M-series).",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "INTC",
+      "relation": "SUPPLIES",
+      "criticality": 0.2,
+      "note": "Partial outsourced leading-edge capacity for select Intel products.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "QCOM",
+      "relation": "SUPPLIES",
+      "criticality": 0.7,
+      "note": "Foundry for Qualcomm mobile SoCs.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "AVGO",
+      "relation": "SUPPLIES",
+      "criticality": 0.55,
+      "note": "Foundry for Broadcom custom AI ASICs and networking chips.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "ARM",
+      "relation": "SUPPLIES",
+      "criticality": 0.15,
+      "note": "Fabricates chips designed around Arm-licensed cores (indirect).",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ASML",
+      "target": "TSM",
+      "relation": "SUPPLIES",
+      "criticality": 0.85,
+      "note": "EUV lithography systems critical to TSMC advanced nodes.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ASML",
+      "target": "SSNLF",
+      "relation": "SUPPLIES",
+      "criticality": 0.75,
+      "note": "EUV lithography systems for Samsung Foundry/memory.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ASML",
+      "target": "INTC",
+      "relation": "SUPPLIES",
+      "criticality": 0.65,
+      "note": "EUV lithography systems for Intel Foundry.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMAT",
+      "target": "TSM",
+      "relation": "SUPPLIES",
+      "criticality": 0.55,
+      "note": "Wafer fab equipment (deposition/etch) supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMAT",
+      "target": "SSNLF",
+      "relation": "SUPPLIES",
+      "criticality": 0.5,
+      "note": "Wafer fab equipment supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMAT",
+      "target": "SKHY",
+      "relation": "SUPPLIES",
+      "criticality": 0.5,
+      "note": "Wafer fab equipment supplier for memory production.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMAT",
+      "target": "MU",
+      "relation": "SUPPLIES",
+      "criticality": 0.55,
+      "note": "Wafer fab equipment supplier for memory production.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SKHY",
+      "target": "NVDA",
+      "relation": "SUPPLIES",
+      "criticality": 0.78,
+      "note": "Key HBM supplier for NVIDIA AI accelerators.",
+      "evidence_status": "REPORTED_NEWS",
+      "evidence_url": "https://finance.yahoo.com/news/ai-capital-expenditure-shows-no-093005586.html"
+    },
+    {
+      "source": "SKHY",
+      "target": "AMD",
+      "relation": "SUPPLIES",
+      "criticality": 0.42,
+      "note": "HBM/memory supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MU",
+      "target": "NVDA",
+      "relation": "SUPPLIES",
+      "criticality": 0.45,
+      "note": "HBM/DRAM supplier for AI accelerators.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MU",
+      "target": "AAPL",
+      "relation": "SUPPLIES",
+      "criticality": 0.3,
+      "note": "DRAM/NAND memory supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SSNLF",
+      "target": "AAPL",
+      "relation": "SUPPLIES",
+      "criticality": 0.45,
+      "note": "Display panel and memory component supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SSNLF",
+      "target": "NVDA",
+      "relation": "SUPPLIES",
+      "criticality": 0.3,
+      "note": "Secondary/emerging HBM supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NVDA",
+      "target": "MSFT",
+      "relation": "SUPPLIES",
+      "criticality": 0.55,
+      "note": "GPU supply for Azure AI infrastructure.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NVDA",
+      "target": "GOOGL",
+      "relation": "SUPPLIES",
+      "criticality": 0.5,
+      "note": "GPU supply for Google Cloud AI infrastructure.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NVDA",
+      "target": "AMZN",
+      "relation": "SUPPLIES",
+      "criticality": 0.5,
+      "note": "GPU supply for AWS AI infrastructure.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NVDA",
+      "target": "META",
+      "relation": "SUPPLIES",
+      "criticality": 0.5,
+      "note": "GPU supply for Meta AI data centres.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMD",
+      "target": "MSFT",
+      "relation": "SUPPLIES",
+      "criticality": 0.25,
+      "note": "Secondary GPU/CPU procurement.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AVGO",
+      "target": "GOOGL",
+      "relation": "SUPPLIES",
+      "criticality": 0.55,
+      "note": "Co-designed custom AI ASIC (TPU) partnership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "QCOM",
+      "target": "AAPL",
+      "relation": "SUPPLIES",
+      "criticality": 0.35,
+      "note": "Modem chip supplier (historically primary).",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AVGO",
+      "target": "AAPL",
+      "relation": "SUPPLIES",
+      "criticality": 0.3,
+      "note": "RF/connectivity component supplier.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ARM",
+      "target": "QCOM",
+      "relation": "LICENSES_TO",
+      "criticality": 0.7,
+      "note": "Core architecture license for mobile SoCs.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ARM",
+      "target": "AAPL",
+      "relation": "LICENSES_TO",
+      "criticality": 0.75,
+      "note": "Core architecture license for Apple Silicon.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ARM",
+      "target": "NVDA",
+      "relation": "LICENSES_TO",
+      "criticality": 0.4,
+      "note": "Architecture license used in Grace CPU/data centre platforms.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "LMT",
+      "target": "RTX",
+      "relation": "SUPPLIES",
+      "criticality": 0.3,
+      "note": "Missile/subsystem component interdependencies across primes.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "BA",
+      "target": "RTX",
+      "relation": "SUPPLIES",
+      "criticality": 0.25,
+      "note": "Avionics/engine subsystem supplier relationships.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NOC",
+      "target": "LMT",
+      "relation": "SUPPLIES",
+      "criticality": 0.2,
+      "note": "Subsystem/sensor supply on shared defense programs.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "TAIWAN",
+      "relation": "OPERATES_IN",
+      "criticality": 1.0,
+      "note": "Headquartered and fabricates primarily in Taiwan.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SKHY",
+      "target": "SOUTH_KOREA",
+      "relation": "OPERATES_IN",
+      "criticality": 1.0,
+      "note": "Headquartered and fabricates primarily in South Korea.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SSNLF",
+      "target": "SOUTH_KOREA",
+      "relation": "OPERATES_IN",
+      "criticality": 1.0,
+      "note": "Headquartered in South Korea.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "DBK",
+      "target": "GERMANY",
+      "relation": "OPERATES_IN",
+      "criticality": 1.0,
+      "note": "Headquartered in Germany.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SHEL",
+      "target": "EUROPE",
+      "relation": "OPERATES_IN",
+      "criticality": 0.8,
+      "note": "Major European-domiciled energy major.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "BP",
+      "target": "EUROPE",
+      "relation": "OPERATES_IN",
+      "criticality": 0.8,
+      "note": "Major European-domiciled energy major.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TTE",
+      "target": "EUROPE",
+      "relation": "OPERATES_IN",
+      "criticality": 0.8,
+      "note": "Major European-domiciled energy major.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MAERSK",
+      "target": "EUROPE",
+      "relation": "OPERATES_IN",
+      "criticality": 0.7,
+      "note": "Headquartered in Denmark; global shipping operations.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "RIO",
+      "target": "EUROPE",
+      "relation": "OPERATES_IN",
+      "criticality": 0.4,
+      "note": "Dual-listed, UK-domiciled mining major.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TSM",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NVDA",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMD",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "INTC",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SKHY",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SSNLF",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ASML",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMAT",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AVGO",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MU",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "QCOM",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ARM",
+      "target": "SECTOR_SEMICONDUCTORS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Semiconductors sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "IBM",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MSFT",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AAPL",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "GOOGL",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AMZN",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "META",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "ORCL",
+      "target": "SECTOR_TECHNOLOGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Technology sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "JPM",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "C",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "DBK",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "BAC",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "GS",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MS",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "WFC",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "UBS",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "HSBC",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "AIG",
+      "target": "SECTOR_FINANCIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Financials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "BA",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "LMT",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "RTX",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "NOC",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "GD",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "MAERSK",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "CAT",
+      "target": "SECTOR_INDUSTRIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Industrials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "XOM",
+      "target": "SECTOR_ENERGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Energy sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "SHEL",
+      "target": "SECTOR_ENERGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Energy sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "CVX",
+      "target": "SECTOR_ENERGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Energy sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "BP",
+      "target": "SECTOR_ENERGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Energy sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "TTE",
+      "target": "SECTOR_ENERGY",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Energy sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "FCX",
+      "target": "SECTOR_MATERIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Materials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    },
+    {
+      "source": "RIO",
+      "target": "SECTOR_MATERIALS",
+      "relation": "BELONGS_TO_SECTOR",
+      "criticality": 1.0,
+      "note": "Materials sector membership.",
+      "evidence_status": "WELL_DOCUMENTED_PUBLIC"
+    }
+  ]
+}

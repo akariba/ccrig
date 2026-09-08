@@ -1,0 +1,323 @@
+{
+  "Apple Inc": {
+    "lei": "HWUPKR0MPOU8FGXBT394",
+    "legal_name": "Apple Inc.",
+    "country": "US",
+    "hq_city": "Cupertino",
+    "status": "ACTIVE",
+    "registered_as": "806592"
+  },
+  "Microsoft Corporation": {
+    "lei": "INR2EJN1ERAN0W5ZP974",
+    "legal_name": "MICROSOFT CORPORATION",
+    "country": "US",
+    "hq_city": "REDMOND",
+    "status": "ACTIVE",
+    "registered_as": "600 413 485"
+  },
+  "NVIDIA Corporation": {
+    "lei": "549300S4KLFTLO7GSQ80",
+    "legal_name": "NVIDIA CORPORATION",
+    "country": "US",
+    "hq_city": "SANTA CLARA",
+    "status": "ACTIVE",
+    "registered_as": "2862596"
+  },
+  "Advanced Micro Devices, Inc.": {
+    "lei": "R2I72C950HOYXII45366",
+    "legal_name": "ADVANCED MICRO DEVICES, INC.",
+    "country": "US",
+    "hq_city": "WILMINGTON",
+    "status": "ACTIVE",
+    "registered_as": "711524"
+  },
+  "Intel Corporation": {
+    "lei": "KNX4USFCNGPY45LOCE31",
+    "legal_name": "INTEL CORPORATION",
+    "country": "US",
+    "hq_city": "WILMINGTON",
+    "status": "ACTIVE",
+    "registered_as": "2189074"
+  },
+  "International Business Machines Corp": null,
+  "JPMORGAN CHASE & CO": {
+    "lei": "8I5DZWZKVSZI1NUHU748",
+    "legal_name": "JPMORGAN CHASE & CO.",
+    "country": "US",
+    "hq_city": "NEW YORK",
+    "status": "ACTIVE",
+    "registered_as": "691011"
+  },
+  "Citigroup Inc": {
+    "lei": "6SHGI4ZSSLCXXQSBB395",
+    "legal_name": "CITIGROUP INC.",
+    "country": "US",
+    "hq_city": "NEW YORK",
+    "status": "ACTIVE",
+    "registered_as": "2154254"
+  },
+  "Deutsche Bank Aktiengesellschaft": {
+    "lei": "529900IH9V4I3VHQVO92",
+    "legal_name": "Deutsche Bank Aktiengesellschaft",
+    "country": "FR",
+    "hq_city": "Frankfurt am Main",
+    "status": "ACTIVE",
+    "registered_as": "310 327 481"
+  },
+  "Exxon Mobil Corporation": null,
+  "Shell plc": {
+    "lei": "21380068P1DRHMJ8KU70",
+    "legal_name": "SHELL PLC",
+    "country": "GB",
+    "hq_city": "LONDON",
+    "status": "ACTIVE",
+    "registered_as": "04366849"
+  },
+  "The Boeing Company": {
+    "lei": "RVHJWBXLJ1RFUBSY1F30",
+    "legal_name": "THE BOEING COMPANY",
+    "country": "US",
+    "hq_city": "Wilmington",
+    "status": "ACTIVE",
+    "registered_as": "334807"
+  },
+  "Lockheed Martin Corporation": {
+    "lei": "DPRBOZP0K5RM2YE8UU08",
+    "legal_name": "LOCKHEED MARTIN CORPORATION",
+    "country": "US",
+    "hq_city": "BETHESDA",
+    "status": "ACTIVE",
+    "registered_as": "D03964756"
+  },
+  "Taiwan Semiconductor Manufacturing Company Limited": null,
+  "QUALCOMM Incorporated": {
+    "lei": "H1J8DDZKZP6H7RWC0H53",
+    "legal_name": "QUALCOMM INCORPORATED",
+    "country": "US",
+    "hq_city": "San Diego",
+    "status": "ACTIVE",
+    "registered_as": "2271160"
+  },
+  "Broadcom Inc.": {
+    "lei": "549300WV6GIDOZJTV909",
+    "legal_name": "BROADCOM INC.",
+    "country": "US",
+    "hq_city": "San Jose",
+    "status": "ACTIVE",
+    "registered_as": "6610117"
+  },
+  "Micron Technology, Inc.": {
+    "lei": "B3DXGBC8GAIYWI2Z0172",
+    "legal_name": "MICRON TECHNOLOGY, INC.",
+    "country": "US",
+    "hq_city": "WILMINGTON",
+    "status": "ACTIVE",
+    "registered_as": "2032425"
+  },
+  "ASML Holding N.V.": {
+    "lei": "724500Y6DUVHQD6OXN27",
+    "legal_name": "ASML Holding N.V.",
+    "country": "NL",
+    "hq_city": "Veldhoven",
+    "status": "ACTIVE",
+    "registered_as": "17085815"
+  },
+  "Applied Materials, Inc.": {
+    "lei": "41BNNE1AFPNAZELZ6K07",
+    "legal_name": "APPLIED MATERIALS, INC.",
+    "country": "US",
+    "hq_city": "Wilmington",
+    "status": "ACTIVE",
+    "registered_as": "2120849"
+  },
+  "Alphabet Inc.": {
+    "lei": "5493006MHB84DD0ZWV18",
+    "legal_name": "ALPHABET INC.",
+    "country": "US",
+    "hq_city": "Mountain View",
+    "status": "ACTIVE",
+    "registered_as": "5786925"
+  },
+  "Amazon.com, Inc.": {
+    "lei": "ZXTILKJKG63JELOEG630",
+    "legal_name": "AMAZON.COM, INC.",
+    "country": "US",
+    "hq_city": "Seattle",
+    "status": "ACTIVE",
+    "registered_as": "2620453"
+  },
+  "Meta Platforms, Inc.": {
+    "lei": "BQ4BKCS1HXDV9HN80Z93",
+    "legal_name": "META PLATFORMS, INC.",
+    "country": "US",
+    "hq_city": "MENLO PARK",
+    "status": "ACTIVE",
+    "registered_as": "3835815"
+  },
+  "Oracle Corporation": {
+    "lei": "1Z4GXXU7ZHVWFCD8TV52",
+    "legal_name": "ORACLE CORPORATION",
+    "country": "US",
+    "hq_city": "Austin",
+    "status": "ACTIVE",
+    "registered_as": "4028125"
+  },
+  "Chevron Corporation": {
+    "lei": "549300FRUAGV0OSIMA92",
+    "legal_name": "CHEVRON TRANSPORT CORPORATION LTD.",
+    "country": "BM",
+    "hq_city": "HAMILTON",
+    "status": "ACTIVE",
+    "registered_as": "26602"
+  },
+  "BP p.l.c.": {
+    "lei": "213800LH1BZH3DI6G760",
+    "legal_name": "BP P.L.C.",
+    "country": "GB",
+    "hq_city": "LONDON",
+    "status": "ACTIVE",
+    "registered_as": "00102498"
+  },
+  "TotalEnergies SE": {
+    "lei": "529900S21EQ1BO4ESM68",
+    "legal_name": "TotalEnergies SE",
+    "country": "FR",
+    "hq_city": "Courbevoie",
+    "status": "ACTIVE",
+    "registered_as": "542 051 180"
+  },
+  "RTX Corporation": {
+    "lei": "I07WOS4YJ0N7YRFE7309",
+    "legal_name": "RTX CORPORATION",
+    "country": "US",
+    "hq_city": "WILMINGTON",
+    "status": "ACTIVE",
+    "registered_as": "334827"
+  },
+  "Northrop Grumman Corporation": {
+    "lei": "RIMU48P07456QXSO0R61",
+    "legal_name": "NORTHROP GRUMMAN CORPORATION",
+    "country": "US",
+    "hq_city": "Wilmington",
+    "status": "ACTIVE",
+    "registered_as": "4856108"
+  },
+  "General Dynamics Corporation": {
+    "lei": "9C1X8XOOTYY2FNYTVH06",
+    "legal_name": "GENERAL DYNAMICS CORPORATION",
+    "country": "US",
+    "hq_city": "Reston",
+    "status": "ACTIVE",
+    "registered_as": "453929"
+  },
+  "Bank of America Corporation": {
+    "lei": "9DJT3UXIJIZJI4WXO774",
+    "legal_name": "BANK OF AMERICA CORPORATION",
+    "country": "US",
+    "hq_city": "Charlotte",
+    "status": "ACTIVE",
+    "registered_as": "2927442"
+  },
+  "Goldman Sachs Group, Inc.": {
+    "lei": "784F5XWPLTWKTBV3E584",
+    "legal_name": "THE GOLDMAN SACHS GROUP, INC.",
+    "country": "US",
+    "hq_city": "NEW YORK",
+    "status": "ACTIVE",
+    "registered_as": "2923466"
+  },
+  "Morgan Stanley": {
+    "lei": "IGJSJL3JD5P30I6NJZ34",
+    "legal_name": "MORGAN STANLEY",
+    "country": "US",
+    "hq_city": "New York",
+    "status": "ACTIVE",
+    "registered_as": "923632"
+  },
+  "Wells Fargo & Company": {
+    "lei": "54930004W6Z9H2LPE588",
+    "legal_name": "WELLS FARGO & COMPANY",
+    "country": "US",
+    "hq_city": "San Francisco",
+    "status": "NULL",
+    "registered_as": "251212"
+  },
+  "UBS Group AG": {
+    "lei": "549300SZJ9VS8SGXAN81",
+    "legal_name": "UBS Group AG",
+    "country": "CH",
+    "hq_city": "Zurich",
+    "status": "ACTIVE",
+    "registered_as": "CHE-395.345.924"
+  },
+  "HSBC Holdings plc": {
+    "lei": "MLU0ZO3ML4LN2LL2TL39",
+    "legal_name": "HSBC HOLDINGS PLC",
+    "country": "GB",
+    "hq_city": "LONDON",
+    "status": "ACTIVE",
+    "registered_as": "00617987"
+  },
+  "American International Group, Inc.": {
+    "lei": "ODVCVCQG2BP6VHV36M30",
+    "legal_name": "AMERICAN INTERNATIONAL GROUP, INC.",
+    "country": "US",
+    "hq_city": "New York",
+    "status": "ACTIVE",
+    "registered_as": "658607"
+  },
+  "A.P. Moller - Maersk A/S": {
+    "lei": "549300D2K6PKKKXVNN73",
+    "legal_name": "A.P. M\u00d8LLER - M\u00c6RSK A/S",
+    "country": "DK",
+    "hq_city": "Kobenhavn K",
+    "status": "ACTIVE",
+    "registered_as": "22756214"
+  },
+  "Caterpillar Inc.": {
+    "lei": "WRJR7GS4GTRECRRTVX92",
+    "legal_name": "CATERPILLAR INC.",
+    "country": "US",
+    "hq_city": "Irving",
+    "status": "ACTIVE",
+    "registered_as": "2085588"
+  },
+  "Freeport-McMoRan Inc.": {
+    "lei": "549300IRDTHJQ1PVET45",
+    "legal_name": "FREEPORT-MCMORAN INC.",
+    "country": "US",
+    "hq_city": "Phoenix",
+    "status": "ACTIVE",
+    "registered_as": "2143193"
+  },
+  "Rio Tinto plc": {
+    "lei": "213800YOEO5OQ72G2R82",
+    "legal_name": "RIO TINTO PLC",
+    "country": "GB",
+    "hq_city": "LONDON",
+    "status": "ACTIVE",
+    "registered_as": "00719885"
+  },
+  "Arm Holdings plc": {
+    "lei": "2138001E66EELTE7Y904",
+    "legal_name": "ARM HOLDINGS PLC",
+    "country": "GB",
+    "hq_city": "CAMBRIDGE",
+    "status": "ACTIVE",
+    "registered_as": "11299879"
+  },
+  "International Business Machines Corporation": {
+    "lei": "VGRQXHF3J8VDLUA7XE92",
+    "legal_name": "INTERNATIONAL BUSINESS MACHINES CORPORATION",
+    "country": "US",
+    "hq_city": "NORTH CASTLE",
+    "status": "ACTIVE"
+  },
+  "Taiwan Semiconductor Manufacturing Co Ltd": {
+    "lei": "254900W3W3WO39B4YU53",
+    "legal_name": "Taiwan Semiconductor Manufacturing Co. Ltd. ADRhedged(TM)",
+    "country": "US",
+    "hq_city": "Bedminster",
+    "status": "ACTIVE"
+  }
+}

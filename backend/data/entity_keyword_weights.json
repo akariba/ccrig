@@ -1,0 +1,391 @@
+{
+  "TSM": {
+    "SEMICONDUCTORS": 1.0,
+    "FOUNDRY": 1.0,
+    "TAIWAN": 1.0,
+    "AI": 0.6,
+    "GPU": 0.5,
+    "HBM": 0.4,
+    "EXPORT_CONTROLS": 0.5,
+    "EARTHQUAKE": 0.4,
+    "GEOPOLITICS": 0.6,
+    "CHIPS_ACT": 0.3,
+    "SUPPLY_DISRUPTION": 0.5,
+    "CAPEX": 0.5,
+    "LITHOGRAPHY": 0.4
+  },
+  "NVDA": {
+    "AI": 1.0,
+    "GPU": 1.0,
+    "SEMICONDUCTORS": 0.9,
+    "DATA_CENTERS": 0.8,
+    "HYPERSCALERS": 0.7,
+    "HBM": 0.6,
+    "AI_BUBBLE": 0.7,
+    "EXPORT_CONTROLS": 0.5,
+    "CHINA": 0.4,
+    "TAIWAN": 0.3,
+    "AI_MONETIZATION": 0.5
+  },
+  "AMD": {
+    "SEMICONDUCTORS": 0.9,
+    "GPU": 0.8,
+    "AI": 0.7,
+    "DATA_CENTERS": 0.6,
+    "AI_BUBBLE": 0.5,
+    "TAIWAN": 0.3
+  },
+  "INTC": {
+    "SEMICONDUCTORS": 1.0,
+    "FOUNDRY": 0.5,
+    "CHIPS_ACT": 0.6,
+    "AI": 0.3,
+    "DATA_CENTERS": 0.4,
+    "TAIWAN": 0.2,
+    "LITHOGRAPHY": 0.3
+  },
+  "SKHY": {
+    "MEMORY": 1.0,
+    "HBM": 1.0,
+    "SEMICONDUCTORS": 0.9,
+    "SOUTH_KOREA": 1.0,
+    "AI": 0.5,
+    "CAPEX": 0.4
+  },
+  "SSNLF": {
+    "MEMORY": 0.9,
+    "SEMICONDUCTORS": 0.9,
+    "SOUTH_KOREA": 1.0,
+    "FOUNDRY": 0.5,
+    "AI": 0.3,
+    "HBM": 0.4
+  },
+  "ASML": {
+    "LITHOGRAPHY": 1.0,
+    "SEMICONDUCTORS": 0.9,
+    "EXPORT_CONTROLS": 0.6,
+    "CHINA": 0.4,
+    "EUROPE": 0.5,
+    "FOUNDRY": 0.5
+  },
+  "AMAT": {
+    "LITHOGRAPHY": 0.8,
+    "SEMICONDUCTORS": 0.9,
+    "CAPEX": 0.5,
+    "EXPORT_CONTROLS": 0.4
+  },
+  "AVGO": {
+    "SEMICONDUCTORS": 0.9,
+    "AI": 0.7,
+    "GPU": 0.3,
+    "HYPERSCALERS": 0.6,
+    "DATA_CENTERS": 0.6
+  },
+  "MU": {
+    "MEMORY": 1.0,
+    "HBM": 0.7,
+    "SEMICONDUCTORS": 0.9,
+    "AI": 0.4,
+    "CAPEX": 0.4
+  },
+  "QCOM": {
+    "SEMICONDUCTORS": 0.8,
+    "TAIWAN": 0.3,
+    "CHINA": 0.4
+  },
+  "ARM": {
+    "SEMICONDUCTORS": 0.7,
+    "AI": 0.4,
+    "MNA": 0.2
+  },
+  "IBM": {
+    "AI": 0.6,
+    "CLOUD": 0.5,
+    "CYBERSECURITY": 0.4,
+    "SEMICONDUCTORS": 0.2,
+    "AI_MONETIZATION": 0.4
+  },
+  "MSFT": {
+    "AI": 1.0,
+    "CLOUD": 1.0,
+    "DATA_CENTERS": 0.9,
+    "HYPERSCALERS": 1.0,
+    "CYBERSECURITY": 0.4,
+    "AI_BUBBLE": 0.5,
+    "GPU": 0.4,
+    "CAPEX": 0.6,
+    "AI_MONETIZATION": 0.6,
+    "POWER_GRID": 0.3
+  },
+  "AAPL": {
+    "SEMICONDUCTORS": 0.5,
+    "CHINA": 0.5,
+    "TAIWAN": 0.4,
+    "FOUNDRY": 0.3
+  },
+  "GOOGL": {
+    "AI": 1.0,
+    "CLOUD": 0.9,
+    "DATA_CENTERS": 0.9,
+    "HYPERSCALERS": 1.0,
+    "AI_BUBBLE": 0.5,
+    "CAPEX": 0.6,
+    "AI_MONETIZATION": 0.5,
+    "POWER_GRID": 0.3
+  },
+  "AMZN": {
+    "AI": 0.8,
+    "CLOUD": 1.0,
+    "DATA_CENTERS": 0.9,
+    "HYPERSCALERS": 1.0,
+    "AI_BUBBLE": 0.4,
+    "CAPEX": 0.6,
+    "POWER_GRID": 0.3
+  },
+  "META": {
+    "AI": 0.9,
+    "DATA_CENTERS": 0.9,
+    "HYPERSCALERS": 0.9,
+    "AI_BUBBLE": 0.5,
+    "CAPEX": 0.6,
+    "GPU": 0.4,
+    "AI_MONETIZATION": 0.4
+  },
+  "ORCL": {
+    "AI": 0.6,
+    "CLOUD": 0.8,
+    "DATA_CENTERS": 0.6,
+    "HYPERSCALERS": 0.5,
+    "CAPEX": 0.4
+  },
+  "JPM": {
+    "BANKING": 1.0,
+    "INTEREST_RATES": 0.6,
+    "CREDIT_CRISIS": 0.4,
+    "INFLATION": 0.3
+  },
+  "C": {
+    "BANKING": 1.0,
+    "INTEREST_RATES": 0.5,
+    "CREDIT_CRISIS": 0.4,
+    "EUROPE": 0.2
+  },
+  "DBK": {
+    "BANKING": 1.0,
+    "GERMANY": 1.0,
+    "EUROPE": 0.8,
+    "CREDIT_CRISIS": 0.4,
+    "INTEREST_RATES": 0.4,
+    "RUSSIA": 0.3
+  },
+  "BAC": {
+    "BANKING": 1.0,
+    "INTEREST_RATES": 0.5,
+    "CREDIT_CRISIS": 0.3,
+    "BANK_FUNDING": 0.3
+  },
+  "GS": {
+    "BANKING": 0.9,
+    "INTEREST_RATES": 0.4,
+    "MNA": 0.4
+  },
+  "MS": {
+    "BANKING": 0.9,
+    "INTEREST_RATES": 0.4,
+    "MNA": 0.4
+  },
+  "WFC": {
+    "BANKING": 1.0,
+    "INTEREST_RATES": 0.5,
+    "BANK_FUNDING": 0.3
+  },
+  "UBS": {
+    "BANKING": 1.0,
+    "EUROPE": 0.6,
+    "BANK_FUNDING": 0.4,
+    "CREDIT_CRISIS": 0.3
+  },
+  "HSBC": {
+    "BANKING": 1.0,
+    "EUROPE": 0.5,
+    "CHINA": 0.4
+  },
+  "AIG": {
+    "INSURANCE": 1.0,
+    "BANKING": 0.2,
+    "CREDIT_CRISIS": 0.3
+  },
+  "BA": {
+    "AEROSPACE": 1.0,
+    "DEFENSE": 0.6,
+    "SUPPLY_DISRUPTION": 0.4,
+    "TARIFFS": 0.3
+  },
+  "LMT": {
+    "DEFENSE": 1.0,
+    "AEROSPACE": 0.8,
+    "UKRAINE": 0.4,
+    "RUSSIA": 0.3,
+    "NATO": 0.6
+  },
+  "RTX": {
+    "DEFENSE": 1.0,
+    "AEROSPACE": 0.8,
+    "NATO": 0.6,
+    "UKRAINE": 0.3
+  },
+  "NOC": {
+    "DEFENSE": 1.0,
+    "AEROSPACE": 0.6,
+    "NATO": 0.5
+  },
+  "GD": {
+    "DEFENSE": 1.0,
+    "AEROSPACE": 0.5,
+    "NATO": 0.4,
+    "SHIPPING": 0.2
+  },
+  "MAERSK": {
+    "SHIPPING": 1.0,
+    "EUROPE": 0.5,
+    "SUPPLY_DISRUPTION": 0.4,
+    "TARIFFS": 0.3
+  },
+  "CAT": {
+    "SUPPLY_DISRUPTION": 0.3,
+    "TARIFFS": 0.3,
+    "MINING": 0.3
+  },
+  "XOM": {
+    "OIL": 1.0,
+    "ENERGY": 1.0,
+    "NATURAL_GAS": 0.5,
+    "OPEC": 0.5,
+    "INFLATION": 0.3
+  },
+  "SHEL": {
+    "OIL": 1.0,
+    "ENERGY": 1.0,
+    "NATURAL_GAS": 0.7,
+    "OPEC": 0.4,
+    "EUROPE": 0.5,
+    "RUSSIA": 0.3
+  },
+  "CVX": {
+    "OIL": 1.0,
+    "ENERGY": 1.0,
+    "OPEC": 0.4
+  },
+  "BP": {
+    "OIL": 1.0,
+    "ENERGY": 1.0,
+    "NATURAL_GAS": 0.5,
+    "EUROPE": 0.6,
+    "RUSSIA": 0.3
+  },
+  "TTE": {
+    "OIL": 0.9,
+    "ENERGY": 1.0,
+    "NATURAL_GAS": 0.6,
+    "EUROPE": 0.6,
+    "RUSSIA": 0.3
+  },
+  "FCX": {
+    "MINING": 1.0,
+    "AI": 0.2,
+    "DATA_CENTERS": 0.2,
+    "POWER_GRID": 0.3
+  },
+  "RIO": {
+    "MINING": 1.0,
+    "CHINA": 0.4,
+    "EUROPE": 0.3
+  },
+  "CP_ALPHA": {
+    "AI": 0.6,
+    "AI_BUBBLE": 0.5,
+    "SEMICONDUCTORS": 0.4,
+    "GPU": 0.4
+  },
+  "CP_PACIFIC": {
+    "TAIWAN": 0.5,
+    "SEMICONDUCTORS": 0.5,
+    "SOUTH_KOREA": 0.3,
+    "MEMORY": 0.3
+  },
+  "CP_MERIDIAN": {
+    "ENERGY": 0.5,
+    "DEFENSE": 0.4,
+    "OIL": 0.3,
+    "AEROSPACE": 0.3
+  },
+  "CP_NORTHBRIDGE": {
+    "BANKING": 0.5,
+    "INSURANCE": 1.0,
+    "EUROPE": 0.3,
+    "CREDIT_CRISIS": 0.3
+  },
+  "CP_SUMMIT": {
+    "BANKING": 0.3,
+    "AI": 0.3,
+    "ENERGY": 0.2
+  },
+  "CP_HELIX": {
+    "AI": 0.5,
+    "SEMICONDUCTORS": 0.5,
+    "AI_BUBBLE": 0.4
+  },
+  "CP_CASCADE": {
+    "BANKING": 0.7,
+    "BANK_FUNDING": 0.6,
+    "INTEREST_RATES": 0.5
+  },
+  "CP_IRONGATE": {
+    "DEFENSE": 0.5,
+    "AEROSPACE": 0.3
+  },
+  "CP_LATTICE": {
+    "AI": 0.5,
+    "SEMICONDUCTORS": 0.4,
+    "TAIWAN": 0.3
+  },
+  "CP_VANTAGE": {
+    "EUROPE": 0.6,
+    "BANKING": 0.3
+  },
+  "CP_HARBOR": {
+    "ENERGY": 0.6,
+    "SHIPPING": 0.5,
+    "OIL": 0.3
+  },
+  "CP_KESTREL": {
+    "AI": 0.6,
+    "AI_BUBBLE": 0.5
+  },
+  "CP_ORION": {
+    "INSURANCE": 0.8,
+    "CREDIT_CRISIS": 0.3
+  },
+  "CP_DELTA": {
+    "BANKING": 0.4,
+    "AI": 0.3
+  },
+  "CP_ANCHOR": {
+    "BANK_FUNDING": 0.8,
+    "BANKING": 0.6,
+    "INTEREST_RATES": 0.4
+  },
+  "CP_TRIREME": {
+    "SHIPPING": 0.8,
+    "ENERGY": 0.3
+  },
+  "CP_EQUINOX": {
+    "AI": 0.3,
+    "ENERGY": 0.3,
+    "DEFENSE": 0.3
+  },
+  "CP_GRANITE": {
+    "MINING": 0.8,
+    "CHINA": 0.3
+  }
+}

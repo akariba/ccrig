@@ -1,0 +1,282 @@
+{
+  "documents": [
+    {
+      "id": "r1",
+      "date": "2026-06-04",
+      "entities": [
+        "TSM",
+        "NVDA",
+        "AMD"
+      ],
+      "keywords": [
+        "AI",
+        "FOUNDRY",
+        "TAIWAN",
+        "SUPPLY_DISRUPTION"
+      ],
+      "title": "TSMC CEO Warns Chip Supply Won't Meet AI-Fueled Demand for Years",
+      "source": "Bloomberg",
+      "url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+      "snippet": "TSMC's global chip supply will fall short of AI-fuelled demand for years, CEO C.C. Wei said.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r2",
+      "date": "2026-06-04",
+      "entities": [
+        "TSM"
+      ],
+      "keywords": [
+        "AI",
+        "TAIWAN",
+        "CAPEX"
+      ],
+      "title": "TSMC posts record profits on continued AI demand",
+      "source": "CNBC",
+      "url": "https://www.cnbc.com/2026/04/16/tsmc-q1-profit-58-percent-ai-chip-demand-record.html",
+      "snippet": "TSMC Q1 2026 profit rose sharply on continued AI-driven demand.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r3",
+      "date": "2026-07-15",
+      "entities": [
+        "TSM"
+      ],
+      "keywords": [
+        "AI",
+        "TAIWAN",
+        "CAPEX"
+      ],
+      "title": "TSMC to invest another $100 billion in US as Q2 profit surges",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/world/asia-pacific/tsmcs-second-quarter-profit-seen-hitting-record-ai-boom-2026-07-15/",
+      "snippet": "TSMC Q2 profit surged 77% on AI boom; raised US and capex plans.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r4",
+      "date": "2026-03-24",
+      "entities": [
+        "AVGO",
+        "TSM"
+      ],
+      "keywords": [
+        "SEMICONDUCTORS",
+        "SUPPLY_DISRUPTION",
+        "FOUNDRY"
+      ],
+      "title": "Broadcom flags supply constraints, says TSMC capacity a bottleneck",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/world/asia-pacific/broadcom-flags-supply-constraints-says-tsmc-capacity-bottleneck-2026-03-24/",
+      "snippet": "Broadcom said TSMC production capacity limitations are a supply bottleneck.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r5",
+      "date": "2026-05-27",
+      "entities": [
+        "NVDA",
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "META"
+      ],
+      "keywords": [
+        "AI_BUBBLE",
+        "CAPEX",
+        "AI_MONETIZATION"
+      ],
+      "title": "Investors stay calm as AI capex boom eclipses dotcom mania",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/commentary/reuters-open-interest/investors-stay-calm-ai-capex-boom-eclipses-dotcom-mania-2026-05-27/",
+      "snippet": "AI capex projected near $800bn in 2026; Morgan Stanley sees $1.12tn in 2027; PIMCO flags overbuild and debt-financing risk.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r6",
+      "date": "2026-06-29",
+      "entities": [
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "META"
+      ],
+      "keywords": [
+        "AI_BUBBLE",
+        "CAPEX",
+        "RECESSION"
+      ],
+      "title": "The central bank of central banks sees a $1 trillion AI investment boom risk",
+      "source": "Fortune / BIS",
+      "url": "https://fortune.com/2026/06/29/bis-central-bank-warning-hyperscaler-data-center-1-trillion-gamble-recession/",
+      "snippet": "BIS warns hyperscaler AI/data-centre spending concentration poses a macro risk.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r7",
+      "date": "2025-12-03",
+      "entities": [
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "META"
+      ],
+      "keywords": [
+        "AI_BUBBLE",
+        "CAPEX"
+      ],
+      "title": "Bank of America says we're in an AI 'air pocket,' not a bubble",
+      "source": "Fortune / BofA",
+      "url": "https://fortune.com/2025/12/03/is-ai-a-bubble-bofa-says-air-pocket-in-2026-data-center-debt/",
+      "snippet": "BofA: aggressive hyperscaler capex increasingly debt-financed; risk if monetisation lags.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r8",
+      "date": "2026-06-10",
+      "entities": [
+        "NVDA",
+        "AMD",
+        "MSFT"
+      ],
+      "keywords": [
+        "AI_BUBBLE",
+        "CAPEX"
+      ],
+      "title": "Goldman Sachs says the AI boom is bigger than investors think",
+      "source": "Business Insider / Goldman Sachs",
+      "url": "https://www.businessinsider.com/stock-market-wall-street-tech-selloff-ai-token-goldman-sachs-2026-6",
+      "snippet": "Goldman: 2027 hyperscaler capex consensus too conservative; could reach ~$1.1tn.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r9",
+      "date": "2026-02-23",
+      "entities": [
+        "TSM"
+      ],
+      "keywords": [
+        "TAIWAN",
+        "FOUNDRY",
+        "CAPEX"
+      ],
+      "title": "TSMC Speeds up Expansion in Taiwan: up to 10 Fabs Under Construction",
+      "source": "TrendForce",
+      "url": "https://www.trendforce.com/news/2026/02/23/news-tsmc-speeds-up-expansion-in-taiwan-up-to-10-fabs-reportedly-under-construction-or-starting-in-2026/",
+      "snippet": "TrendForce reports up to 10 TSMC fabs under construction or starting in 2026 in Taiwan.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r10",
+      "date": "2026-07-08",
+      "entities": [
+        "LMT",
+        "BA",
+        "RTX",
+        "NOC"
+      ],
+      "keywords": [
+        "DEFENSE",
+        "NATO"
+      ],
+      "title": "Fact Sheet: NATO allies commit to historic defense investment",
+      "source": "The White House",
+      "url": "https://www.whitehouse.gov/fact-sheets/2026/07/fact-sheet-president-donald-j-trump-secures-historic-defense-investment-from-nato-allies-powering-american-industry/",
+      "snippet": "NATO Ankara Summit: allies announce major defense procurement deals with Lockheed Martin, Boeing, Northrop Grumman, RTX and others.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r11",
+      "date": "2026-07-07",
+      "entities": [
+        "LMT",
+        "BA",
+        "RTX",
+        "NOC"
+      ],
+      "keywords": [
+        "DEFENSE",
+        "NATO"
+      ],
+      "title": "NATO touts $50 billion in arms deals as leaders meet in Ankara",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/business/autos-transportation/defence-companies-sign-deals-nato-industry-forum-2026-07-07/",
+      "snippet": "NATO members and defense contractors sign roughly $50bn in deals at the industry forum.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r12",
+      "date": "2026-01-26",
+      "entities": [
+        "SHEL",
+        "BP",
+        "TTE",
+        "XOM"
+      ],
+      "keywords": [
+        "RUSSIA",
+        "NATURAL_GAS",
+        "ENERGY",
+        "EUROPE"
+      ],
+      "title": "EU countries give final approval to Russian gas ban",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/business/energy/eu-countries-give-final-approval-russian-gas-ban-2026-01-26/",
+      "snippet": "EU formally approves phase-out/ban of Russian gas imports, reshaping European energy supply.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r13",
+      "date": "2026-07-27",
+      "entities": [
+        "SHEL",
+        "BP",
+        "TTE"
+      ],
+      "keywords": [
+        "NATURAL_GAS",
+        "ENERGY",
+        "EUROPE"
+      ],
+      "title": "Europe faces a long, cold winter as fuel buffers dwindle",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/commentary/reuters-open-interest/europe-faces-long-cold-winter-fuel-buffers-dwindle-2026-07-27/",
+      "snippet": "European gas storage buffers are running low heading into winter 2026.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    },
+    {
+      "id": "r14",
+      "date": "2026-03-11",
+      "entities": [
+        "SHEL",
+        "BP",
+        "TTE"
+      ],
+      "keywords": [
+        "RUSSIA",
+        "NATURAL_GAS",
+        "GEOPOLITICS"
+      ],
+      "title": "Mideast conflict may hasten Europe's gas divorce from Russia",
+      "source": "Reuters",
+      "url": "https://www.reuters.com/markets/commodities/mideast-conflict-may-hasten-europes-gas-divorce-russia-vladimirov-2026-03-11/",
+      "snippet": "Middle East tensions add pressure to Europe's shift away from Russian gas.",
+      "is_synthetic": false,
+      "source_type": "REAL_PUBLIC_NEWS"
+    }
+  ]
+}

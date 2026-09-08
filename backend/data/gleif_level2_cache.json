@@ -1,0 +1,402 @@
+{
+  "Apple Inc": {
+    "lei": "HWUPKR0MPOU8FGXBT394",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:56.508920+00:00"
+  },
+  "Microsoft Corporation": {
+    "lei": "INR2EJN1ERAN0W5ZP974",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:56.922881+00:00"
+  },
+  "NVIDIA Corporation": {
+    "lei": "549300S4KLFTLO7GSQ80",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:57.284628+00:00"
+  },
+  "Advanced Micro Devices, Inc.": {
+    "lei": "R2I72C950HOYXII45366",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:57.647143+00:00"
+  },
+  "Intel Corporation": {
+    "lei": "KNX4USFCNGPY45LOCE31",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:58.004402+00:00"
+  },
+  "JPMORGAN CHASE & CO": {
+    "lei": "8I5DZWZKVSZI1NUHU748",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:58.368967+00:00"
+  },
+  "Citigroup Inc": {
+    "lei": "6SHGI4ZSSLCXXQSBB395",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:58.925218+00:00"
+  },
+  "Deutsche Bank Aktiengesellschaft": {
+    "lei": "529900IH9V4I3VHQVO92",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": false,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": false,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:59.396933+00:00"
+  },
+  "Shell plc": {
+    "lei": "21380068P1DRHMJ8KU70",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:00:59.772380+00:00"
+  },
+  "The Boeing Company": {
+    "lei": "RVHJWBXLJ1RFUBSY1F30",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:00.131342+00:00"
+  },
+  "Lockheed Martin Corporation": {
+    "lei": "DPRBOZP0K5RM2YE8UU08",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:00.504114+00:00"
+  },
+  "QUALCOMM Incorporated": {
+    "lei": "H1J8DDZKZP6H7RWC0H53",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:00.878300+00:00"
+  },
+  "Broadcom Inc.": {
+    "lei": "549300WV6GIDOZJTV909",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:01.275442+00:00"
+  },
+  "Micron Technology, Inc.": {
+    "lei": "B3DXGBC8GAIYWI2Z0172",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:01.658071+00:00"
+  },
+  "ASML Holding N.V.": {
+    "lei": "724500Y6DUVHQD6OXN27",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:02.070490+00:00"
+  },
+  "Applied Materials, Inc.": {
+    "lei": "41BNNE1AFPNAZELZ6K07",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:02.454692+00:00"
+  },
+  "Alphabet Inc.": {
+    "lei": "5493006MHB84DD0ZWV18",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:02.839968+00:00"
+  },
+  "Amazon.com, Inc.": {
+    "lei": "ZXTILKJKG63JELOEG630",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:03.213078+00:00"
+  },
+  "Meta Platforms, Inc.": {
+    "lei": "BQ4BKCS1HXDV9HN80Z93",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:03.565345+00:00"
+  },
+  "Oracle Corporation": {
+    "lei": "1Z4GXXU7ZHVWFCD8TV52",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:03.939093+00:00"
+  },
+  "Chevron Corporation": {
+    "lei": "549300FRUAGV0OSIMA92",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:04.298401+00:00"
+  },
+  "BP p.l.c.": {
+    "lei": "213800LH1BZH3DI6G760",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:04.668935+00:00"
+  },
+  "TotalEnergies SE": {
+    "lei": "529900S21EQ1BO4ESM68",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:05.038041+00:00"
+  },
+  "RTX Corporation": {
+    "lei": "I07WOS4YJ0N7YRFE7309",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:05.400250+00:00"
+  },
+  "Northrop Grumman Corporation": {
+    "lei": "RIMU48P07456QXSO0R61",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:05.761823+00:00"
+  },
+  "General Dynamics Corporation": {
+    "lei": "9C1X8XOOTYY2FNYTVH06",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:06.187006+00:00"
+  },
+  "Bank of America Corporation": {
+    "lei": "9DJT3UXIJIZJI4WXO774",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:06.669530+00:00"
+  },
+  "Goldman Sachs Group, Inc.": {
+    "lei": "784F5XWPLTWKTBV3E584",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:07.102731+00:00"
+  },
+  "Morgan Stanley": {
+    "lei": "IGJSJL3JD5P30I6NJZ34",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:07.590032+00:00"
+  },
+  "Wells Fargo & Company": {
+    "lei": "54930004W6Z9H2LPE588",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:07.974372+00:00"
+  },
+  "UBS Group AG": {
+    "lei": "549300SZJ9VS8SGXAN81",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:08.348069+00:00"
+  },
+  "HSBC Holdings plc": {
+    "lei": "MLU0ZO3ML4LN2LL2TL39",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:08.923455+00:00"
+  },
+  "American International Group, Inc.": {
+    "lei": "ODVCVCQG2BP6VHV36M30",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:09.288401+00:00"
+  },
+  "A.P. Moller - Maersk A/S": {
+    "lei": "549300D2K6PKKKXVNN73",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": false,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": false,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:09.650990+00:00"
+  },
+  "Caterpillar Inc.": {
+    "lei": "WRJR7GS4GTRECRRTVX92",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:10.018814+00:00"
+  },
+  "Freeport-McMoRan Inc.": {
+    "lei": "549300IRDTHJQ1PVET45",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:10.389162+00:00"
+  },
+  "Rio Tinto plc": {
+    "lei": "213800YOEO5OQ72G2R82",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:10.779388+00:00"
+  },
+  "Arm Holdings plc": {
+    "lei": "2138001E66EELTE7Y904",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": false,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": false,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:11.159091+00:00"
+  },
+  "International Business Machines Corporation": {
+    "lei": "VGRQXHF3J8VDLUA7XE92",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:11.549472+00:00"
+  },
+  "Taiwan Semiconductor Manufacturing Co Ltd": {
+    "lei": "254900W3W3WO39B4YU53",
+    "direct_parent": null,
+    "direct_parent_reporting_exception": true,
+    "ultimate_parent": null,
+    "ultimate_parent_reporting_exception": true,
+    "source": "GLEIF",
+    "source_type": "REAL_PUBLIC_DATA",
+    "retrieved_at": "2026-08-06T23:01:11.928310+00:00"
+  }
+}

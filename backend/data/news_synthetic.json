@@ -1,0 +1,736 @@
+{
+  "documents": [
+    {
+      "id": "n1",
+      "date": "2026-06-02",
+      "entities": [
+        "TSM",
+        "NVDA",
+        "AMD"
+      ],
+      "text": "TSMC reported record advanced-node demand as NVIDIA and AMD compete for allocation of next-generation AI chip capacity in Taiwan.",
+      "title": "TSMC reported record advanced-node demand as NVIDIA and AMD compete for allocation of...",
+      "keywords": [
+        "TAIWAN",
+        "SEMICONDUCTORS",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "TSMC reported record advanced-node demand as NVIDIA and AMD compete for allocation of next-generation AI chip capacity in Taiwan.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n2",
+      "date": "2026-06-05",
+      "entities": [
+        "NVDA",
+        "SKHY"
+      ],
+      "text": "SK Hynix said high-bandwidth memory (HBM) supply for NVIDIA's AI accelerators remains sold out through next year amid surging data centre demand.",
+      "title": "SK Hynix said high-bandwidth memory (HBM) supply for NVIDIA's AI accelerators remains...",
+      "keywords": [
+        "GPU",
+        "DATA_CENTERS",
+        "MEMORY",
+        "HBM",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "SK Hynix said high-bandwidth memory (HBM) supply for NVIDIA's AI accelerators remains sold out through next year amid surging data centre demand.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n3",
+      "date": "2026-06-10",
+      "entities": [
+        "TSM",
+        "AAPL",
+        "INTC"
+      ],
+      "text": "Apple locks in TSMC's newest fabrication node for upcoming chips, while Intel pushes its own foundry roadmap to compete for leading-edge orders.",
+      "title": "Apple locks in TSMC's newest fabrication node for upcoming chips, while Intel pushes...",
+      "keywords": [
+        "FOUNDRY",
+        "SEMICONDUCTORS"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Apple locks in TSMC's newest fabrication node for upcoming chips, while Intel pushes its own foundry roadmap to compete for leading-edge orders.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n4",
+      "date": "2026-06-14",
+      "entities": [
+        "MSFT",
+        "NVDA"
+      ],
+      "text": "Microsoft Azure signs a multi-year GPU supply agreement with NVIDIA to expand AI data centre capacity across hyperscale cloud regions.",
+      "title": "Microsoft Azure signs a multi-year GPU supply agreement with NVIDIA to expand AI data...",
+      "keywords": [
+        "DATA_CENTERS",
+        "CLOUD",
+        "GPU",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Microsoft Azure signs a multi-year GPU supply agreement with NVIDIA to expand AI data centre capacity across hyperscale cloud regions.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n5",
+      "date": "2026-06-18",
+      "entities": [
+        "IBM",
+        "INTC"
+      ],
+      "text": "IBM and Intel both highlight enterprise AI and hybrid cloud roadmaps at industry conference, emphasizing on-premise inference chips.",
+      "title": "IBM and Intel both highlight enterprise AI and hybrid cloud roadmaps at industry...",
+      "keywords": [
+        "CLOUD",
+        "SEMICONDUCTORS",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "IBM and Intel both highlight enterprise AI and hybrid cloud roadmaps at industry conference, emphasizing on-premise inference chips.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n6",
+      "date": "2026-06-20",
+      "entities": [
+        "TSM",
+        "SSNLF",
+        "SKHY"
+      ],
+      "text": "Taiwan, South Korea semiconductor manufacturers TSMC, Samsung and SK Hynix face rising capital expenditure for advanced packaging and HBM output.",
+      "title": "Taiwan, South Korea semiconductor manufacturers TSMC, Samsung and SK Hynix face rising...",
+      "keywords": [
+        "CAPEX",
+        "FOUNDRY",
+        "SEMICONDUCTORS",
+        "SOUTH_KOREA",
+        "TAIWAN",
+        "HBM",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Taiwan, South Korea semiconductor manufacturers TSMC, Samsung and SK Hynix face rising capital expenditure for advanced packaging and HBM output.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n7",
+      "date": "2026-06-25",
+      "entities": [
+        "XOM",
+        "SHEL"
+      ],
+      "text": "ExxonMobil and Shell report resilient refining margins as global energy markets stay volatile amid OPEC+ supply decisions.",
+      "title": "ExxonMobil and Shell report resilient refining margins as global energy markets stay...",
+      "keywords": [
+        "ENERGY",
+        "OPEC"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "ExxonMobil and Shell report resilient refining margins as global energy markets stay volatile amid OPEC+ supply decisions.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n8",
+      "date": "2026-06-28",
+      "entities": [
+        "BA",
+        "LMT"
+      ],
+      "text": "Boeing and Lockheed Martin see rising defense budgets across NATO members as governments increase military procurement spending.",
+      "title": "Boeing and Lockheed Martin see rising defense budgets across NATO members as...",
+      "keywords": [
+        "DEFENSE",
+        "NATO"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Boeing and Lockheed Martin see rising defense budgets across NATO members as governments increase military procurement spending.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n9",
+      "date": "2026-07-01",
+      "entities": [
+        "JPM",
+        "C"
+      ],
+      "text": "JPMorgan and Citigroup post strong trading revenue as market volatility boosts fixed income and equities trading desks.",
+      "title": "JPMorgan and Citigroup post strong trading revenue as market volatility boosts fixed...",
+      "keywords": [],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "JPMorgan and Citigroup post strong trading revenue as market volatility boosts fixed income and equities trading desks.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n10",
+      "date": "2026-07-03",
+      "entities": [
+        "NVDA",
+        "AMD",
+        "MSFT"
+      ],
+      "text": "AI bubble concerns resurface as analysts question whether hyperscaler capital expenditure on GPUs from NVIDIA and AMD can be justified by near-term returns.",
+      "title": "AI bubble concerns resurface as analysts question whether hyperscaler capital...",
+      "keywords": [
+        "CAPEX",
+        "HYPERSCALERS",
+        "AI_BUBBLE",
+        "GPU",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "AI bubble concerns resurface as analysts question whether hyperscaler capital expenditure on GPUs from NVIDIA and AMD can be justified by near-term returns.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n11",
+      "date": "2026-07-06",
+      "entities": [
+        "TSM",
+        "NVDA",
+        "AMD",
+        "AAPL"
+      ],
+      "text": "A magnitude 7.2 earthquake struck near Hsinchu, Taiwan, disrupting semiconductor fabrication at several TSMC plants and raising concerns for NVIDIA, AMD and Apple chip supply.",
+      "title": "A magnitude 7.2 earthquake struck near Hsinchu, Taiwan, disrupting semiconductor...",
+      "keywords": [
+        "SEMICONDUCTORS",
+        "FOUNDRY",
+        "EARTHQUAKE",
+        "TAIWAN",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "A magnitude 7.2 earthquake struck near Hsinchu, Taiwan, disrupting semiconductor fabrication at several TSMC plants and raising concerns for NVIDIA, AMD and Apple chip supply.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n11b",
+      "date": "2026-07-06",
+      "entities": [
+        "TSM",
+        "SKHY"
+      ],
+      "text": "Power outages following the Taiwan earthquake also affected nearby memory and packaging facilities linked to SK Hynix supply chains.",
+      "title": "Power outages following the Taiwan earthquake also affected nearby memory and...",
+      "keywords": [
+        "EARTHQUAKE",
+        "MEMORY",
+        "TAIWAN",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Power outages following the Taiwan earthquake also affected nearby memory and packaging facilities linked to SK Hynix supply chains.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n11c",
+      "date": "2026-07-07",
+      "entities": [
+        "TSM",
+        "MSFT",
+        "NVDA"
+      ],
+      "text": "Hyperscalers including Microsoft warn of potential AI chip delivery delays after the Taiwan earthquake disrupted TSMC's advanced packaging lines.",
+      "title": "Hyperscalers including Microsoft warn of potential AI chip delivery delays after the...",
+      "keywords": [
+        "FOUNDRY",
+        "HYPERSCALERS",
+        "EARTHQUAKE",
+        "SUPPLY_DISRUPTION",
+        "TAIWAN",
+        "SEMICONDUCTORS",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Hyperscalers including Microsoft warn of potential AI chip delivery delays after the Taiwan earthquake disrupted TSMC's advanced packaging lines.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n11d",
+      "date": "2026-07-07",
+      "entities": [
+        "TSM",
+        "AMAT",
+        "ASML"
+      ],
+      "text": "Equipment suppliers ASML and Applied Materials say a portion of tool installations near Hsinchu were paused for inspection after the earthquake.",
+      "title": "Equipment suppliers ASML and Applied Materials say a portion of tool installations...",
+      "keywords": [
+        "EARTHQUAKE",
+        "TAIWAN"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Equipment suppliers ASML and Applied Materials say a portion of tool installations near Hsinchu were paused for inspection after the earthquake.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n12",
+      "date": "2026-07-10",
+      "entities": [
+        "SHEL",
+        "XOM"
+      ],
+      "text": "Russia-Ukraine escalation raises fears over European natural gas supply, lifting Shell and ExxonMobil energy trading desks.",
+      "title": "Russia-Ukraine escalation raises fears over European natural gas supply, lifting Shell...",
+      "keywords": [
+        "NATURAL_GAS",
+        "EUROPE",
+        "UKRAINE",
+        "ENERGY",
+        "RUSSIA",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Russia-Ukraine escalation raises fears over European natural gas supply, lifting Shell and ExxonMobil energy trading desks.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n12b",
+      "date": "2026-07-11",
+      "entities": [
+        "LMT",
+        "BA"
+      ],
+      "text": "Defense stocks Lockheed Martin and Boeing rally as Russia-Ukraine tensions escalate and European governments announce new defense spending packages.",
+      "title": "Defense stocks Lockheed Martin and Boeing rally as Russia-Ukraine tensions escalate...",
+      "keywords": [
+        "EUROPE",
+        "DEFENSE",
+        "UKRAINE",
+        "RUSSIA",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Defense stocks Lockheed Martin and Boeing rally as Russia-Ukraine tensions escalate and European governments announce new defense spending packages.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n12c",
+      "date": "2026-07-12",
+      "entities": [
+        "DBK",
+        "JPM"
+      ],
+      "text": "European banks including Deutsche Bank face scrutiny over exposure to Russian counterparties as sanctions tighten amid the Ukraine crisis.",
+      "title": "European banks including Deutsche Bank face scrutiny over exposure to Russian...",
+      "keywords": [
+        "SANCTIONS",
+        "EUROPE",
+        "UKRAINE",
+        "RUSSIA",
+        "BANKING",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "European banks including Deutsche Bank face scrutiny over exposure to Russian counterparties as sanctions tighten amid the Ukraine crisis.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n12d",
+      "date": "2026-07-13",
+      "entities": [
+        "RTX",
+        "NOC",
+        "GD"
+      ],
+      "text": "Raytheon, Northrop Grumman and General Dynamics see order backlogs grow as European NATO members accelerate defense procurement amid the Ukraine crisis.",
+      "title": "Raytheon, Northrop Grumman and General Dynamics see order backlogs grow as European...",
+      "keywords": [
+        "EUROPE",
+        "DEFENSE",
+        "UKRAINE",
+        "NATO",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Raytheon, Northrop Grumman and General Dynamics see order backlogs grow as European NATO members accelerate defense procurement amid the Ukraine crisis.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n13",
+      "date": "2026-07-15",
+      "entities": [
+        "NVDA",
+        "AMD",
+        "MSFT",
+        "TSM"
+      ],
+      "text": "AI bubble correction fears deepen as NVIDIA, AMD and cloud hyperscalers see valuations slide on concerns over data centre overbuild and GPU depreciation.",
+      "title": "AI bubble correction fears deepen as NVIDIA, AMD and cloud hyperscalers see valuations...",
+      "keywords": [
+        "HYPERSCALERS",
+        "DATA_CENTERS",
+        "AI_BUBBLE",
+        "CLOUD",
+        "GPU",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "AI bubble correction fears deepen as NVIDIA, AMD and cloud hyperscalers see valuations slide on concerns over data centre overbuild and GPU depreciation.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n13b",
+      "date": "2026-07-16",
+      "entities": [
+        "SKHY",
+        "SSNLF"
+      ],
+      "text": "Memory makers SK Hynix and Samsung warn that a slowdown in AI capital expenditure could soften HBM demand growth next year.",
+      "title": "Memory makers SK Hynix and Samsung warn that a slowdown in AI capital expenditure...",
+      "keywords": [
+        "CAPEX",
+        "MEMORY",
+        "HBM",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Memory makers SK Hynix and Samsung warn that a slowdown in AI capital expenditure could soften HBM demand growth next year.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n13c",
+      "date": "2026-07-17",
+      "entities": [
+        "GOOGL",
+        "AMZN",
+        "META"
+      ],
+      "text": "Alphabet, Amazon and Meta all flag rising depreciation and power costs tied to aggressive AI data centre build-outs, reviving AI bubble debate.",
+      "title": "Alphabet, Amazon and Meta all flag rising depreciation and power costs tied to...",
+      "keywords": [
+        "DATA_CENTERS",
+        "AI_BUBBLE",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Alphabet, Amazon and Meta all flag rising depreciation and power costs tied to aggressive AI data centre build-outs, reviving AI bubble debate.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n14",
+      "date": "2026-07-18",
+      "entities": [
+        "IBM",
+        "MSFT"
+      ],
+      "text": "IBM and Microsoft both pivot enterprise strategy toward generative AI and agentic software following renewed investor scrutiny of AI monetisation.",
+      "title": "IBM and Microsoft both pivot enterprise strategy toward generative AI and agentic...",
+      "keywords": [
+        "AI_MONETIZATION",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "IBM and Microsoft both pivot enterprise strategy toward generative AI and agentic software following renewed investor scrutiny of AI monetisation.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n15",
+      "date": "2026-07-20",
+      "entities": [
+        "TSM",
+        "INTC"
+      ],
+      "text": "Intel and TSMC both outline expanded US and Taiwan fabrication capacity amid ongoing export control tensions between the US and China over advanced chips.",
+      "title": "Intel and TSMC both outline expanded US and Taiwan fabrication capacity amid ongoing...",
+      "keywords": [
+        "EXPORT_CONTROLS",
+        "FOUNDRY",
+        "TAIWAN",
+        "SEMICONDUCTORS",
+        "CHINA",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Intel and TSMC both outline expanded US and Taiwan fabrication capacity amid ongoing export control tensions between the US and China over advanced chips.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n16",
+      "date": "2026-07-22",
+      "entities": [
+        "JPM",
+        "C",
+        "DBK"
+      ],
+      "text": "Global banks JPMorgan, Citigroup and Deutsche Bank increase provisions tied to counterparty credit risk amid volatile rates and geopolitical uncertainty.",
+      "title": "Global banks JPMorgan, Citigroup and Deutsche Bank increase provisions tied to...",
+      "keywords": [
+        "CREDIT_CRISIS",
+        "GEOPOLITICS",
+        "BANKING",
+        "AI",
+        "EUROPE"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Global banks JPMorgan, Citigroup and Deutsche Bank increase provisions tied to counterparty credit risk amid volatile rates and geopolitical uncertainty.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n16b",
+      "date": "2026-07-23",
+      "entities": [
+        "BAC",
+        "WFC",
+        "UBS"
+      ],
+      "text": "Bank of America, Wells Fargo and UBS report deposit stability but flag close monitoring of wholesale funding markets amid rate volatility.",
+      "title": "Bank of America, Wells Fargo and UBS report deposit stability but flag close...",
+      "keywords": [
+        "BANKING"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Bank of America, Wells Fargo and UBS report deposit stability but flag close monitoring of wholesale funding markets amid rate volatility.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n17",
+      "date": "2026-07-25",
+      "entities": [
+        "XOM",
+        "SHEL",
+        "LMT"
+      ],
+      "text": "Energy and defense names ExxonMobil, Shell and Lockheed Martin benefit from elevated geopolitical risk premium tied to the Russia-Ukraine conflict and Middle East tensions.",
+      "title": "Energy and defense names ExxonMobil, Shell and Lockheed Martin benefit from elevated...",
+      "keywords": [
+        "GEOPOLITICS",
+        "DEFENSE",
+        "UKRAINE",
+        "ENERGY",
+        "RUSSIA",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Energy and defense names ExxonMobil, Shell and Lockheed Martin benefit from elevated geopolitical risk premium tied to the Russia-Ukraine conflict and Middle East tensions.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n18",
+      "date": "2026-07-28",
+      "entities": [
+        "NVDA",
+        "SKHY",
+        "TSM"
+      ],
+      "text": "NVIDIA's next-generation AI accelerator roadmap depends heavily on TSMC's CoWoS advanced packaging and SK Hynix's HBM4 memory supply.",
+      "title": "NVIDIA's next-generation AI accelerator roadmap depends heavily on TSMC's CoWoS...",
+      "keywords": [
+        "FOUNDRY",
+        "GPU",
+        "MEMORY",
+        "HBM",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "NVIDIA's next-generation AI accelerator roadmap depends heavily on TSMC's CoWoS advanced packaging and SK Hynix's HBM4 memory supply.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n19",
+      "date": "2026-08-01",
+      "entities": [
+        "AAPL",
+        "TSM",
+        "SSNLF"
+      ],
+      "text": "Apple diversifies chip and display sourcing between TSMC and Samsung as geopolitical risk in the Taiwan Strait weighs on supply chain planning.",
+      "title": "Apple diversifies chip and display sourcing between TSMC and Samsung as geopolitical...",
+      "keywords": [
+        "GEOPOLITICS",
+        "TAIWAN",
+        "SEMICONDUCTORS",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Apple diversifies chip and display sourcing between TSMC and Samsung as geopolitical risk in the Taiwan Strait weighs on supply chain planning.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n20",
+      "date": "2026-08-03",
+      "entities": [
+        "BA",
+        "LMT",
+        "XOM"
+      ],
+      "text": "Rising defense and energy capital expenditure lifts industrial order books for Boeing, Lockheed Martin and integrated oil majors including ExxonMobil.",
+      "title": "Rising defense and energy capital expenditure lifts industrial order books for Boeing,...",
+      "keywords": [
+        "CAPEX",
+        "DEFENSE",
+        "ENERGY",
+        "OIL"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Rising defense and energy capital expenditure lifts industrial order books for Boeing, Lockheed Martin and integrated oil majors including ExxonMobil.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n21",
+      "date": "2026-08-04",
+      "entities": [
+        "MAERSK",
+        "SHEL"
+      ],
+      "text": "Container shipping group Maersk flags Red Sea and Middle East routing disruptions, warning of higher freight costs feeding into energy logistics.",
+      "title": "Container shipping group Maersk flags Red Sea and Middle East routing disruptions,...",
+      "keywords": [
+        "SHIPPING",
+        "SUPPLY_DISRUPTION",
+        "ENERGY",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Container shipping group Maersk flags Red Sea and Middle East routing disruptions, warning of higher freight costs feeding into energy logistics.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n22",
+      "date": "2026-08-05",
+      "entities": [
+        "RIO",
+        "FCX"
+      ],
+      "text": "Rio Tinto and Freeport-McMoRan highlight surging copper demand tied to AI data centre power infrastructure and grid buildout.",
+      "title": "Rio Tinto and Freeport-McMoRan highlight surging copper demand tied to AI data centre...",
+      "keywords": [
+        "DATA_CENTERS",
+        "MINING",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Rio Tinto and Freeport-McMoRan highlight surging copper demand tied to AI data centre power infrastructure and grid buildout.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n23",
+      "date": "2026-08-06",
+      "entities": [
+        "AIG",
+        "UBS",
+        "CP_NORTHBRIDGE"
+      ],
+      "text": "Insurers and European banks reassess fixed-income counterparty credit risk frameworks as rate volatility and geopolitical tension persist through the second half of 2026.",
+      "title": "Insurers and European banks reassess fixed-income counterparty credit risk frameworks...",
+      "keywords": [
+        "CREDIT_CRISIS",
+        "GEOPOLITICS",
+        "EUROPE",
+        "INSURANCE",
+        "BANKING"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Insurers and European banks reassess fixed-income counterparty credit risk frameworks as rate volatility and geopolitical tension persist through the second half of 2026.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n24",
+      "date": "2026-05-15",
+      "entities": [
+        "ASML",
+        "AMAT",
+        "TSM"
+      ],
+      "text": "Semiconductor equipment makers ASML and Applied Materials report backlog growth as foundries expand advanced-node and packaging capacity for AI chips.",
+      "title": "Semiconductor equipment makers ASML and Applied Materials report backlog growth as...",
+      "keywords": [
+        "SEMICONDUCTORS",
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Semiconductor equipment makers ASML and Applied Materials report backlog growth as foundries expand advanced-node and packaging capacity for AI chips.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    },
+    {
+      "id": "n25",
+      "date": "2026-04-10",
+      "entities": [
+        "QCOM",
+        "ARM",
+        "AAPL"
+      ],
+      "text": "Qualcomm and Arm continue architecture licensing disputes even as smartphone makers including Apple push further into on-device AI processing.",
+      "title": "Qualcomm and Arm continue architecture licensing disputes even as smartphone makers...",
+      "keywords": [
+        "AI"
+      ],
+      "source": "Synthetic Narrative Corpus (POC)",
+      "snippet": "Qualcomm and Arm continue architecture licensing disputes even as smartphone makers including Apple push further into on-device AI processing.",
+      "url": null,
+      "is_synthetic": true,
+      "source_type": "SYNTHETIC_NARRATIVE"
+    }
+  ]
+}
