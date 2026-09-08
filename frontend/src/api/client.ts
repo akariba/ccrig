@@ -2,7 +2,21 @@
 // or set VITE_API_HOST at build time when frontend and backend are separate services.
 const BASE = import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "";
 
+// The GitHub Pages build (VITE_STATIC_BACKEND=true) has no server at all -
+// requests are dispatched straight into a Python runtime running in the
+// browser via Pyodide. See ./pyodideClient.ts and backend/app/browser_dispatch.py.
+const STATIC_BACKEND = import.meta.env.VITE_STATIC_BACKEND === "true";
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  if (STATIC_BACKEND) {
+    const { callApi } = await import("./pyodideClient");
+    const [pathname, qs] = path.split("?");
+    const query = Object.fromEntries(new URLSearchParams(qs ?? ""));
+    const method = (init?.method as string) ?? "GET";
+    const body = init?.body ? JSON.parse(init.body as string) : null;
+    return callApi(method, pathname, query, body) as Promise<T>;
+  }
+
   const res = await fetch(BASE + path, {
     headers: { "Content-Type": "application/json" },
     ...init,

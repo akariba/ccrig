@@ -6,11 +6,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:static": "node scripts/vendor-backend.mjs && tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
     "cytoscape": "^3.34.0",
+    "pyodide": "^0.28.3",
     "react": "^19.2.8",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.2.8",

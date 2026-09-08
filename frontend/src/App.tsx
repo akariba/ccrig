@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
+import { PyodideBootOverlay } from "./components/PyodideBootOverlay";
 import { InvestigationProvider } from "./context/InvestigationContext";
 import { DailyReview } from "./pages/DailyReview";
 import { RelationshipWorkbench } from "./pages/RelationshipWorkbench";
@@ -16,7 +17,8 @@ import { ExposureMovers } from "./pages/ExposureMovers";
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <PyodideBootOverlay />
       <InvestigationProvider>
       <Routes>
         <Route element={<Layout />}>
