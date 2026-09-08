@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: ccrig-backend
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.10
+
+  - type: web
+    name: ccrig-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_HOST
+        fromService:
+          type: web
+          name: ccrig-backend
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -1,4 +1,6 @@
-const BASE = ""; // proxied via vite.config.ts in dev; same-origin in a combined deploy
+// Proxied via vite.config.ts in dev; same-origin if combined into one deploy,
+// or set VITE_API_HOST at build time when frontend and backend are separate services.
+const BASE = import.meta.env.VITE_API_HOST ? `https://${import.meta.env.VITE_API_HOST}` : "";
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(BASE + path, {

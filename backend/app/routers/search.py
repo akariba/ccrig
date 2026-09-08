@@ -4,6 +4,7 @@ narrative (free text), counterparty. Intent classification may use the AI
 provider (deterministic fallback is always available); the actual lookup
 logic is 100% deterministic regardless of which provider classified it.
 """
+import re
 from fastapi import APIRouter, Query
 from ..core.data import STORE
 from ..core import themes as theme_mod, event_parser
@@ -18,11 +19,20 @@ def _match_entity(q):
     if exact and exact["node_type"] in ("Company/Issuer", "Counterparty"):
         return [exact]
     matches = []
+    # Word-boundary-anchored, not a raw substring test - "ai" must not match
+    # inside "taiwan" (it isn't a word start there), so a theme query like
+    # "AI" doesn't get hijacked into an unrelated entity hit. Still matches
+    # a partial word start, e.g. "sam" -> "Samsung".
+    pattern = re.compile(r"\b" + re.escape(ql), re.IGNORECASE) if ql else None
     for eid in STORE.browsable_ids:
         e = STORE.entity(eid)
-        if ql in e["name"].lower() or (e.get("ticker") and ql == e["ticker"].lower()):
+        if (pattern and pattern.search(e["name"])) or (e.get("ticker") and ql == e["ticker"].lower()):
             matches.append(e)
     return matches
+
+
+def _normalize_word(w: str) -> str:
+    return w[:-1] if w.endswith("s") and len(w) > 3 else w
 
 
 def _match_theme(q):
@@ -30,8 +40,21 @@ def _match_theme(q):
     if theme_id:
         return theme_mod.theme_detail(theme_id)
     ql = q.lower()
+    ql_words = {_normalize_word(w) for w in ql.split()}
     for kw in STORE.keywords:
-        if ql in kw["label"].lower():
+        label = kw["label"].lower()
+        # Substring match in EITHER direction - a short query like "rates"
+        # matching the longer label "interest rates" was already handled,
+        # but a longer natural-language query like "interest rate
+        # volatility" containing the shorter theme label "interest rates"
+        # was not, since the original check only tested query-in-label.
+        if label in ql or ql in label:
+            return theme_mod.theme_detail(kw["id"])
+        # Word-level fallback (singular/plural normalized): every word in
+        # the theme label must appear in the query, e.g. "interest rate
+        # volatility" contains {interest, rate} from label "interest rates".
+        label_words = {_normalize_word(w) for w in label.split()}
+        if label_words and label_words <= ql_words:
             return theme_mod.theme_detail(kw["id"])
     return None
 
