@@ -69,18 +69,26 @@ async function boot(): Promise<PyodideInterface> {
     dirsMade.add(path);
   };
   ensureDir("/backend");
-
   for (const relPath of manifest) {
-    const fullPath = `/backend/${relPath}`;
-    ensureDir(fullPath.slice(0, fullPath.lastIndexOf("/")));
-    const isText = /\.(py|json|csv|txt)$/.test(relPath);
-    if (isText) {
-      pyodide.FS.writeFile(fullPath, await fetchText(`${base}backend/${relPath}`));
-    } else {
-      const buf = new Uint8Array(await (await fetch(`${base}backend/${relPath}`)).arrayBuffer());
-      pyodide.FS.writeFile(fullPath, buf);
-    }
+    ensureDir(`/backend/${relPath}`.split("/").slice(0, -1).join("/"));
   }
+
+  // Fetch all files concurrently - sequential round-trips for ~70 small
+  // files added noticeable, needless latency to every cold boot.
+  await withRetries("fetch application files", 3, () =>
+    Promise.all(
+      manifest.map(async (relPath) => {
+        const fullPath = `/backend/${relPath}`;
+        const isText = /\.(py|json|csv|txt)$/.test(relPath);
+        if (isText) {
+          pyodide.FS.writeFile(fullPath, await fetchText(`${base}backend/${relPath}`));
+        } else {
+          const buf = new Uint8Array(await (await fetch(`${base}backend/${relPath}`)).arrayBuffer());
+          pyodide.FS.writeFile(fullPath, buf);
+        }
+      })
+    )
+  );
 
   onBootProgress?.("Starting application...");
   pyodide.runPython(`
