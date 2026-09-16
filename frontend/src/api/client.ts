@@ -88,4 +88,10 @@ export const api = {
     const qs = new URLSearchParams(params).toString();
     return req<any>(`/api/breaches${qs ? "?" + qs : ""}`);
   },
+
+  distanceMapCounterparties: () => req<any>("/api/distance-map/counterparties"),
+  distanceMapForCounterparty: (id: string, params: Record<string, string | number> = {}) => {
+    const qs = new URLSearchParams(params as any).toString();
+    return req<any>(`/api/distance-map/counterparty/${id}${qs ? "?" + qs : ""}`);
+  },
 };

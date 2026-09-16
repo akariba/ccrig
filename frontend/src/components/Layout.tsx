@@ -18,6 +18,7 @@ const NAV = [
   { to: "/entity", label: "Entity Explorer" },
   { to: "/exposure-movers", label: "Exposure Movers" },
   { to: "/graph", label: "Graph Explorer" },
+  { to: "/distance-map", label: "Distance Map" },
   { to: "/theme-radar", label: "Theme Radar" },
   { to: "/model-lab", label: "Model Lab" },
   { to: "/backtest-lab", label: "Backtest Lab" },

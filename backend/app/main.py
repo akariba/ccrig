@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import entities, counterparties, themes, search, event, graph, model_lab, misc, priority
+from .routers import entities, counterparties, themes, search, event, graph, model_lab, misc, priority, distance_map
 
 app = FastAPI(
     title="CCRIG AI Analyst Platform (POC)",
@@ -27,6 +27,7 @@ app.include_router(graph.router)
 app.include_router(model_lab.router)
 app.include_router(misc.router)
 app.include_router(priority.router)
+app.include_router(distance_map.router)
 
 
 @app.get("/")
