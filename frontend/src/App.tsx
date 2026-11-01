@@ -10,6 +10,7 @@ import { Counterparty360 } from "./pages/Counterparty360";
 import { EventStudio } from "./pages/EventStudio";
 import { GraphExplorer } from "./pages/GraphExplorer";
 import { DistanceMap } from "./pages/DistanceMap";
+import { GlobalEventImpactMap } from "./pages/GlobalEventImpactMap";
 import { ModelLab } from "./pages/ModelLab";
 import { BacktestLab } from "./pages/BacktestLab";
 import { Provenance } from "./pages/Provenance";
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/counterparty" element={<Counterparty360 />} />
           <Route path="/event-studio" element={<EventStudio />} />
           <Route path="/graph" element={<GraphExplorer />} />
+          <Route path="/event-impact-map" element={<GlobalEventImpactMap />} />
           <Route path="/distance-map" element={<DistanceMap />} />
           <Route path="/exposure-movers" element={<ExposureMovers />} />
           <Route path="/breaches" element={<BreachesActions />} />

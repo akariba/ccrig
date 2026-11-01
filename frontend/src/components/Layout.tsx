@@ -12,6 +12,7 @@ const NAV = [
   { section: "Relationship Intelligence" },
   { to: "/", label: "Relationships" },
   { to: "/event-studio", label: "Events" },
+  { to: "/event-impact-map", label: "Event Impact Map" },
   { to: "/counterparty", label: "Counterparties" },
   { to: "/breaches", label: "Controls" },
   { section: "Research" },
