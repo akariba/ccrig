@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "description": "Event discovery providers. A provider may only retrieve from the approved source it names (data/events/approved_sources.json): its URL must be on that source's domains, and every document it returns is checked against the same allow-list. 'entities' limits which companies the provider is used for; a company-newsroom feed is never used for other companies. No credentials belong in this file.",
+  "providers": [
+    {
+      "id": "nvidia_newsroom_feed",
+      "kind": "rss",
+      "label": "NVIDIA Newsroom (RSS releases feed)",
+      "approved_source_id": "nvidia_newsroom",
+      "url": "https://nvidianews.nvidia.com/releases.xml",
+      "entities": ["NVDA"],
+      "max_items": 50,
+      "note": "Items that link to other hosts (for example blogs.nvidia.com) are listed as excluded: that host is not an approved source."
+    },
+    {
+      "id": "federal_register",
+      "kind": "federal_register",
+      "label": "Federal Register (official API)",
+      "approved_source_id": "us_federal_register",
+      "url": "https://www.federalregister.gov/api/v1/documents.json",
+      "entities": "*",
+      "max_items": 25,
+      "location": {
+        "gazetteer_key": "country-us",
+        "basis": "Issued by a United States federal agency (per the Federal Register's agency metadata). The document states no city, so the location is country-level."
+      },
+      "note": "Full-text search of notices, rules and proposed rules. The evidence is the title and abstract the API returns."
+    }
+  ]
+}
