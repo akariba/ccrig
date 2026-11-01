@@ -1,0 +1,2037 @@
+{
+ "components": {
+  "schemas": {
+   "CalibrateRequest": {
+    "properties": {
+     "gamma": {
+      "default": 8.0,
+      "exclusiveMinimum": 0.0,
+      "maximum": 1000.0,
+      "title": "Gamma",
+      "type": "number"
+     },
+     "lam": {
+      "default": 2.0,
+      "maximum": 1000.0,
+      "minimum": 0.0,
+      "title": "Lam",
+      "type": "number"
+     },
+     "starting_weights": {
+      "anyOf": [
+       {
+        "additionalProperties": {
+         "type": "number"
+        },
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Starting Weights"
+     }
+    },
+    "title": "CalibrateRequest",
+    "type": "object"
+   },
+   "EventParseRequest": {
+    "properties": {
+     "geography": {
+      "anyOf": [
+       {
+        "maxLength": 100,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Geography"
+     },
+     "max_hops": {
+      "default": 2,
+      "maximum": 3.0,
+      "minimum": 1.0,
+      "title": "Max Hops",
+      "type": "integer"
+     },
+     "min_score": {
+      "default": 0.05,
+      "maximum": 1.0,
+      "minimum": 0.0,
+      "title": "Min Score",
+      "type": "number"
+     },
+     "sector": {
+      "anyOf": [
+       {
+        "maxLength": 100,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Sector"
+     },
+     "text": {
+      "maxLength": 20000,
+      "title": "Text",
+      "type": "string"
+     },
+     "top_k": {
+      "default": 15,
+      "maximum": 50.0,
+      "minimum": 1.0,
+      "title": "Top K",
+      "type": "integer"
+     }
+    },
+    "required": [
+     "text"
+    ],
+    "title": "EventParseRequest",
+    "type": "object"
+   },
+   "HTTPValidationError": {
+    "properties": {
+     "detail": {
+      "items": {
+       "$ref": "#/components/schemas/ValidationError"
+      },
+      "title": "Detail",
+      "type": "array"
+     }
+    },
+    "title": "HTTPValidationError",
+    "type": "object"
+   },
+   "IngestDocument": {
+    "properties": {
+     "date": {
+      "description": "ISO date, YYYY-MM-DD",
+      "title": "Date",
+      "type": "string"
+     },
+     "entities": {
+      "anyOf": [
+       {
+        "items": {
+         "maxLength": 64,
+         "minLength": 1,
+         "type": "string"
+        },
+        "maxItems": 50,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Entities"
+     },
+     "id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,63}$",
+      "title": "Id",
+      "type": "string"
+     },
+     "is_synthetic": {
+      "anyOf": [
+       {
+        "type": "boolean"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "default": true,
+      "title": "Is Synthetic"
+     },
+     "keywords": {
+      "anyOf": [
+       {
+        "items": {
+         "maxLength": 64,
+         "minLength": 1,
+         "type": "string"
+        },
+        "maxItems": 50,
+        "type": "array"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Keywords"
+     },
+     "snippet": {
+      "maxLength": 5000,
+      "minLength": 1,
+      "title": "Snippet",
+      "type": "string"
+     },
+     "source": {
+      "anyOf": [
+       {
+        "maxLength": 100,
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Source"
+     },
+     "title": {
+      "maxLength": 300,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+     },
+     "url": {
+      "anyOf": [
+       {
+        "maxLength": 500,
+        "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://\\S+$",
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Url"
+     }
+    },
+    "required": [
+     "id",
+     "date",
+     "title",
+     "snippet"
+    ],
+    "title": "IngestDocument",
+    "type": "object"
+   },
+   "MarketAgreementRequest": {
+    "properties": {
+     "top_k": {
+      "default": 5,
+      "maximum": 50.0,
+      "minimum": 1.0,
+      "title": "Top K",
+      "type": "integer"
+     },
+     "weights": {
+      "anyOf": [
+       {
+        "additionalProperties": {
+         "type": "number"
+        },
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Weights"
+     }
+    },
+    "title": "MarketAgreementRequest",
+    "type": "object"
+   },
+   "PairRequest": {
+    "properties": {
+     "a": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "A",
+      "type": "string"
+     },
+     "b": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "B",
+      "type": "string"
+     },
+     "preset": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preset"
+     },
+     "weights": {
+      "anyOf": [
+       {
+        "additionalProperties": {
+         "type": "number"
+        },
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Weights"
+     }
+    },
+    "required": [
+     "a",
+     "b"
+    ],
+    "title": "PairRequest",
+    "type": "object"
+   },
+   "ScoreRequest": {
+    "properties": {
+     "entity_id": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Entity Id",
+      "type": "string"
+     },
+     "preset": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Preset"
+     },
+     "top_k": {
+      "default": 15,
+      "maximum": 50.0,
+      "minimum": 1.0,
+      "title": "Top K",
+      "type": "integer"
+     },
+     "weights": {
+      "anyOf": [
+       {
+        "additionalProperties": {
+         "type": "number"
+        },
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Weights"
+     }
+    },
+    "required": [
+     "entity_id"
+    ],
+    "title": "ScoreRequest",
+    "type": "object"
+   },
+   "ValidationError": {
+    "properties": {
+     "ctx": {
+      "title": "Context",
+      "type": "object"
+     },
+     "input": {
+      "title": "Input"
+     },
+     "loc": {
+      "items": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        }
+       ]
+      },
+      "title": "Location",
+      "type": "array"
+     },
+     "msg": {
+      "title": "Message",
+      "type": "string"
+     },
+     "type": {
+      "title": "Error Type",
+      "type": "string"
+     }
+    },
+    "required": [
+     "loc",
+     "msg",
+     "type"
+    ],
+    "title": "ValidationError",
+    "type": "object"
+   }
+  }
+ },
+ "info": {
+  "description": "Counterparty Credit Risk Intelligence Graph - AI-assisted analyst platform. Strong POC to demonstrate the full business vision; not a production architecture decision.",
+  "title": "CCRIG AI Analyst Platform (POC)",
+  "version": "0.1.0-poc"
+ },
+ "openapi": "3.1.0",
+ "paths": {
+  "/": {
+   "get": {
+    "operationId": "root__get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Root"
+   }
+  },
+  "/api/backtest/run": {
+   "get": {
+    "operationId": "backtest_run_api_backtest_run_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "scenario_id",
+      "required": false,
+      "schema": {
+       "default": "taiwan_earthquake_2026",
+       "maxLength": 64,
+       "minLength": 1,
+       "title": "Scenario Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Backtest Run",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/backtest/scenarios": {
+   "get": {
+    "operationId": "backtest_scenarios_api_backtest_scenarios_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Backtest Scenarios",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/breaches": {
+   "get": {
+    "operationId": "breaches_api_breaches_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 50,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Breaches",
+    "tags": [
+     "priority"
+    ]
+   }
+  },
+  "/api/counterparties": {
+   "get": {
+    "operationId": "list_counterparties_api_counterparties_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Counterparties",
+    "tags": [
+     "counterparties"
+    ]
+   }
+  },
+  "/api/counterparties/{cp_id}": {
+   "get": {
+    "operationId": "counterparty_360_api_counterparties__cp_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "cp_id",
+      "required": true,
+      "schema": {
+       "title": "Cp Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Counterparty 360",
+    "tags": [
+     "counterparties"
+    ]
+   }
+  },
+  "/api/distance-map/counterparties": {
+   "get": {
+    "description": "Counterparty list for the Distance Map's left-panel selector - the\nsame portfolio-holdings counterparty universe as /api/counterparties.",
+    "operationId": "list_counterparties_api_distance_map_counterparties_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "List Counterparties",
+    "tags": [
+     "distance-map"
+    ]
+   }
+  },
+  "/api/distance-map/counterparty/{cp_id}": {
+   "get": {
+    "operationId": "get_distances_api_distance_map_counterparty__cp_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "cp_id",
+      "required": true,
+      "schema": {
+       "title": "Cp Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "min_rho",
+      "required": false,
+      "schema": {
+       "default": 0.0,
+       "maximum": 1.0,
+       "minimum": 0.0,
+       "title": "Min Rho",
+       "type": "number"
+      }
+     },
+     {
+      "in": "query",
+      "name": "max_hops",
+      "required": false,
+      "schema": {
+       "default": 2,
+       "maximum": 3,
+       "minimum": 1,
+       "title": "Max Hops",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Get Distances",
+    "tags": [
+     "distance-map"
+    ]
+   }
+  },
+  "/api/entities": {
+   "get": {
+    "operationId": "list_entities_api_entities_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "sector",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Sector"
+      }
+     },
+     {
+      "in": "query",
+      "name": "country",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Country"
+      }
+     },
+     {
+      "in": "query",
+      "name": "node_type",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "default": "Company/Issuer",
+       "title": "Node Type"
+      }
+     },
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 200,
+       "maximum": 1000,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Entities",
+    "tags": [
+     "entities"
+    ]
+   }
+  },
+  "/api/entities/{entity_id}": {
+   "get": {
+    "operationId": "entity_360_api_entities__entity_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entity_id",
+      "required": true,
+      "schema": {
+       "title": "Entity Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "top_k",
+      "required": false,
+      "schema": {
+       "default": 10,
+       "maximum": 50,
+       "minimum": 1,
+       "title": "Top K",
+       "type": "integer"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Entity 360",
+    "tags": [
+     "entities"
+    ]
+   }
+  },
+  "/api/entities/{entity_id}/explain/{other_id}": {
+   "get": {
+    "operationId": "explain_relationship_api_entities__entity_id__explain__other_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entity_id",
+      "required": true,
+      "schema": {
+       "title": "Entity Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "path",
+      "name": "other_id",
+      "required": true,
+      "schema": {
+       "title": "Other Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Explain Relationship",
+    "tags": [
+     "entities"
+    ]
+   }
+  },
+  "/api/event/parse": {
+   "post": {
+    "operationId": "parse_event_api_event_parse_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/EventParseRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Parse Event",
+    "tags": [
+     "event"
+    ]
+   }
+  },
+  "/api/event/sample-scenarios": {
+   "get": {
+    "description": "The 6 required preloaded sample scenarios (BUILD_MANDATE section 28).\nEach is a raw query string the frontend feeds into /api/search or\n/api/event/parse - none are pre-baked; every one runs the live pipeline.",
+    "operationId": "sample_scenarios_api_event_sample_scenarios_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Sample Scenarios",
+    "tags": [
+     "event"
+    ]
+   }
+  },
+  "/api/graph/ego/{entity_id}": {
+   "get": {
+    "operationId": "ego_graph_api_graph_ego__entity_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entity_id",
+      "required": true,
+      "schema": {
+       "title": "Entity Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "hops",
+      "required": false,
+      "schema": {
+       "default": 1,
+       "title": "Hops",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "top_k",
+      "required": false,
+      "schema": {
+       "default": 8,
+       "maximum": 50,
+       "minimum": 1,
+       "title": "Top K",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "min_score",
+      "required": false,
+      "schema": {
+       "default": 0.1,
+       "maximum": 1.0,
+       "minimum": 0.0,
+       "title": "Min Score",
+       "type": "number"
+      }
+     },
+     {
+      "in": "query",
+      "name": "layers",
+      "required": false,
+      "schema": {
+       "default": "fact,derived,exposure",
+       "maxLength": 100,
+       "title": "Layers",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "node_types",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Node Types"
+      }
+     },
+     {
+      "in": "query",
+      "name": "include_studio",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Include Studio",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ego Graph",
+    "tags": [
+     "graph"
+    ]
+   }
+  },
+  "/api/health": {
+   "get": {
+    "operationId": "health_api_health_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Health",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/impact-map/register": {
+   "get": {
+    "operationId": "register_api_impact_map_register_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Register",
+    "tags": [
+     "impact-map"
+    ]
+   }
+  },
+  "/api/impact-map/search": {
+   "get": {
+    "operationId": "search_api_impact_map_search_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": true,
+      "schema": {
+       "maxLength": 100,
+       "minLength": 1,
+       "title": "Q",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Search",
+    "tags": [
+     "impact-map"
+    ]
+   }
+  },
+  "/api/impact-map/{entity_id}/compare": {
+   "get": {
+    "description": "Curated register vs the latest dynamic discovery, side by side.",
+    "operationId": "compare_api_impact_map__entity_id__compare_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entity_id",
+      "required": true,
+      "schema": {
+       "title": "Entity Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 5,
+       "maximum": 5,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "recency_days",
+      "required": false,
+      "schema": {
+       "default": 180,
+       "maximum": 730,
+       "minimum": 1,
+       "title": "Recency Days",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "as_of",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 10,
+         "minLength": 10,
+         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "As Of"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Compare",
+    "tags": [
+     "impact-map"
+    ]
+   }
+  },
+  "/api/impact-map/{entity_id}/events": {
+   "get": {
+    "description": "mode=curated (default): the approved-source register. mode=discovered: the latest dynamic discovery run, if this deployment can run one.",
+    "operationId": "events_api_impact_map__entity_id__events_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "entity_id",
+      "required": true,
+      "schema": {
+       "title": "Entity Id",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "limit",
+      "required": false,
+      "schema": {
+       "default": 5,
+       "maximum": 5,
+       "minimum": 1,
+       "title": "Limit",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "recency_days",
+      "required": false,
+      "schema": {
+       "default": 180,
+       "maximum": 730,
+       "minimum": 1,
+       "title": "Recency Days",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "as_of",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 10,
+         "minLength": 10,
+         "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "As Of"
+      }
+     },
+     {
+      "in": "query",
+      "name": "mode",
+      "required": false,
+      "schema": {
+       "default": "curated",
+       "enum": [
+        "curated",
+        "discovered"
+       ],
+       "title": "Mode",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "include_studio",
+      "required": false,
+      "schema": {
+       "default": false,
+       "title": "Include Studio",
+       "type": "boolean"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Events",
+    "tags": [
+     "impact-map"
+    ]
+   }
+  },
+  "/api/metric-definitions": {
+   "get": {
+    "description": "The single canonical source every 'Definition' / 'How calculated?'\nUI affordance reads from - a metric must never be explained differently\non two different pages.",
+    "operationId": "metric_definitions_api_metric_definitions_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Metric Definitions",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/metric-definitions/{metric_id}": {
+   "get": {
+    "operationId": "metric_definition_api_metric_definitions__metric_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "metric_id",
+      "required": true,
+      "schema": {
+       "title": "Metric Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Metric Definition",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/model-lab/calibration/anchors": {
+   "get": {
+    "operationId": "calibration_anchors_api_model_lab_calibration_anchors_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Calibration Anchors",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/model-lab/calibration/market-agreement": {
+   "post": {
+    "operationId": "calibration_market_agreement_api_model_lab_calibration_market_agreement_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/MarketAgreementRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Calibration Market Agreement",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/model-lab/calibration/run": {
+   "post": {
+    "operationId": "calibration_run_api_model_lab_calibration_run_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/CalibrateRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Calibration Run",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/model-lab/pair": {
+   "post": {
+    "operationId": "pair_api_model_lab_pair_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/PairRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Pair",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/model-lab/presets": {
+   "get": {
+    "operationId": "presets_api_model_lab_presets_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Presets",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/model-lab/score": {
+   "post": {
+    "operationId": "score_api_model_lab_score_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/ScoreRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Score",
+    "tags": [
+     "model-lab"
+    ]
+   }
+  },
+  "/api/priority-queue": {
+   "get": {
+    "operationId": "priority_queue_api_priority_queue_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "priority",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 50,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Priority"
+      }
+     },
+     {
+      "in": "query",
+      "name": "driver",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 50,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Driver"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Priority Queue",
+    "tags": [
+     "priority"
+    ]
+   }
+  },
+  "/api/priority-queue/{counterparty_id}": {
+   "get": {
+    "operationId": "priority_detail_api_priority_queue__counterparty_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "counterparty_id",
+      "required": true,
+      "schema": {
+       "title": "Counterparty Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Priority Detail",
+    "tags": [
+     "priority"
+    ]
+   }
+  },
+  "/api/priority-queue/{counterparty_id}/risk-clusters": {
+   "get": {
+    "description": "Phase 3: derived risk clusters over the canonical Connected Risk\nGraph (core/risk_clusters.py) - never manually curated, never a\nfabricated risk score. Empty list is a valid answer (no cluster\nevidence found), not an error.",
+    "operationId": "counterparty_risk_clusters_api_priority_queue__counterparty_id__risk_clusters_get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "counterparty_id",
+      "required": true,
+      "schema": {
+       "title": "Counterparty Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Counterparty Risk Clusters",
+    "tags": [
+     "priority"
+    ]
+   }
+  },
+  "/api/provenance": {
+   "get": {
+    "operationId": "provenance_api_provenance_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Provenance",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/provenance/coverage": {
+   "get": {
+    "operationId": "provenance_coverage_api_provenance_coverage_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Provenance Coverage",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/scalability/simulate": {
+   "get": {
+    "operationId": "scalability_simulate_api_scalability_simulate_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Scalability Simulate",
+    "tags": [
+     "misc"
+    ]
+   }
+  },
+  "/api/search": {
+   "get": {
+    "operationId": "universal_search_api_search_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": true,
+      "schema": {
+       "maxLength": 20000,
+       "minLength": 1,
+       "title": "Q",
+       "type": "string"
+      }
+     },
+     {
+      "in": "query",
+      "name": "max_hops",
+      "required": false,
+      "schema": {
+       "default": 2,
+       "maximum": 3,
+       "minimum": 1,
+       "title": "Max Hops",
+       "type": "integer"
+      }
+     },
+     {
+      "in": "query",
+      "name": "min_score",
+      "required": false,
+      "schema": {
+       "default": 0.05,
+       "maximum": 1.0,
+       "minimum": 0.0,
+       "title": "Min Score",
+       "type": "number"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Universal Search",
+    "tags": [
+     "search"
+    ]
+   }
+  },
+  "/api/studio/contracts": {
+   "get": {
+    "operationId": "contracts_api_studio_contracts_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Contracts",
+    "tags": [
+     "studio"
+    ]
+   }
+  },
+  "/api/studio/status": {
+   "get": {
+    "operationId": "status_api_studio_status_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Status",
+    "tags": [
+     "studio"
+    ]
+   }
+  },
+  "/api/themes": {
+   "get": {
+    "operationId": "list_themes_api_themes_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "q",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Q"
+      }
+     },
+     {
+      "in": "query",
+      "name": "kind",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "maxLength": 100,
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Kind"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "List Themes",
+    "tags": [
+     "themes"
+    ]
+   }
+  },
+  "/api/themes/discover": {
+   "post": {
+    "description": "Force the concept-discovery pipeline to re-run over the current live\nnews corpus (STORE.news_all) - proves the discovered-theme set is\nrecomputed from text, not hard-coded.",
+    "operationId": "force_discover_api_themes_discover_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "summary": "Force Discover",
+    "tags": [
+     "themes"
+    ]
+   }
+  },
+  "/api/themes/ingest": {
+   "post": {
+    "description": "Minimal ingestion path (POC scope): append one news document to the\nlive corpus and invalidate the discovery cache. No internet-feed\nintegration - this only proves that NEW text can make a NEW concept\nemerge on the next /api/themes/discover call.\n\nDisabled unless CCRIG_ENABLE_INGEST=1 (it writes to process-wide state\nthat every viewer shares). Ingested text is always stored as synthetic /\nunverified; ids are unique and the number of documents is bounded.",
+    "operationId": "ingest_document_api_themes_ingest_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/IngestDocument"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Ingest Document",
+    "tags": [
+     "themes"
+    ]
+   }
+  },
+  "/api/themes/{theme_id}": {
+   "get": {
+    "operationId": "theme_detail_api_themes__theme_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "theme_id",
+      "required": true,
+      "schema": {
+       "title": "Theme Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {}
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "summary": "Theme Detail",
+    "tags": [
+     "themes"
+    ]
+   }
+  }
+ }
+}

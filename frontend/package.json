@@ -10,11 +10,15 @@
     "lint": "oxlint",
     "test": "node --test",
     "verify:static": "node scripts/vendor-backend.mjs && node scripts/verify-static-backend.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "gen:api": "cd ../backend && python3 -m scripts.export_openapi ../frontend/src/api/openapi.json && cd ../frontend && npx --yes openapi-typescript@7.13.0 src/api/openapi.json -o src/api/schema.d.ts"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.105.1",
     "cytoscape": "^3.34.0",
+    "cytoscape-fcose": "2.2.0",
     "d3-geo": "3.1.1",
+    "echarts": "6.1.0",
     "pyodide": "0.28.3",
     "react": "^19.2.8",
     "react-cytoscapejs": "^2.0.0",
@@ -22,7 +26,8 @@
     "react-router-dom": "^7.18.2",
     "recharts": "^3.10.1",
     "topojson-client": "3.1.0",
-    "world-atlas": "2.0.2"
+    "world-atlas": "2.0.2",
+    "zod": "4.6.7"
   },
   "devDependencies": {
     "@types/d3-geo": "3.1.0",
