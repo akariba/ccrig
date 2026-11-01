@@ -66,7 +66,7 @@ Restart the backend. The sidebar badge will change from "Offline deterministic m
 ### Deployments and CORS
 
 * **Local development** needs nothing: Vite proxies `/api` to the backend, and the API allows `localhost` / `127.0.0.1` origins by default.
-* **GitHub Pages** (`npm run build:static`) has no server; the backend runs in the browser via Pyodide.
+* **GitHub Pages** (`npm run build:static`) has no server; the backend runs in the browser via Pyodide, with every runtime version pinned in `frontend/src/api/pyodide-pins.json`.
 * **Render** serves the frontend from a different origin, so `render.yaml` sets `CCRIG_CORS_ORIGIN_REGEX` for the backend. Rename the frontend service or use a custom domain and you must update it (or set `CCRIG_CORS_ORIGINS`). See `.env.example`.
 
 ### 4. Run tests
@@ -77,6 +77,17 @@ python3 -m pytest -q
 ```
 
 The suite (run it for the current count) covers the 7 mandate-required invariants (candidate generation precedes scoring, signed correlation never abs()'d, directionality preserved, Layer A/B/C never summed, two Event Studio ranking modes never mixed in units, typed-path determinism, evidence-quality labels never rendered as fake confidence %) plus pipeline sanity checks.
+
+Frontend checks (from `frontend/`):
+
+```bash
+npm run lint                # oxlint
+npx tsc -p tsconfig.app.json --noEmit
+npm test                    # dependency-free node:test checks of the UI logic (error messages, backend-status badge)
+npm run verify:static       # boots the pinned in-browser runtime headlessly and checks it (needs network)
+```
+
+`npm run verify:static` is the check for the GitHub Pages build: it vendors the backend exactly as `build:static` does, boots Pyodide with the pinned packages from `frontend/src/api/pyodide-pins.json`, asserts every installed version equals its pin (and that pandas is absent), and runs the analytical baseline plus all shared request-validation cases through the in-browser dispatcher. Run it whenever `pyodide-pins.json`, `requirements.txt` or the dispatcher changes.
 
 ### 5. Validation harness and analytical baseline
 

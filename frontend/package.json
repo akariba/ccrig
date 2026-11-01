@@ -8,11 +8,13 @@
     "build": "tsc -b && vite build",
     "build:static": "node scripts/vendor-backend.mjs && tsc -b && vite build && cp dist/index.html dist/404.html && touch dist/.nojekyll",
     "lint": "oxlint",
+    "test": "node --test",
+    "verify:static": "node scripts/vendor-backend.mjs && node scripts/verify-static-backend.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
     "cytoscape": "^3.34.0",
-    "pyodide": "^0.28.3",
+    "pyodide": "0.28.3",
     "react": "^19.2.8",
     "react-cytoscapejs": "^2.0.0",
     "react-dom": "^19.2.8",

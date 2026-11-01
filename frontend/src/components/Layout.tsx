@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { api } from "../api/client";
 import { InvestigationBreadcrumb } from "./InvestigationBreadcrumb";
+import { describeBackendStatus, type BackendHealth } from "./healthStatus";
 
 // Text-only institutional navigation - no decorative icon set. Active state
 // is communicated by a left accent rule + color (see .nav-link.active in
@@ -27,10 +28,25 @@ const NAV = [
 ];
 
 export function Layout() {
-  const [health, setHealth] = useState<any>(null);
+  const [health, setHealth] = useState<BackendHealth>(null);
   useEffect(() => {
-    api.health().then(setHealth).catch(() => setHealth({ ai_mode: "UNREACHABLE" }));
+    // An unreachable backend is reported as such (never as "offline mode") and
+    // re-checked until it answers, so the badge recovers without a page reload.
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const check = () =>
+      api
+        .health()
+        .then((h) => { if (!cancelled) setHealth(h); })
+        .catch(() => {
+          if (cancelled) return;
+          setHealth({ unreachable: true });
+          timer = setTimeout(check, 5000);
+        });
+    check();
+    return () => { cancelled = true; clearTimeout(timer); };
   }, []);
+  const status = describeBackendStatus(health);
 
   return (
     <div className="app-shell">
@@ -60,12 +76,10 @@ export function Layout() {
         </nav>
         <div style={{ flex: 1 }} />
         <div className="ai-mode-pill">
-          <div style={{ fontWeight: 600, color: "var(--text)" }}>
-            {health ? (health.ai_enabled ? "Enhanced AI mode" : "Offline deterministic mode") : "Connecting..."}
+          <div style={{ fontWeight: 600, color: status.tone === "error" ? "var(--error)" : "var(--text)" }}>
+            {status.title}
           </div>
-          <div style={{ marginTop: 2 }}>
-            {health?.ai_model ? `Model: ${health.ai_model}` : "No AI_API_KEY set — full functionality retained"}
-          </div>
+          {status.detail && <div style={{ marginTop: 2 }}>{status.detail}</div>}
         </div>
       </aside>
       <main className="main-content">

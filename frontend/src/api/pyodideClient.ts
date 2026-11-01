@@ -5,6 +5,7 @@
 // drives, and scripts/vendor-backend.mjs for how backend/app + backend/data
 // end up served as static files at `${BASE_URL}backend/`.
 import type { PyodideInterface } from "pyodide";
+import pins from "./pyodide-pins.json";
 
 type StatusBody = [number, unknown];
 
@@ -42,21 +43,22 @@ async function boot(): Promise<PyodideInterface> {
   // Vite bundles pyodide.mjs itself but can't bundle its binary runtime
   // assets (wasm/zip); pin indexURL to the matching version on jsdelivr,
   // which is Pyodide's own documented CDN distribution for exactly this.
+  // Every version (runtime, bundled scientific packages, micropip installs)
+  // comes from ./pyodide-pins.json and is checked by `npm run verify:static`;
+  // nothing here may float to "latest".
   // The whole boot sequence is retried on transient network failures - a
   // single flaky DNS lookup or CDN hiccup shouldn't strand the visitor on
   // the loading screen forever.
   const pyodide = await withRetries("loadPyodide", 3, () =>
-    loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.28.3/full/" })
+    loadPyodide({ indexURL: `https://cdn.jsdelivr.net/pyodide/v${pins.pyodide}/full/` })
   );
 
-  onBootProgress?.("Loading numpy, pandas, scipy, scikit-learn...");
-  await withRetries("loadPackage", 3, () =>
-    pyodide.loadPackage(["numpy", "pandas", "scipy", "scikit-learn", "micropip"])
-  );
+  onBootProgress?.("Loading numpy, scipy, scikit-learn...");
+  await withRetries("loadPackage", 3, () => pyodide.loadPackage(pins.loadPackages));
 
   onBootProgress?.("Installing networkx, fastapi, pydantic...");
   const micropip = pyodide.pyimport("micropip");
-  await withRetries("micropip.install", 3, () => micropip.install(["networkx", "fastapi", "pydantic"]));
+  await withRetries("micropip.install", 3, () => micropip.install(pins.micropip));
 
   onBootProgress?.("Loading application code and data...");
   const base = import.meta.env.BASE_URL;

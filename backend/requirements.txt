@@ -3,7 +3,6 @@ uvicorn[standard]==0.52.1
 pydantic==2.12.5
 networkx==3.6.1
 scikit-learn==1.9.0
-pandas==3.0.5
 numpy==2.5.1
 scipy==1.18.0
 pytest==9.1.1

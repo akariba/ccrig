@@ -69,6 +69,10 @@ Request constraints live in the endpoints' own signatures and request models (`Q
 
 The GitHub Pages build has no server: `app/browser_dispatch.py` calls the endpoint functions in-process inside Pyodide. It validates parameters through pydantic from the same signatures (and resolves omitted `Query(...)` defaults), so the static build rejects and accepts exactly what the server does. `tests/test_dispatcher_parity.py` sends every case in `validation/request_cases.py` through both paths and requires identical statuses and error locations; the dispatcher refuses at import time any endpoint parameter kind it cannot reproduce (`Depends`, `Header`, `Request`, ...).
 
+## Static build runtime (GitHub Pages)
+
+`frontend/src/api/pyodide-pins.json` is the single source of truth for the in-browser runtime: the Pyodide release (the npm `pyodide` dependency is pinned to the same exact version), the scientific packages Pyodide loads (`numpy`, `scipy`, `scikit-learn`), and exact `micropip` pins for everything fetched from PyPI (`fastapi` equal to `requirements.txt`, plus its resolved dependencies). Packages bundled by Pyodide (pydantic, networkx, ...) are fixed by the release; the file records their versions so drift is detected. These can differ from `requirements.txt` (the server's pins) - the analytical baseline in `backend/validation/` is what shows that results do not depend on the difference. pandas is not used by the application and is not installed.
+
 ## API surface
 
 All endpoints are namespaced under `/api/*` and registered in `backend/app/main.py`:

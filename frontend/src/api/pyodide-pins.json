@@ -1,0 +1,24 @@
+{
+  "description": "Single source of truth for the in-browser (GitHub Pages) Python runtime. Read by src/api/pyodideClient.ts, scripts/verify-static-backend.mjs and backend/tests/test_static_build_pins.py. Change it only together with a passing `npm run verify:static`.",
+  "pyodide": "0.28.3",
+  "loadPackages": ["numpy", "scipy", "scikit-learn", "micropip"],
+  "micropip": [
+    "fastapi==0.141.1",
+    "starlette==1.10.0",
+    "annotated-doc==0.0.5",
+    "typing-inspection==0.4.4",
+    "typing-extensions==4.16.0",
+    "pydantic==2.10.6",
+    "networkx==3.4.2"
+  ],
+  "bundledByPyodide": {
+    "numpy": "2.2.5",
+    "scipy": "1.14.1",
+    "scikit-learn": "1.7.0",
+    "pydantic": "2.10.6",
+    "pydantic-core": "2.27.2",
+    "networkx": "3.4.2",
+    "anyio": "4.9.0",
+    "annotated-types": "0.7.0"
+  }
+}
