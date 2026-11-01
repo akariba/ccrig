@@ -41,16 +41,21 @@ class SemanticSpace:
         sim = cosine_similarity(va, vb)[0][0]
         return float(sim)
 
-    def nearest(self, entity_id, top_k):
+    def nearest(self, entity_id, top_k, among=None):
+        """Top-k most similar entities. `among` (a collection of ids) restricts
+        the candidates BEFORE the cut, so a restricted pool still yields k
+        neighbours. The TF-IDF space itself is fitted on all entities either
+        way, so similarity values do not depend on `among`."""
         if entity_id not in self.index:
             return []
         v = self.matrix[self.index[entity_id]]
         sims = cosine_similarity(v, self.matrix)[0]
         order = np.argsort(-sims)
+        allowed = None if among is None else set(among)
         out = []
         for idx in order:
             cand = self.ids[idx]
-            if cand == entity_id:
+            if cand == entity_id or (allowed is not None and cand not in allowed):
                 continue
             out.append((cand, float(sims[idx])))
             if len(out) >= top_k:

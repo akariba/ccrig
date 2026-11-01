@@ -14,22 +14,41 @@ from .config import (
 )
 
 
-def _category_block(entity_id):
+def relatedness_pool(entity_id):
+    """Entities eligible as RELATEDNESS candidates for `entity_id`.
+
+    Layer separation: relatedness (Layer B) is a property of issuers.
+    Counterparties are Layer C entities - they reach an issuer's view only
+    through the explicit exposure join, never as "related" peers, and the
+    metadata nodes (sectors, countries) are not entities at all. So an issuer's
+    pool is issuers only.
+
+    A counterparty-centred query (the Distance Map) keeps the legacy pool of all
+    browsable entities: that view's method is unchanged in this phase.
+    Search and the Graph Explorer do not use this pool.
+    """
+    e = STORE.entity(entity_id)
+    if e and e.get("node_type") == "Company/Issuer":
+        return STORE.issuer_ids, "ISSUER_ONLY"
+    return STORE.browsable_ids, "LEGACY_ALL_BROWSABLE"
+
+
+def _category_block(entity_id, pool):
     e = STORE.entity(entity_id)
     if not e:
         return []
-    peers = [eid for eid in STORE.browsable_ids
+    peers = [eid for eid in pool
              if eid != entity_id and STORE.entity(eid)["sector"] == e["sector"]]
     return peers[:CANDIDATE_CATEGORY_BLOCK_MAX]
 
 
-def _theme_neighbors(entity_id, top_k):
+def _theme_neighbors(entity_id, top_k, pool):
     weights = STORE.entity_keyword_weights.get(entity_id, {})
     if not weights:
         return []
     my_themes = set(weights.keys())
     scored = []
-    for other in STORE.browsable_ids:
+    for other in pool:
         if other == entity_id:
             continue
         other_weights = STORE.entity_keyword_weights.get(other, {})
@@ -49,10 +68,13 @@ def generate_candidates(entity_id):
     if entity_id not in STORE.entities_by_id:
         return None
 
-    fact_neighs = list(fact_neighbors(entity_id).keys())
-    category_block = _category_block(entity_id)
-    semantic_neighs = [eid for eid, _ in SEMANTIC.nearest(entity_id, CANDIDATE_SEMANTIC_NN)]
-    theme_neighs = _theme_neighbors(entity_id, CANDIDATE_THEME_NN)
+    pool, pool_kind = relatedness_pool(entity_id)
+    pool_set = set(pool)
+    fact_neighs = [eid for eid in fact_neighbors(entity_id) if pool_kind == "LEGACY_ALL_BROWSABLE" or eid in pool_set]
+    category_block = _category_block(entity_id, pool)
+    semantic_neighs = [eid for eid, _ in SEMANTIC.nearest(
+        entity_id, CANDIDATE_SEMANTIC_NN, among=None if pool_kind == "LEGACY_ALL_BROWSABLE" else pool_set)]
+    theme_neighs = _theme_neighbors(entity_id, CANDIDATE_THEME_NN, pool)
     market_neighs = market.market_neighbors(entity_id, CANDIDATE_MARKET_NN)
 
     # Exposure-graph counterparties are surfaced separately (Counterparty
@@ -73,10 +95,10 @@ def generate_candidates(entity_id):
                 seen.add(eid)
                 union.append(eid)
 
-    n_browsable = len(STORE.browsable_ids)
-    theoretical_pairs_for_entity = n_browsable - 1
+    theoretical_pairs_for_entity = len(pool) - 1
     return {
         "entity_id": entity_id,
+        "pool": pool_kind,
         "sources": sources,
         "candidate_ids": union,
         "instrumentation": {

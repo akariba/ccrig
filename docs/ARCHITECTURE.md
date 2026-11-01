@@ -29,6 +29,8 @@ For any "find related/relevant entities" query (Entity 360's related panel, Them
    
    Each source's contribution is **instrumented and shown in the UI** (Entity 360's relationship-instrumentation KPIs: pairs considered → candidates generated → candidates retained → reduction % → number of blocking sources).
 
+   **Candidate pool (layer separation).** For an issuer, all five sources draw on issuers only (`candidates.relatedness_pool`): counterparties are Layer C and reach an issuer's view through the exposure join, search and the Graph Explorer's exposure layer - never as "related" peers - and sector/country metadata nodes are not entities. A counterparty-centred query (the Distance Map) still uses the legacy all-browsable pool; changing that is part of the separately authorised Distance Map work. Pair scores do not depend on the pool.
+
 2. **Relevance scoring** (`core/scoring.py`) — only the retained candidate set is scored, using the current Model Lab weight vector, producing a per-pair **feature vector** (not a single scalar) with `n/a` for components that have no evidence for that pair (e.g. no supply-chain edge exists between two entities → `supply_chain: n/a`, not `0`).
 
 3. **Typed path explanation** (`core/paths.py`) — every retained pair gets a deterministic, human-readable typed path (`FACT_PATH`, `DERIVED_PATH`, etc.) describing *why* it was retained, shown in the Explain panel.

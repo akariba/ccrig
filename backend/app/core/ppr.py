@@ -43,10 +43,9 @@ def _build_relation_graph():
 
     # Layer B: derived candidate-scored edges (general preset), bounded by
     # candidate generation exactly like every other consumer of scoring.py.
-    # generate_candidates() can still surface counterparties as candidates
-    # (it draws on the shared browsable_ids sector/theme/semantic blocks),
-    # so we explicitly drop any candidate that isn't an issuer before it
-    # can become a PPR edge/node.
+    # generate_candidates() already returns an issuer-only pool for an issuer
+    # centre (candidates.relatedness_pool); the membership check below stays
+    # as a second line of defence so a non-issuer can never become a PPR node.
     for eid in STORE.issuer_ids:
         cand = candidates.generate_candidates(eid)
         if not cand:

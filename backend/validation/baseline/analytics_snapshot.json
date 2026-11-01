@@ -1749,12 +1749,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 27,
-     "reduction_ratio": 0.55,
-     "theoretical_pair_count": 60
+     "candidate_count": 25,
+     "reduction_ratio": 0.4048,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 27,
+    "scored_pair_count": 25,
     "top_related": [
      {
       "component_values": {
@@ -1881,48 +1881,6 @@
      {
       "component_values": {
        "geography": 1.0,
-       "market_negative": null,
-       "market_positive": null,
-       "news": 0.8010018789148142,
-       "ownership": null,
-       "sector": 0.0,
-       "semantic": 0.07227033391783656,
-       "supply_chain": null
-      },
-      "composite_score": 0.4176,
-      "entity_id": "CP_ALPHA",
-      "missing_components": [
-       "supply_chain",
-       "ownership",
-       "market_positive",
-       "market_negative"
-      ],
-      "name": "Alpha Quant Capital LP"
-     },
-     {
-      "component_values": {
-       "geography": 1.0,
-       "market_negative": null,
-       "market_positive": null,
-       "news": 0.816496580927726,
-       "ownership": null,
-       "sector": 0.0,
-       "semantic": 0.0374171567619279,
-       "supply_chain": null
-      },
-      "composite_score": 0.4139,
-      "entity_id": "CP_HELIX",
-      "missing_components": [
-       "supply_chain",
-       "ownership",
-       "market_positive",
-       "market_negative"
-      ],
-      "name": "Helix Multi-Strategy Partners"
-     },
-     {
-      "component_values": {
-       "geography": 1.0,
        "market_negative": 0.0,
        "market_positive": 0.1208392300439763,
        "news": 0.9132233209773137,
@@ -1959,6 +1917,46 @@
        "market_negative"
       ],
       "name": "Broadcom Inc."
+     },
+     {
+      "component_values": {
+       "geography": 1.0,
+       "market_negative": null,
+       "market_positive": null,
+       "news": 0.44908871313907195,
+       "ownership": null,
+       "sector": 0.0,
+       "semantic": 0.0827300206350215,
+       "supply_chain": null
+      },
+      "composite_score": 0.3146,
+      "entity_id": "MU",
+      "missing_components": [
+       "supply_chain",
+       "ownership",
+       "market_positive",
+       "market_negative"
+      ],
+      "name": "Micron Technology, Inc."
+     },
+     {
+      "component_values": {
+       "geography": 1.0,
+       "market_negative": 0.0,
+       "market_positive": 0.1390612745644045,
+       "news": 0.566393860323831,
+       "ownership": null,
+       "sector": 0.0,
+       "semantic": 0.04730482452199424,
+       "supply_chain": null
+      },
+      "composite_score": 0.2839,
+      "entity_id": "AMD",
+      "missing_components": [
+       "supply_chain",
+       "ownership"
+      ],
+      "name": "Advanced Micro Devices, Inc."
      }
     ]
    },
@@ -2076,12 +2074,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 39,
-     "reduction_ratio": 0.35,
-     "theoretical_pair_count": 60
+     "candidate_count": 22,
+     "reduction_ratio": 0.4762,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 39,
+    "scored_pair_count": 22,
     "top_related": [
      {
       "component_values": {
@@ -2152,27 +2150,6 @@
        "news": 1.0,
        "ownership": null,
        "sector": 1.0,
-       "semantic": 0.16051355032911327,
-       "supply_chain": null
-      },
-      "composite_score": 0.7985,
-      "entity_id": "CP_CASCADE",
-      "missing_components": [
-       "supply_chain",
-       "ownership",
-       "market_positive",
-       "market_negative"
-      ],
-      "name": "Cascade Regional Bank Treasury"
-     },
-     {
-      "component_values": {
-       "geography": 1.0,
-       "market_negative": null,
-       "market_positive": null,
-       "news": 1.0,
-       "ownership": null,
-       "sector": 1.0,
        "semantic": 0.14857993253377472,
        "supply_chain": null
       },
@@ -2206,27 +2183,6 @@
        "market_negative"
       ],
       "name": "The Goldman Sachs Group, Inc."
-     },
-     {
-      "component_values": {
-       "geography": 1.0,
-       "market_negative": null,
-       "market_positive": null,
-       "news": 0.9829463743659809,
-       "ownership": null,
-       "sector": 1.0,
-       "semantic": 0.09155574654978366,
-       "supply_chain": null
-      },
-      "composite_score": 0.7769,
-      "entity_id": "CP_ANCHOR",
-      "missing_components": [
-       "supply_chain",
-       "ownership",
-       "market_positive",
-       "market_negative"
-      ],
-      "name": "Anchor Money Market Fund"
      },
      {
       "component_values": {
@@ -2290,6 +2246,46 @@
        "market_negative"
       ],
       "name": "American International Group, Inc."
+     },
+     {
+      "component_values": {
+       "geography": 0.0,
+       "market_negative": null,
+       "market_positive": null,
+       "news": 0.4783648732349399,
+       "ownership": null,
+       "sector": 1.0,
+       "semantic": 0.4717002718595443,
+       "supply_chain": null
+      },
+      "composite_score": 0.5567,
+      "entity_id": "HSBC",
+      "missing_components": [
+       "supply_chain",
+       "ownership",
+       "market_positive",
+       "market_negative"
+      ],
+      "name": "HSBC Holdings plc"
+     },
+     {
+      "component_values": {
+       "geography": 1.0,
+       "market_negative": 0.0,
+       "market_positive": 0.20268425896426204,
+       "news": 0.10889310129609417,
+       "ownership": null,
+       "sector": 0.0,
+       "semantic": 0.07819251510354307,
+       "supply_chain": null
+      },
+      "composite_score": 0.1938,
+      "entity_id": "XOM",
+      "missing_components": [
+       "supply_chain",
+       "ownership"
+      ],
+      "name": "ExxonMobil Corporation"
      }
     ]
    },
@@ -2704,12 +2700,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 29,
-     "reduction_ratio": 0.5167,
-     "theoretical_pair_count": 60
+     "candidate_count": 27,
+     "reduction_ratio": 0.3571,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 29,
+    "scored_pair_count": 27,
     "top_related": [
      {
       "component_values": {
@@ -3191,12 +3187,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 26,
-     "reduction_ratio": 0.5667,
-     "theoretical_pair_count": 60
+     "candidate_count": 25,
+     "reduction_ratio": 0.4048,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 26,
+    "scored_pair_count": 25,
     "top_related": [
      {
       "component_values": {
@@ -3592,12 +3588,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 19,
-     "reduction_ratio": 0.6833,
-     "theoretical_pair_count": 60
+     "candidate_count": 18,
+     "reduction_ratio": 0.5714,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 19,
+    "scored_pair_count": 18,
     "top_related": [
      {
       "component_values": {
@@ -4089,12 +4085,12 @@
    "ownership": [],
    "relationship_summary": {
     "instrumentation": {
-     "candidate_count": 25,
-     "reduction_ratio": 0.5833,
-     "theoretical_pair_count": 60
+     "candidate_count": 23,
+     "reduction_ratio": 0.4524,
+     "theoretical_pair_count": 42
     },
     "retained_count": 10,
-    "scored_pair_count": 25,
+    "scored_pair_count": 23,
     "top_related": [
      {
       "component_values": {
@@ -4533,7 +4529,7 @@
     "unresolved_llm_entity_candidates": []
    },
    "ai_mode": "DETERMINISTIC_OFFLINE",
-   "ai_summary": "AI explanation (deterministic): classified as 'Geographic / Natural Disaster'. Directly mentioned/theme-relevant entities: 17. Themes detected: semiconductors, foundry, Taiwan, earthquake. Bounded typed-path traversal (Mode 1) surfaced 15 propagated entities; relation-aware Personalized PageRank (Mode 2) surfaced 15 entities (different units - not directly comparable). 14 synthetic counterparties are exposed to the resulting relevant issuer set via the Layer C exposure join.",
+   "ai_summary": "AI explanation (deterministic): classified as 'Geographic / Natural Disaster'. Directly mentioned/theme-relevant entities: 17. Themes detected: semiconductors, foundry, Taiwan, earthquake. Bounded typed-path traversal (Mode 1) surfaced 15 propagated entities; relation-aware Personalized PageRank (Mode 2) surfaced 15 entities (different units - not directly comparable). 13 synthetic counterparties are exposed to the resulting relevant issuer set via the Layer C exposure join.",
    "counterparty_exposure_paths": [
     {
      "counterparty": "CP_PACIFIC",
@@ -4856,14 +4852,6 @@
      "relation": "HOLDS_VIA_FUND"
     },
     {
-     "counterparty": "CP_DELTA",
-     "exposure_pct": 0.3,
-     "is_synthetic": true,
-     "issuer": "MS",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_VIA_FUND"
-    },
-    {
      "counterparty": "CP_NORTHBRIDGE",
      "exposure_pct": 0.24,
      "is_synthetic": true,
@@ -4888,6 +4876,14 @@
      "relation": "HOLDS_BONDS"
     },
     {
+     "counterparty": "CP_DELTA",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "MS",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_VIA_FUND"
+    },
+    {
      "counterparty": "CP_SUMMIT",
      "exposure_pct": 0.06,
      "is_synthetic": true,
@@ -4904,12 +4900,28 @@
      "relation": "HOLDS_BONDS"
     },
     {
-     "counterparty": "CP_IRONGATE",
-     "exposure_pct": 0.25,
+     "counterparty": "CP_VANTAGE",
+     "exposure_pct": 0.15,
      "is_synthetic": true,
-     "issuer": "GD",
+     "issuer": "UBS",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "LENDS_TO"
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_ORION",
+     "exposure_pct": 0.35,
+     "is_synthetic": true,
+     "issuer": "UBS",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_pct": 0.24,
+     "is_synthetic": true,
+     "issuer": "UBS",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
     }
    ],
    "detected_countries": [
@@ -5362,63 +5374,63 @@
     "results": [
      {
       "entity_id": "GOOGL",
-      "ppr_score": 0.031212
+      "ppr_score": 0.029924
      },
      {
       "entity_id": "MSFT",
-      "ppr_score": 0.026807
+      "ppr_score": 0.025821
      },
      {
       "entity_id": "AMZN",
-      "ppr_score": 0.025094
+      "ppr_score": 0.023817
      },
      {
       "entity_id": "META",
-      "ppr_score": 0.024689
+      "ppr_score": 0.023451
      },
      {
       "entity_id": "ORCL",
-      "ppr_score": 0.021103
+      "ppr_score": 0.019692
      },
      {
       "entity_id": "IBM",
-      "ppr_score": 0.018232
-     },
-     {
-      "entity_id": "BAC",
-      "ppr_score": 1.2e-05
+      "ppr_score": 0.017391
      },
      {
       "entity_id": "C",
-      "ppr_score": 1.2e-05
+      "ppr_score": 1.3e-05
      },
      {
-      "entity_id": "WFC",
-      "ppr_score": 1.2e-05
+      "entity_id": "BAC",
+      "ppr_score": 1.3e-05
      },
      {
       "entity_id": "JPM",
-      "ppr_score": 1.2e-05
+      "ppr_score": 1.3e-05
      },
      {
-      "entity_id": "MS",
-      "ppr_score": 1e-05
+      "entity_id": "WFC",
+      "ppr_score": 1.3e-05
      },
      {
       "entity_id": "GS",
-      "ppr_score": 1e-05
+      "ppr_score": 1.2e-05
      },
      {
       "entity_id": "DBK",
-      "ppr_score": 9e-06
+      "ppr_score": 1.1e-05
+     },
+     {
+      "entity_id": "MS",
+      "ppr_score": 1.1e-05
+     },
+     {
+      "entity_id": "UBS",
+      "ppr_score": 7e-06
      },
      {
       "entity_id": "HSBC",
-      "ppr_score": 4e-06
-     },
-     {
-      "entity_id": "GD",
-      "ppr_score": 3e-06
+      "ppr_score": 7e-06
      }
     ]
    },
@@ -5662,7 +5674,7 @@
        "relation": "HOLDS_EQUITY"
       },
       {
-       "event_relevance": 0.0001,
+       "event_relevance": 0.0002,
        "exposure_pct": 0.2,
        "issuer": "DBK",
        "relation": "HOLDS_BONDS"
@@ -5671,7 +5683,7 @@
     },
     {
      "counterparty": "CP_VANTAGE",
-     "exposure_weighted_relevance": 0.162,
+     "exposure_weighted_relevance": 0.1621,
      "issuers": [
       {
        "event_relevance": 0.9,
@@ -5680,10 +5692,46 @@
        "relation": "HOLDS_EQUITY"
       },
       {
-       "event_relevance": 0.0001,
+       "event_relevance": 0.0002,
        "exposure_pct": 0.18,
        "issuer": "DBK",
        "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.15,
+       "issuer": "UBS",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_weighted_relevance": 0.0002,
+     "issuers": [
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.24,
+       "issuer": "BAC",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.28,
+       "issuer": "JPM",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.24,
+       "issuer": "WFC",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.24,
+       "issuer": "UBS",
+       "relation": "HOLDS_BONDS"
       }
      ]
     },
@@ -5734,7 +5782,7 @@
        "relation": "HOLDS_BONDS"
       },
       {
-       "event_relevance": 0.0001,
+       "event_relevance": 0.0002,
        "exposure_pct": 0.24,
        "issuer": "DBK",
        "relation": "HOLDS_BONDS"
@@ -5742,49 +5790,19 @@
      ]
     },
     {
-     "counterparty": "CP_ANCHOR",
-     "exposure_weighted_relevance": 0.0001,
-     "issuers": [
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.24,
-       "issuer": "BAC",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.28,
-       "issuer": "JPM",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.24,
-       "issuer": "WFC",
-       "relation": "HOLDS_BONDS"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_IRONGATE",
-     "exposure_weighted_relevance": 0.0,
-     "issuers": [
-      {
-       "event_relevance": 0.0,
-       "exposure_pct": 0.25,
-       "issuer": "GD",
-       "relation": "LENDS_TO"
-      }
-     ]
-    },
-    {
      "counterparty": "CP_ORION",
-     "exposure_weighted_relevance": 0.0,
+     "exposure_weighted_relevance": 0.0001,
      "issuers": [
       {
        "event_relevance": 0.0001,
        "exposure_pct": 0.3,
        "issuer": "HSBC",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.35,
+       "issuer": "UBS",
        "relation": "HOLDS_BONDS"
       }
      ]
@@ -11233,9 +11251,9 @@
   "body": {
    "entity_id": "TSM",
    "instrumentation": {
-    "candidate_count": 25,
-    "reduction_ratio": 0.5833,
-    "theoretical_pair_count": 60
+    "candidate_count": 23,
+    "reduction_ratio": 0.4524,
+    "theoretical_pair_count": 42
    },
    "results": [
     {
@@ -11473,72 +11491,68 @@
     },
     {
      "component_values": {
-      "geography": 0.5,
+      "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
-      "news": 1.0,
+      "news": 0.7561156642986933,
       "ownership": null,
       "sector": 0.0,
-      "semantic": 0.023701107618323225,
+      "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "CP_LATTICE",
+     "entity_id": "META",
      "missing_components": [
       "supply_chain",
       "ownership",
       "market_positive",
       "market_negative"
      ],
-     "name": "Lattice Sovereign Growth Fund",
-     "score": 0.3857
+     "name": "Meta Platforms, Inc.",
+     "score": 0.2268
     },
     {
      "component_values": {
-      "geography": 1.0,
-      "market_negative": null,
-      "market_positive": null,
-      "news": null,
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.36348057155836644,
+      "news": 0.6265125137069192,
       "ownership": null,
       "sector": 0.0,
-      "semantic": null,
+      "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "TAIWAN",
+     "entity_id": "MSFT",
      "missing_components": [
       "supply_chain",
-      "ownership",
-      "semantic",
-      "news",
-      "market_positive",
-      "market_negative"
+      "ownership"
      ],
-     "name": "Taiwan",
-     "score": 0.3478
+     "name": "Microsoft Corporation",
+     "score": 0.2005
     },
     {
      "component_values": {
       "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
-      "news": 1.0,
+      "news": 0.3320778360912659,
       "ownership": null,
       "sector": 0.0,
       "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "CP_ALPHA",
+     "entity_id": "GOOGL",
      "missing_components": [
       "supply_chain",
       "ownership",
       "market_positive",
       "market_negative"
      ],
-     "name": "Alpha Quant Capital LP",
-     "score": 0.3
+     "name": "Alphabet Inc.",
+     "score": 0.0996
     }
    ],
    "retained_count": 15,
-   "scored_pair_count": 25,
+   "scored_pair_count": 23,
    "weights_used": {
     "geography": 0.08,
     "market_negative": 0.05,
@@ -11556,9 +11570,9 @@
   "body": {
    "entity_id": "TSM",
    "instrumentation": {
-    "candidate_count": 25,
-    "reduction_ratio": 0.5833,
-    "theoretical_pair_count": 60
+    "candidate_count": 23,
+    "reduction_ratio": 0.4524,
+    "theoretical_pair_count": 42
    },
    "results": [
     {
@@ -11796,72 +11810,68 @@
     },
     {
      "component_values": {
-      "geography": 0.5,
+      "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
-      "news": 1.0,
+      "news": 0.7561156642986933,
       "ownership": null,
       "sector": 0.0,
-      "semantic": 0.023701107618323225,
+      "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "CP_LATTICE",
+     "entity_id": "META",
      "missing_components": [
       "supply_chain",
       "ownership",
       "market_positive",
       "market_negative"
      ],
-     "name": "Lattice Sovereign Growth Fund",
-     "score": 0.3857
+     "name": "Meta Platforms, Inc.",
+     "score": 0.2268
     },
     {
      "component_values": {
-      "geography": 1.0,
-      "market_negative": null,
-      "market_positive": null,
-      "news": null,
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.36348057155836644,
+      "news": 0.6265125137069192,
       "ownership": null,
       "sector": 0.0,
-      "semantic": null,
+      "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "TAIWAN",
+     "entity_id": "MSFT",
      "missing_components": [
       "supply_chain",
-      "ownership",
-      "semantic",
-      "news",
-      "market_positive",
-      "market_negative"
+      "ownership"
      ],
-     "name": "Taiwan",
-     "score": 0.3478
+     "name": "Microsoft Corporation",
+     "score": 0.2005
     },
     {
      "component_values": {
       "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
-      "news": 1.0,
+      "news": 0.3320778360912659,
       "ownership": null,
       "sector": 0.0,
       "semantic": 0.0,
       "supply_chain": null
      },
-     "entity_id": "CP_ALPHA",
+     "entity_id": "GOOGL",
      "missing_components": [
       "supply_chain",
       "ownership",
       "market_positive",
       "market_negative"
      ],
-     "name": "Alpha Quant Capital LP",
-     "score": 0.3
+     "name": "Alphabet Inc.",
+     "score": 0.0996
     }
    ],
    "retained_count": 15,
-   "scored_pair_count": 25,
+   "scored_pair_count": 23,
    "weights_used": {
     "geography": 0.08,
     "market_negative": 0.05,
@@ -11879,9 +11889,9 @@
   "body": {
    "entity_id": "TSM",
    "instrumentation": {
-    "candidate_count": 25,
-    "reduction_ratio": 0.5833,
-    "theoretical_pair_count": 60
+    "candidate_count": 23,
+    "reduction_ratio": 0.4524,
+    "theoretical_pair_count": 42
    },
    "results": [
     {
@@ -12083,48 +12093,6 @@
     },
     {
      "component_values": {
-      "geography": 0.5,
-      "market_negative": null,
-      "market_positive": null,
-      "news": 1.0,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.023701107618323225,
-      "supply_chain": null
-     },
-     "entity_id": "CP_LATTICE",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Lattice Sovereign Growth Fund",
-     "score": 0.5034
-    },
-    {
-     "component_values": {
-      "geography": 0.0,
-      "market_negative": null,
-      "market_positive": null,
-      "news": 1.0,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.0,
-      "supply_chain": null
-     },
-     "entity_id": "CP_ALPHA",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Alpha Quant Capital LP",
-     "score": 0.4286
-    },
-    {
-     "component_values": {
       "geography": 0.0,
       "market_negative": 0.0,
       "market_positive": 0.37155168422235124,
@@ -12140,29 +12108,6 @@
      ],
      "name": "Intel Corporation",
      "score": 0.414
-    },
-    {
-     "component_values": {
-      "geography": 1.0,
-      "market_negative": null,
-      "market_positive": null,
-      "news": null,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": null,
-      "supply_chain": null
-     },
-     "entity_id": "TAIWAN",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "semantic",
-      "news",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Taiwan",
-     "score": 0.3333
     },
     {
      "component_values": {
@@ -12184,10 +12129,68 @@
      ],
      "name": "Meta Platforms, Inc.",
      "score": 0.324
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.3022419006321725,
+      "news": 0.9950219870810078,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": 0.8
+     },
+     "entity_id": "AAPL",
+     "missing_components": [
+      "ownership"
+     ],
+     "name": "Apple Inc.",
+     "score": 0.311
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.36348057155836644,
+      "news": 0.6265125137069192,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "MSFT",
+     "missing_components": [
+      "supply_chain",
+      "ownership"
+     ],
+     "name": "Microsoft Corporation",
+     "score": 0.2388
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": null,
+      "market_positive": null,
+      "news": 0.3320778360912659,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "GOOGL",
+     "missing_components": [
+      "supply_chain",
+      "ownership",
+      "market_positive",
+      "market_negative"
+     ],
+     "name": "Alphabet Inc.",
+     "score": 0.1423
     }
    ],
    "retained_count": 15,
-   "scored_pair_count": 25,
+   "scored_pair_count": 23,
    "weights_used": {
     "geography": 0.05,
     "market_negative": 0.2,
@@ -12416,9 +12419,9 @@
   "body": {
    "entity_id": "TSM",
    "instrumentation": {
-    "candidate_count": 25,
-    "reduction_ratio": 0.5833,
-    "theoretical_pair_count": 60
+    "candidate_count": 23,
+    "reduction_ratio": 0.4524,
+    "theoretical_pair_count": 42
    },
    "results": [
     {
@@ -12516,29 +12519,6 @@
      ],
      "name": "SK Hynix Inc.",
      "score": 0.6171
-    },
-    {
-     "component_values": {
-      "geography": 1.0,
-      "market_negative": null,
-      "market_positive": null,
-      "news": null,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": null,
-      "supply_chain": null
-     },
-     "entity_id": "TAIWAN",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "semantic",
-      "news",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Taiwan",
-     "score": 0.6
     },
     {
      "component_values": {
@@ -12641,27 +12621,6 @@
     },
     {
      "component_values": {
-      "geography": 0.5,
-      "market_negative": null,
-      "market_positive": null,
-      "news": 1.0,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.023701107618323225,
-      "supply_chain": null
-     },
-     "entity_id": "CP_LATTICE",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Lattice Sovereign Growth Fund",
-     "score": 0.4405
-    },
-    {
-     "component_values": {
       "geography": 0.0,
       "market_negative": 0.0,
       "market_positive": 0.37155168422235124,
@@ -12677,27 +12636,6 @@
      ],
      "name": "Intel Corporation",
      "score": 0.333
-    },
-    {
-     "component_values": {
-      "geography": 0.5,
-      "market_negative": null,
-      "market_positive": null,
-      "news": 0.5698028822981898,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.023355573617191424,
-      "supply_chain": null
-     },
-     "entity_id": "CP_PACIFIC",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Pacific Tech Partners",
-     "score": 0.3329
     },
     {
      "component_values": {
@@ -12718,10 +12656,71 @@
      ],
      "name": "Arm Holdings plc",
      "score": 0.2904
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": null,
+      "market_positive": null,
+      "news": 0.7561156642986933,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "META",
+     "missing_components": [
+      "supply_chain",
+      "ownership",
+      "market_positive",
+      "market_negative"
+     ],
+     "name": "Meta Platforms, Inc.",
+     "score": 0.189
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.36348057155836644,
+      "news": 0.6265125137069192,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "MSFT",
+     "missing_components": [
+      "supply_chain",
+      "ownership"
+     ],
+     "name": "Microsoft Corporation",
+     "score": 0.1617
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": null,
+      "market_positive": null,
+      "news": 0.3320778360912659,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "GOOGL",
+     "missing_components": [
+      "supply_chain",
+      "ownership",
+      "market_positive",
+      "market_negative"
+     ],
+     "name": "Alphabet Inc.",
+     "score": 0.083
     }
    ],
    "retained_count": 15,
-   "scored_pair_count": 25,
+   "scored_pair_count": 23,
    "weights_used": {
     "geography": 0.15,
     "market_negative": 0.05,
@@ -12739,9 +12738,9 @@
   "body": {
    "entity_id": "TSM",
    "instrumentation": {
-    "candidate_count": 25,
-    "reduction_ratio": 0.5833,
-    "theoretical_pair_count": 60
+    "candidate_count": 23,
+    "reduction_ratio": 0.4524,
+    "theoretical_pair_count": 42
    },
    "results": [
     {
@@ -12959,27 +12958,6 @@
     },
     {
      "component_values": {
-      "geography": 0.5,
-      "market_negative": null,
-      "market_positive": null,
-      "news": 1.0,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.023701107618323225,
-      "supply_chain": null
-     },
-     "entity_id": "CP_LATTICE",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Lattice Sovereign Growth Fund",
-     "score": 0.4304
-    },
-    {
-     "component_values": {
       "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
@@ -13003,27 +12981,6 @@
       "geography": 0.0,
       "market_negative": null,
       "market_positive": null,
-      "news": 1.0,
-      "ownership": null,
-      "sector": 0.0,
-      "semantic": 0.0,
-      "supply_chain": null
-     },
-     "entity_id": "CP_ALPHA",
-     "missing_components": [
-      "supply_chain",
-      "ownership",
-      "market_positive",
-      "market_negative"
-     ],
-     "name": "Alpha Quant Capital LP",
-     "score": 0.3846
-    },
-    {
-     "component_values": {
-      "geography": 0.0,
-      "market_negative": null,
-      "market_positive": null,
       "news": 0.7561156642986933,
       "ownership": null,
       "sector": 0.0,
@@ -13039,10 +12996,50 @@
      ],
      "name": "Meta Platforms, Inc.",
      "score": 0.2908
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": 0.0,
+      "market_positive": 0.36348057155836644,
+      "news": 0.6265125137069192,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "MSFT",
+     "missing_components": [
+      "supply_chain",
+      "ownership"
+     ],
+     "name": "Microsoft Corporation",
+     "score": 0.2428
+    },
+    {
+     "component_values": {
+      "geography": 0.0,
+      "market_negative": null,
+      "market_positive": null,
+      "news": 0.3320778360912659,
+      "ownership": null,
+      "sector": 0.0,
+      "semantic": 0.0,
+      "supply_chain": null
+     },
+     "entity_id": "GOOGL",
+     "missing_components": [
+      "supply_chain",
+      "ownership",
+      "market_positive",
+      "market_negative"
+     ],
+     "name": "Alphabet Inc.",
+     "score": 0.1277
     }
    ],
    "retained_count": 15,
-   "scored_pair_count": 25,
+   "scored_pair_count": 23,
    "weights_used": {
     "geography": 0.05,
     "market_negative": 0.03,
