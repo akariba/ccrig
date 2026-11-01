@@ -222,7 +222,7 @@ export function GeoStage(props: Props) {
     for (const m of p.scene.markers) {
       const q = projectAt(p.mode, w, h, s.cam, s.flat, m.lon, m.lat);
       const [ox, oy] = s.offsets[m.id] ?? [0, 0];
-      disp[m.id] = { x: q.x + ox, y: q.y + oy, ax: q.x, ay: q.y, visible: q.visible };
+      disp[m.id] = { x: q.x + ox, y: q.y + oy, ax: q.x, ay: q.y, visible: q.visible && q.x + ox >= 18 && q.x + ox <= w - 18 && q.y + oy >= 18 && q.y + oy <= h - 18 };   // judged where the marker is drawn, after any fan-out
       const el = els.current.get(m.id);
       if (el) {
         el.style.transform = `translate(${(q.x + ox).toFixed(1)}px, ${(q.y + oy).toFixed(1)}px)`;
