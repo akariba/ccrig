@@ -58,6 +58,7 @@ export function EventStudio() {
       }
     } catch (e) {
       if (requestId === requestIdRef.current) {
+        setResult(null);   // the previous event's result must not sit under the text that just failed
         setError(apiErrorMessage(e));
       }
     } finally {

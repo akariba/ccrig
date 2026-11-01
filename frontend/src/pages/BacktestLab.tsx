@@ -36,7 +36,8 @@ export function BacktestLab() {
         <h1>Backtest Lab</h1>
         <div className="subtitle">
           Look-ahead is prevented by design: the model score is computed as-of the event date using only fact-graph
-          and pre-event correlation windows; observed labels use strictly forward price moves (`forward_move()`).
+          and pre-event correlation windows; observed labels use strictly forward, market-adjusted price moves over one
+          identical window for every entity. Entities named in the event text are inputs, not predictions.
         </div>
       </div>
 

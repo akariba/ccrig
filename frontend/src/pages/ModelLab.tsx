@@ -54,6 +54,7 @@ export function ModelLab() {
       const r = await api.modelLabScore({ entity_id: entityId, weights });
       setResult(r);
     } catch (e) {
+      setResult(null);   // never leave a ranking on screen that does not match the weights just submitted
       setError(apiErrorMessage(e));
     } finally {
       setLoading(false);
