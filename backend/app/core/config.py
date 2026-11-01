@@ -13,6 +13,15 @@ AI_API_KEY = os.environ.get("AI_API_KEY", "").strip()
 AI_MODEL = os.environ.get("AI_MODEL", "").strip()
 AI_ENABLED = bool(AI_BASE_URL and AI_API_KEY and AI_MODEL)
 
+# --- Document ingestion (POC) ---
+# POST /api/themes/ingest appends to the process-wide in-memory news corpus
+# that every Theme Radar / discovery view reads. Anyone who can reach the API
+# could otherwise grow that shared state, so it is OFF unless explicitly
+# enabled (CCRIG_ENABLE_INGEST=1). Ingested text is always labelled
+# synthetic / unverified; INGEST_MAX_DOCS bounds how many may be added.
+INGEST_ENABLED = os.environ.get("CCRIG_ENABLE_INGEST", "").strip().lower() in {"1", "true", "yes", "on"}
+INGEST_MAX_DOCS = 200
+
 # --- Candidate generation / scoring defaults ---
 DEFAULT_TOP_K = 12
 MAX_TOP_K = 50

@@ -30,6 +30,10 @@ This POC intentionally demonstrates the complete business vision from `BUILD_MAN
 - The sidebar/layout is optimized for desktop analyst workflows (per the mandate's target user); it does not collapse into a hamburger menu on narrow mobile viewports. This is an intentional trade-off for an internal analyst tool, not a responsive-design bug — verified at 390px width; content remains fully readable, just alongside a persistent full-height sidebar rather than a mobile-optimized nav pattern.
 - Bundle size warning (~1.09 MB / 331 KB gzipped, mostly Cytoscape.js + Recharts) — acceptable for a local/POC deployment; would warrant code-splitting for a production build.
 
+## Document ingestion
+
+`POST /api/themes/ingest` is a POC demonstration that new text can surface a new concept. It writes to the process-wide in-memory news corpus, so it is **disabled unless `CCRIG_ENABLE_INGEST=1`**, there is still no authentication in front of it, and anything ingested is lost on restart. Ingested documents are always stored as synthetic / unverified (the caller cannot mark them real or attribute them to an outlet), ids must be unique, and at most 200 may be added. Do not enable it on a publicly reachable deployment.
+
 ## What a production system would need beyond this POC
 
 - Replace brute-force candidate generation with an ANN index (FAISS/HNSW) for >10k-entity universes.

@@ -9,6 +9,8 @@ from app import request_validation as validation
 TOO_LONG = "x" * (validation.MAX_TEXT_CHARS + 1)
 ALL_ZERO = {k: 0 for k in validation.WEIGHT_KEYS}
 
+INGEST_DOC = {"id": "case_doc", "date": "2026-08-01", "title": "A title", "snippet": "A snippet."}
+
 # (id, method, path, body, expected_status)
 INVALID = [
     ("search-empty", "GET", "/api/search?q=", None, 422),
@@ -52,6 +54,11 @@ INVALID = [
     ("event-min-score-2", "POST", "/api/event/parse", {"text": "x", "min_score": 2}, 422),
     ("event-topk-0", "POST", "/api/event/parse", {"text": "x", "top_k": 0}, 422),
     ("event-non-object-body", "POST", "/api/event/parse", ["not", "an", "object"], 422),
+    ("ingest-forged-synthetic-flag", "POST", "/api/themes/ingest", {**INGEST_DOC, "is_synthetic": False}, 422),
+    ("ingest-javascript-url", "POST", "/api/themes/ingest", {**INGEST_DOC, "url": "javascript:alert(1)"}, 422),
+    ("ingest-poison-keywords", "POST", "/api/themes/ingest", {**INGEST_DOC, "keywords": [[1]]}, 422),
+    ("ingest-bad-date", "POST", "/api/themes/ingest", {**INGEST_DOC, "date": "soon"}, 422),
+    ("ingest-missing-fields", "POST", "/api/themes/ingest", {"id": "only-an-id"}, 422),
 ]
 
 # Valid requests that previously worked (or must keep working) - bodies must match too.
@@ -89,4 +96,6 @@ VALID = [
     ("unknown-path", "GET", "/api/nope", None, 404),
     ("wrong-method", "POST", "/api/health", None, 405),
     ("score-unknown-entity", "POST", "/api/model-lab/score", {"entity_id": "NOPE"}, 404),
+    # ingestion is off unless CCRIG_ENABLE_INGEST=1, so a well-formed document is refused, not stored
+    ("ingest-disabled-by-default", "POST", "/api/themes/ingest", INGEST_DOC, 403),
 ]

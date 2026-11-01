@@ -57,6 +57,8 @@ The platform runs **fully offline** by default (a `DeterministicProvider` handle
 ```bash
 cp .env.example backend/.env
 # edit backend/.env: set AI_BASE_URL, AI_API_KEY, AI_MODEL (any OpenAI-compatible endpoint)
+# the app reads process environment variables only - load the file when starting the server:
+#   cd backend && python3 -m uvicorn app.main:app --env-file .env
 ```
 
 Restart the backend. The sidebar badge will change from "Offline deterministic mode" to reflect the active provider. The AI layer is never used for bulk pairwise relationship scoring in either mode — see `docs/LIMITATIONS.md`.

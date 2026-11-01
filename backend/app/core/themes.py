@@ -24,10 +24,12 @@ cluster's representative headlines - it never invents a theme independent
 of source documents.
 """
 import re
+import threading
 from collections import defaultdict
 from datetime import datetime
 from .data import STORE
 from . import event_parser
+from . import config
 
 
 def _parse_date(d):
@@ -138,25 +140,89 @@ def invalidate_discovery_cache():
     _DISCOVERY_CACHE = None
 
 
+class DocumentRejected(ValueError):
+    """The document cannot be ingested (malformed or disallowed)."""
+
+
+class DuplicateDocument(DocumentRejected):
+    """A document with this id is already in the corpus."""
+
+
+class IngestCapacityReached(DocumentRejected):
+    """The bounded number of ingested documents has been reached."""
+
+
+_INGEST_LOCK = threading.Lock()
+_INGEST_REQUIRED = ("id", "date", "title", "snippet")
+_URL_RE = re.compile(r"^https?://\S+$", re.IGNORECASE)
+
+
+def _checked_document(doc):
+    """Shape checks that protect every reader of STORE.news_all: theme_stats()
+    uses `keywords` entries as dict keys and `entities` entries as set
+    members, so one non-string entry would otherwise break Theme Radar for
+    every later caller."""
+    for field in _INGEST_REQUIRED:
+        if not isinstance(doc[field], str) or not doc[field].strip():
+            raise DocumentRejected(f"'{field}' must be a non-empty string")
+    if _parse_date(doc["date"]) is None:
+        raise DocumentRejected("'date' must be an ISO date (YYYY-MM-DD)")
+    entities = doc.get("entities") or []
+    keywords = doc.get("keywords") or []
+    if not isinstance(entities, list) or not all(isinstance(e, str) for e in entities):
+        raise DocumentRejected("'entities' must be a list of entity ids")
+    if not isinstance(keywords, list) or not all(isinstance(k, str) for k in keywords):
+        raise DocumentRejected("'keywords' must be a list of strings")
+    entities = [e.upper() for e in entities]
+    unknown = sorted(e for e in entities if e not in STORE.entities_by_id)
+    if unknown:
+        raise DocumentRejected(f"unknown entity id(s): {unknown}")
+    url = doc.get("url")
+    if url is not None and not (isinstance(url, str) and _URL_RE.match(url)):
+        raise DocumentRejected("'url' must be an http(s) URL")
+    return entities, [k.upper() for k in keywords]
+
+
 def ingest_news_document(doc):
     """Simple ingestion path (POC scope: in-memory, no external feed):
     append a news document to the live corpus and invalidate the discovery
     cache so the NEXT discover_themes() call re-runs the full pipeline over
     the enlarged corpus - proving new concepts can emerge from new text
     rather than being hard-coded. Required fields: id, date, title,
-    snippet. Optional: entities, keywords, source, url, is_synthetic."""
-    required = {"id", "date", "title", "snippet"}
-    missing = required - set(doc.keys())
+    snippet. Optional: entities, keywords, source, url.
+
+    Provenance is not caller-controlled: ingested text is unverified, so it
+    is always stored as synthetic (`is_synthetic=True`, `source_type=
+    SYNTHETIC_NARRATIVE`) with `source="INGESTED (unverified)"`; a source the
+    caller names is kept only as `claimed_source`. Ids are unique, and the
+    number of ingested documents is bounded (config.INGEST_MAX_DOCS)."""
+    missing = set(_INGEST_REQUIRED) - set(doc.keys())
     if missing:
         raise ValueError(f"news document missing required fields: {sorted(missing)}")
-    doc = {
-        "entities": [], "keywords": [], "source": "INGESTED", "url": None,
-        "is_synthetic": True, "source_type": "SYNTHETIC_NARRATIVE",
+    entities, keywords = _checked_document(doc)
+
+    stored = {
+        "url": None,
         **doc,
+        "entities": entities,
+        "keywords": keywords,
+        "is_synthetic": True,
+        "source_type": "SYNTHETIC_NARRATIVE",
+        "source": "INGESTED (unverified)",
+        "ingested": True,
     }
-    STORE.news_all.append(doc)
+    claimed = doc.get("source")
+    if claimed and claimed not in ("INGESTED", stored["source"]):
+        stored["claimed_source"] = str(claimed)
+
+    with _INGEST_LOCK:
+        if any(d["id"] == stored["id"] for d in STORE.news_all):
+            raise DuplicateDocument(f"a document with id '{stored['id']}' already exists")
+        if sum(1 for d in STORE.news_all if d.get("ingested")) >= config.INGEST_MAX_DOCS:
+            raise IngestCapacityReached(f"at most {config.INGEST_MAX_DOCS} documents may be ingested")
+        STORE.news_all.append(stored)
     invalidate_discovery_cache()
-    return doc
+    return stored
 
 
 def _news_doc_text(doc):
