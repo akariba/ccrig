@@ -21,6 +21,7 @@ from ..core.config import DATA_DIR
 
 RESOLVED, MAPPED, AMBIGUOUS, UNRESOLVED = "RESOLVED", "MAPPED", "AMBIGUOUS", "UNRESOLVED"
 _KIND_TYPES = {"entity": None, "issuer": ("Company/Issuer",), "portfolio_counterparty": ("Counterparty",)}
+CCR_KIND = "ccr_counterparty"          # ids of the CCR exposure dataset: a different universe from the portfolio-holdings counterparties
 
 
 def _fold(text: str) -> str:
@@ -79,6 +80,12 @@ class EntityIndex:
         v = raw.strip()
         if not v:
             return Resolution(raw, UNRESOLVED, rule="EMPTY", reason="empty identifier")
+        if kind == CCR_KIND:
+            if v in self.ccr_ids:
+                return Resolution(raw, RESOLVED, v, "EXACT_ID")
+            if v in self.entities:
+                return Resolution(raw, UNRESOLVED, rule="WRONG_UNIVERSE", reason=f"'{v}' is a {self.entities[v].get('node_type')} in the entity master, not a CCR counterparty; the two populations are never merged")
+            return Resolution(raw, UNRESOLVED, rule="NO_MATCH", reason="not a counterparty in the CCR exposure dataset")
         if v in self.entities:
             if self._allowed(v, kind):
                 return Resolution(raw, RESOLVED, v, "EXACT_ID")

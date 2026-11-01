@@ -284,5 +284,95 @@ def _discovered_event_evidence(c, rows, findings, as_of, ctx):
             findings.add("CHECK", "ERROR", "SCENARIO_NOT_EVENT", "the title or evidence reads as a scenario or hypothetical, not a real event", row=r["_row"])
 
 
-_CHECKS = {"discovered_event_evidence": _discovered_event_evidence, "no_self_loop": _no_self_loop, "documented_needs_link": _documented_needs_link, "synthetic_not_documented": _synthetic_not_documented,
+def _load_ccr_master():
+    import json as _json
+
+    from ..core.config import DATA_DIR
+
+    path = DATA_DIR / "ccr_counterparties.json"
+    return {c["id"]: c for c in _json.loads(path.read_text("utf-8"))["counterparties"]} if path.exists() else {}
+
+
+def _relationship_assertions(c, rows, findings, as_of, ctx):
+    from . import relationships
+
+    store = ctx.get("store")
+    for r in rows:
+        for severity, code, message in relationships.check_row(r):
+            findings.add("CHECK", severity, code, message, row=r["_row"])
+        if store is None:
+            findings.add("CHECK", "ERROR", "NO_EVIDENCE_STORE", "the evidence store is not available, so quotes cannot be re-verified", row=r["_row"])
+        else:
+            for p in relationships.reverify_row(store, r):
+                findings.add("CHECK", "ERROR", p["code"], p["message"], row=r["_row"])
+        if r["is_synthetic"]:
+            findings.add("CHECK", "ERROR", "SYNTHETIC_RELATIONSHIP", "a synthetic relationship cannot be ingested as documented evidence", row=r["_row"])
+        if r["relationship_as_of"] > as_of.isoformat() or r["relationship_as_of"] > r["source_published_date"]:
+            findings.add("CHECK", "ERROR", "RELATIONSHIP_DATE_AFTER_SOURCE", "the relationship date is after the source's publication date or after today", row=r["_row"])
+        if r["relation"] == "AFFILIATED_WITH" and r["source"] > r["target"]:
+            findings.add("CHECK", "ERROR", "SYMMETRIC_NOT_ORDERED", "an undirected affiliation is stored with its two companies in alphabetical order", row=r["_row"])
+
+
+def _reference_links(c, rows, findings, as_of, ctx):
+    master = _load_ccr_master()
+    for r in rows:
+        if r["link_kind"] == "INFERRED_DEPENDENCY" and not (r.get("basis") or "").strip():
+            findings.add("CHECK", "ERROR", "INFERRED_WITHOUT_BASIS", "an inferred dependency must state how it was inferred; it is never a trade reference", row=r["_row"])
+        if r["as_of_date"] > as_of.isoformat():
+            findings.add("CHECK", "ERROR", "FUTURE_DATE", f"{r['as_of_date']} is after {as_of.isoformat()}", row=r["_row"])
+        rec = master.get(r["counterparty_id"])
+        if rec and r["link_kind"] == "TRADE_REFERENCE_ENTITY" and rec.get("reference_entity_id") and rec["reference_entity_id"] != r["reference_entity_id"] and rec.get("product") == r["product"]:
+            findings.add("CHECK", "WARN", "DIFFERS_FROM_CCR_MASTER", f"the CCR record lists {rec['reference_entity_id']} as the reference entity for {r['product']}; this row says {r['reference_entity_id']}", row=r["_row"])
+        if rec and r["link_kind"] == "TRADE_REFERENCE_ENTITY" and rec.get("product") not in (None, r["product"]):
+            findings.add("CHECK", "WARN", "PRODUCT_NOT_IN_CCR_MASTER", f"the CCR record for {r['counterparty_id']} lists product {rec.get('product')}, not {r['product']}", row=r["_row"])
+
+
+def _ccr_exposure_consistency(c, rows, findings, as_of, ctx):
+    from .contracts import MEASURE_LIMIT
+
+    master = _load_ccr_master()
+    seen_units: dict = {}
+    owner: dict = {}
+    for r in rows:
+        key = r["measure"]
+        unit = (r["currency"], r["unit"])
+        if seen_units.setdefault(key, (unit, r["_row"]))[0] != unit:
+            first = seen_units[key]
+            findings.add("CHECK", "ERROR", "INCONSISTENT_UNITS", f"{key} appears as {first[0][0]} {first[0][1].lower()} (row {first[1]}) and as {unit[0]} {unit[1].lower()}; values are never converted, supply one currency and unit per measure", row=r["_row"])
+        if r["as_of_date"] > as_of.isoformat():
+            findings.add("CHECK", "ERROR", "FUTURE_DATE", f"as-of date {r['as_of_date']} is after {as_of.isoformat()}", row=r["_row"])
+        ns = r["netting_set_id"]
+        if owner.setdefault(ns, r["counterparty_id"]) != r["counterparty_id"]:
+            findings.add("CHECK", "ERROR", "NETTING_SET_CONFLICT", f"netting set {ns} is attached to both {owner[ns]} and {r['counterparty_id']}", row=r["_row"])
+        rec = master.get(r["counterparty_id"])
+        if rec and rec.get("netting_set") and rec["netting_set"] != ns:
+            others = [cid for cid, m in master.items() if m.get("netting_set") == ns and cid != r["counterparty_id"]]
+            if others:
+                findings.add("CHECK", "ERROR", "NETTING_SET_CONFLICT", f"netting set {ns} belongs to {others[0]} in the CCR master, not {r['counterparty_id']}", row=r["_row"])
+            else:
+                findings.add("CHECK", "WARN", "ORPHAN_NETTING_SET", f"netting set {ns} is not the netting set the CCR master lists for {r['counterparty_id']} ({rec['netting_set']}); an exposure on an unlisted netting set is an orphan until the master is extended", row=r["_row"])
+        lt, lv, util = r.get("limit_type"), r.get("limit_value"), r.get("utilization")
+        if lt and r["measure"] not in MEASURE_LIMIT or (lt and MEASURE_LIMIT.get(r["measure"]) != lt):
+            findings.add("CHECK", "ERROR", "LIMIT_MEASURE_MISMATCH", f"a {lt} is never compared with {r['measure']} (limits apply only to their own measure)", row=r["_row"])
+        elif lt and lv is None:
+            findings.add("CHECK", "ERROR", "LIMIT_VALUE_MISSING", f"limit type {lt} has no limit value", row=r["_row"])
+        elif lv is not None and not lt:
+            findings.add("CHECK", "ERROR", "LIMIT_TYPE_MISSING", "a limit value without a limit type cannot be used", row=r["_row"])
+        elif lt and lv is not None:
+            if lv == 0:
+                findings.add("CHECK", "WARN", "ZERO_LIMIT", "the limit is zero, so utilization is undefined and is left empty", row=r["_row"])
+                r["utilization"] = None
+            else:
+                computed = round(r["value"] / lv, 10)
+                if util is not None and abs(util - computed) > 1e-6:
+                    findings.add("CHECK", "ERROR", "UTILIZATION_MISMATCH", f"supplied utilization {util} differs from value/limit = {computed:.6f}", row=r["_row"])
+                r["utilization"] = computed
+        elif util is not None:
+            findings.add("CHECK", "ERROR", "UTILIZATION_WITHOUT_LIMIT", "a utilization was supplied without a limit to compute it against", row=r["_row"])
+        if r["is_synthetic"] is False and not r["source_system"].strip():
+            findings.add("CHECK", "ERROR", "NO_LINEAGE", "real exposures need a named source system", row=r["_row"])
+
+
+_CHECKS = {"relationship_assertions": _relationship_assertions, "reference_links": _reference_links, "ccr_exposure_consistency": _ccr_exposure_consistency,
+           "discovered_event_evidence": _discovered_event_evidence, "no_self_loop": _no_self_loop, "documented_needs_link": _documented_needs_link, "synthetic_not_documented": _synthetic_not_documented,
            "holdings_total": _holdings_total, "limit_consistency": _limit_consistency, "price_series": _price_series}
