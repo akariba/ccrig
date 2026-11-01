@@ -48,6 +48,8 @@ def test_oracle_nvidia_journey_from_source_to_overlay_and_back(ws):
     pn = flow.project(ws, naive["job"]["job_id"])
     assert states(pn) == {"SOURCE": "COMPLETED", "PARSE": "COMPLETED", "PROFILE": "COMPLETED", "VALIDATE": "COMPLETED", "RESOLVE": "COMPLETED", "EVIDENCE": "FAILED_CHECKS", "REVIEW": "BLOCKED", "PROMOTE": "SKIPPED"}
     assert pn["state"] == "BLOCKED" and "UNSUPPORTED_RELATIONSHIP_ASSERTION" in codes(pn, "EVIDENCE")
+    rec = next(s for s in pn["stages"] if s["id"] == "EVIDENCE")["records"]
+    assert (rec["processed"], rec["accepted"], rec["rejected"]) == (1, 0, 1)                    # the claim is counted as rejected, not proposed
     a = pn["assessments"][0]
     assert a["verdict"] == "REJECTED" and a["quotes"][0]["both"] and a["quotes"][0]["cue"] is None and a["quotes"][0]["found_in_stored_source"]
     assert not pn["review"]["can_approve"] and pn["review"]["blocked_because"]

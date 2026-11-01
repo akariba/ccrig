@@ -189,7 +189,7 @@ def _records(pipe: str, counts: dict, ctx: dict) -> dict | None:
         return {"unit": "identifiers", "processed": c.get("distinct_identifiers"), "accepted": ok, "rejected": (c.get("ambiguous") or 0) + (c.get("unresolved") or 0)}
     if pipe == "CHECK":
         prop, exc = c.get("proposed_rows") or 0, c.get("excluded_rows") or 0
-        ctx["proposed"] = prop
+        ctx["proposed"], ctx["check_rows"] = prop, prop + exc
         return {"unit": "rows", "processed": prop + exc, "accepted": prop, "rejected": exc}
     if pipe == "STAGE":
         prop = ctx.get("proposed")
@@ -244,6 +244,7 @@ def structure(store: StudioStore, raw_events: list) -> list:
                 final = (r.get("message") or j["status"]).strip()            # the status as of this event (the job may have been decided since)
                 emit(n, type="JOB_COMPLETED" if kind == "COMPLETED" else "JOB_FAILED")
                 by_stage: dict = {}
+                rows_in_error = {f.get("row") for f in store.findings(j["job_id"]) if f.get("stage") == "CHECK" and f["severity"] == "ERROR" and f.get("row") is not None}
                 for f in store.findings(j["job_id"]):
                     sid = PIPE_TO_STAGE.get(f.get("stage") or "", "SOURCE" if (f.get("stage") in ("PIPELINE", "ACQUIRE")) else None)
                     if sid:
@@ -254,7 +255,11 @@ def structure(store: StudioStore, raw_events: list) -> list:
                     if sid in by_stage:
                         d = by_stage[sid]
                         n += 1
-                        emit(n, type="VALIDATION_RESULT", stage_id=sid, state=FAILED_CHECKS if d["errors"] else WARNINGS, validation=d)
+                        rec = None
+                        if sid == "EVIDENCE" and rows_in_error and ctx.get("check_rows") is not None:        # a proposed row with an error finding is not accepted
+                            total = ctx["check_rows"]
+                            rec = {"unit": "rows", "processed": total, "accepted": max(0, total - len(rows_in_error)), "rejected": min(total, len(rows_in_error))}
+                        emit(n, type="VALIDATION_RESULT", stage_id=sid, state=FAILED_CHECKS if d["errors"] else WARNINGS, validation=d, records=rec)
                 if final == "PENDING_REVIEW":
                     n += 1
                     if j["blocking"]:
