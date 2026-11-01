@@ -73,6 +73,12 @@ export function GlobalEventImpactMap() {
           Recent events about a company, taken from approved primary sources and verified by retrieval, placed on the map with the documented
           relationships that connect the companies they name. Pilot: NVIDIA. <b>The size of any impact is not estimated.</b>
         </div>
+        <div className="pill-list" style={{ marginTop: 8 }} data-testid="semantics-key" aria-label="What each kind of information means">
+          <span className="pill" title="Events are read from a reviewed register; this page never searches the live web">Curated register, not live news search</span>
+          <span className="pill" title="Quoted from the source and checked against the retrieved page">Confirmed: quoted in a source</span>
+          <span className="pill" title="Stored relationship in the platform's dataset, with its own evidence status">Documented: stored relationship</span>
+          <span className="pill" title="Nothing documented connects these; no path is drawn">Unavailable: no documented path</span>
+        </div>
       </div>
 
       <form className="card" onSubmit={submit} aria-label="Search a company">
@@ -213,7 +219,7 @@ function EventPanel({ event, names, onClose }: { event: ImpactEvent; names: Reco
           <dd>{event.sources.map((s) => { const href = safeHttpsUrl(s.url); return (
             <div key={s.id}>{s.publisher} · <span style={{ color: "var(--text-muted)" }}>{s.tier.replace(/_/g, " ").toLowerCase()}</span> · {href ? <a href={href} target="_blank" rel="noreferrer noopener" data-testid="source-link">open source</a> : "link unavailable"}
               <div style={{ fontSize: 11, color: "var(--text-muted)" }}>retrieved {formatDate(s.retrieved_at.slice(0, 10))}; {event.verification.quotes_found}/{event.verification.quotes_total} passages and the date confirmed in the source</div></div>); })}</dd>
-          <dt>Location</dt>
+          <dt>Event location</dt>
           <dd data-testid="event-location">{loc.mapped ? <>{loc.label} <span style={{ color: "var(--text-muted)" }}>({loc.precision})</span><div style={{ fontSize: 11, color: "var(--text-muted)" }}>Basis: {loc.basis}</div></> : `Not mapped: ${loc.reason}`}</dd>
           {event.regions_mentioned.length > 0 && <><dt>Countries named</dt><dd>{event.regions_mentioned.map((r) => r.label).join(", ")}</dd></>}
         </dl>

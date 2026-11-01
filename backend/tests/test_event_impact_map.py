@@ -316,3 +316,35 @@ def test_the_existing_analytics_baseline_is_untouched_by_the_map():
     """The map adds endpoints; it must not move a single pinned score, rank or priority."""
     actual = snapshot.normalise(snapshot.capture(via_fastapi))
     assert snapshot.diff(snapshot.load_snapshot(), actual) == []
+
+
+def test_product_semantics_audit_across_every_window():
+    """Every returned event is traceable, every drawn path is typed and supported, undocumented is never confirmed."""
+    from app.core import event_discovery
+    for days in (30, 90, 180, 365, 730):
+        data = event_discovery.discover("NVDA", recency_days=days)
+        assert len(data["events"]) <= 5
+        assert {r["id"] for r in data["not_returned"]}.isdisjoint({e["id"] for e in data["events"]})
+        assert all(r["reason"] for r in data["not_returned"])
+        stored = {(e["source"].removeprefix("entity:"), e["target"].removeprefix("entity:"), e["relation"])
+                  for e in data["graph"]["edges"] if e["type"] == "DOCUMENTED_RELATION"}
+        for e in data["events"]:
+            assert e["sources"] and all(s["url"].startswith("https://") for s in e["sources"])
+            assert e["verification"]["status"] == "VERIFIED_BY_RETRIEVAL" and e["evidence"]
+            assert e["impact"]["status"] == "NOT_ESTIMATED" and e["verified_exposure"]["status"] == "NOT_AVAILABLE"
+            if e["location"]["mapped"]:
+                assert e["location"]["basis"] and e["location"]["precision"]
+            for ent in e["entities"]:
+                paths = [p for p in e["paths"] if p["entity_id"] == ent["entity_id"]]
+                if ent["relationship_to_target"] == "NO_DOCUMENTED_PATH":
+                    assert paths == []
+                else:
+                    assert paths and all(p["relationship_type"] in ("DIRECT_MENTION", "DOCUMENTED_DIRECT", "DOCUMENTED_INDIRECT") for p in paths)
+            for p in e["paths"]:
+                for step in p["steps"]:
+                    assert step["type"] in ("MENTIONS", "DOCUMENTED_RELATION")
+                    if step["type"] == "DOCUMENTED_RELATION":
+                        se = step["stored_edge"]
+                        assert (se["source"], se["target"], step["relation"]) in stored
+                    else:
+                        assert step["evidence"]["quote"]

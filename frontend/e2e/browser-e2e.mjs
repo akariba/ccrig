@@ -106,6 +106,7 @@ try {
   const cables = Number(await map.getAttribute("data-cables"));
   check("impact map: cables are drawn only because the API returned graph edges", cables > 0, `${cables} cables`);
   check("impact map: no event is selected at first, and the empty panel says so", await page.getByTestId("no-selection").isVisible() && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
+  check("impact map: states plainly that events come from a curated register, not live news search", /Curated register, not live news search/.test(await page.getByTestId("semantics-key").innerText()));
   await shot(page, "02b_impact_map");
   await page.getByTestId("event-marker").first().click();
   const panel = page.getByTestId("event-panel");
