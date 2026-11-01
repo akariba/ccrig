@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .core.config import cors_settings
-from .routers import entities, counterparties, themes, search, event, graph, model_lab, misc, priority, distance_map, impact_map
+from .routers import entities, counterparties, themes, search, event, graph, model_lab, misc, priority, distance_map, impact_map, studio
+from .studio.config import studio_enabled
 
 app = FastAPI(
     title="CCRIG AI Analyst Platform (POC)",
@@ -26,6 +27,10 @@ app.include_router(misc.router)
 app.include_router(priority.router)
 app.include_router(distance_map.router)
 app.include_router(impact_map.router)
+app.include_router(studio.router)           # read-only: what the Studio is and whether this deployment can run it
+if studio_enabled():                       # operator-only routes exist only when explicitly enabled (never in the static build or on a default deployment)
+    from .routers import studio_ops
+    app.include_router(studio_ops.router)
 
 
 @app.get("/")

@@ -116,6 +116,11 @@ VALID = [
     ("unknown-counterparty", "GET", "/api/counterparties/NOPE", None, 404),
     ("unknown-path", "GET", "/api/nope", None, 404),
     ("wrong-method", "POST", "/api/health", None, 405),
+    # the Studio: its description is public and read-only; every write route is absent unless an operator enables it (never in the static build)
+    ("studio-status", "GET", "/api/studio/status", None, 200),
+    ("studio-contracts", "GET", "/api/studio/contracts", None, 200),
+    ("studio-ingest-not-registered", "POST", "/api/studio/jobs", None, 404),
+    ("studio-jobs-not-registered", "GET", "/api/studio/jobs", None, 404),
     ("score-unknown-entity", "POST", "/api/model-lab/score", {"entity_id": "NOPE"}, 404),
     # weight on a component without data is fine as long as another weighted component can be computed
     ("score-market-only-priced-entity", "POST", "/api/model-lab/score",

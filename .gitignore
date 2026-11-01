@@ -9,3 +9,6 @@ __pycache__/
 venv/
 .DS_Store
 frontend/public/backend/
+
+# Studio workspace (never commit; default location is outside the repository)
+.ccrig-studio/
