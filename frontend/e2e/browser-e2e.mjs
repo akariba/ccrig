@@ -127,8 +127,7 @@ try {
   const typed = await page.getByTestId("path").evaluateAll((els) => els.map((e) => e.dataset.relationshipType));
   check("impact map: every drawn path is typed (direct mention / documented direct / indirect), none invented", typed.length >= 1 && typed.every((t) => /^(DIRECT_MENTION|DOCUMENTED_DIRECT|DOCUMENTED_INDIRECT)$/.test(t)), typed.join(","));
   await shot(page, "02c_impact_map_selected");
-  await page.keyboard.press("Escape");
-  await page.locator('[data-testid="event-marker"][aria-pressed="true"]').first().focus();
+  await page.locator('[data-testid="event-marker"][aria-pressed="true"]').first().focus();   // (a click already leaves focus here; Escape below is the only key pressed)
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.querySelector('[data-testid="event-panel"]'), null, { timeout: 5000 }).catch(() => {});
   check("impact map: Escape on a focused marker deselects", !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
