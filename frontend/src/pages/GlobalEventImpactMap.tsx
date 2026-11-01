@@ -5,7 +5,7 @@ import { DataBadge } from "../components/Badge";
 import { GeoStage, type Mode } from "../components/GeoStage";
 import {
   RELATIONSHIP_LABEL, buildScene, categoryStyle, formatDate, pathChips, phaseOf, safeHttpsUrl,
-  type ImpactEvent, type ImpactResponse,
+  type Comparison, type ImpactEvent, type ImpactResponse, REVIEW_LABEL,
 } from "../impactmap/model";
 
 const WINDOWS = [30, 90, 180, 365, 730];
@@ -25,6 +25,9 @@ export function GlobalEventImpactMap() {
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [hoverEventId, setHoverEventId] = useState<string | null>(null);
   const [animate, setAnimate] = useState(true);
+  const source: "curated" | "discovered" = params.get("source") === "discovered" ? "discovered" : "curated";
+  const [comparison, setComparison] = useState<Comparison | null>(null);
+  const [comparing, setComparing] = useState(false);
   const mode: Mode = params.get("view") === "flat" ? "flat" : params.get("view") === "globe" ? "globe" : "auto";
   function setMode(m: Mode) {
     setParams((prev) => { const next = new URLSearchParams(prev); if (m === "auto") next.delete("view"); else next.set("view", m); return next; }, { replace: true });
@@ -37,25 +40,22 @@ export function GlobalEventImpactMap() {
   const latest = useRef(0);
   const selectedEventId = params.get("event");
 
-  async function run(q: string, windowDays: number, chosen?: string) {
+  async function run(q: string, windowDays: number, chosen?: string, src: "curated" | "discovered" = source) {
     const id = ++latest.current;
-    setStatus("loading"); setError(null); setMessage(null); setSelectedEntity(null);
+    setStatus("loading"); setError(null); setMessage(null); setSelectedEntity(null); setComparison(null);
     try {
       const found = await api.impactMapSearch(q);
       if (id !== latest.current) return;
       setMatches(found.matches);
       if (found.matches.length === 0) { setData(null); setEntityId(null); setMessage(found.message); setStatus("ok"); return; }
       const target = chosen ?? found.matches[0].entity_id;
-      const result: ImpactResponse = await api.impactMapEvents(target, { recency_days: windowDays });
+      const result: ImpactResponse = await api.impactMapEvents(target, src === "discovered" ? { recency_days: windowDays, mode: "discovered" } : { recency_days: windowDays });
       if (id !== latest.current) return;
       setEntityId(target); setData(result); setStatus("ok");
       // The page opens in the Global Overview (nothing selected). A valid ?event= deep link opens that event; an unknown one is dropped.
-      setParams((prev) => {
-        const next = new URLSearchParams(prev);
-        const wanted = next.get("event");
-        if (wanted && !result.events.some((e) => e.id === wanted)) next.delete("event");
-        return next;
-      }, { replace: true });
+      // (Read the live URL: a functional setParams would use the render-time params and could undo a change made while the request was in flight.)
+      const live = new URLSearchParams(window.location.search), wanted = live.get("event");
+      if (wanted && !result.events.some((e) => e.id === wanted)) { live.delete("event"); setParams(live, { replace: true }); }
     } catch (e) {
       if (id !== latest.current) return;
       setData(null); setError(apiErrorMessage(e)); setStatus("error");   // never leave results from a previous query on screen
@@ -68,6 +68,17 @@ export function GlobalEventImpactMap() {
     return abandon;                 // leaving the page abandons any request still in flight (it must not navigate back here)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function chooseSource(next: "curated" | "discovered") {
+    if (next === source) return;
+    setParams((prev) => { const p = new URLSearchParams(prev); if (next === "discovered") p.set("source", "discovered"); else p.delete("source"); p.delete("event"); return p; }, { replace: true });
+    run(query, days, entityId ?? undefined, next);
+  }
+  async function compare() {
+    if (!entityId) return;
+    setComparing(true);
+    try { setComparison(await api.impactMapCompare(entityId, { recency_days: days })); } catch (e) { setError(apiErrorMessage(e)); } finally { setComparing(false); }
+  }
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +101,7 @@ export function GlobalEventImpactMap() {
     const relations = scene.cables.filter((c) => c.type === "DOCUMENTED_RELATION");
     return {
       events: data.events.length, places: new Set(data.events.flatMap((e) => (e.location.mapped ? [e.location.label] : []))).size,
-      relations: relations.length, companies: new Set(relations.flatMap((c) => [c.from, c.to])).size,
+      relations: relations.length, companies: new Set(relations.flatMap((c) => [c.from, c.to])).size, unplotted: data.events.filter((e) => !e.location.mapped).length,
     };
   }, [data, scene]);
   const selected: ImpactEvent | undefined = data?.events.find((e) => e.id === selectedEventId);
@@ -109,11 +120,16 @@ export function GlobalEventImpactMap() {
           </select>
           <button className="btn" type="submit" disabled={status === "loading" || !query.trim()}>{status === "loading" ? "Searching…" : "Search"}</button>
         </form>
+        <div className="seg iw-source" role="group" aria-label="Where events come from" data-testid="source-mode">
+          <button type="button" aria-pressed={source === "curated"} onClick={() => chooseSource("curated")} title="A fixed, human-reviewed register: reproducible, the benchmark">Curated register</button>
+          <button type="button" aria-pressed={source === "discovered"} onClick={() => chooseSource("discovered")} title="Events found in approved sources by an operator-run discovery, machine-verified">Dynamic discovery</button>
+        </div>
         <div className="iw-stats" data-testid="impact-status" data-phase={phase} aria-label="Search summary">
           <span><em>Entity</em><b>{data ? `${data.entity.name.replace(/ Corporation$/, "")}${data.entity.ticker ? ` · ${data.entity.ticker}` : ""}` : "—"}</b></span>
           <span><em>Events</em><b>{data ? `${data.events.length} of ≤${data.query.limit}` : "—"}</b></span>
           <span><em>Window</em><b>{data ? `${data.query.recency_days} d to ${formatDate(data.query.as_of)}` : "—"}</b></span>
-          <span title="Events are read from a reviewed register; this page never searches the live web"><em>Source</em><b>{data ? `Curated register · built ${formatDate(data.register.built_at)}` : "—"}</b></span>
+          <span title={source === "curated" ? "Events are read from a reviewed register; this page never searches the live web" : "Events come from the latest discovery run an operator made; this page never searches the live web"}><em>Source</em>
+            <b>{!data ? "—" : source === "curated" ? `Curated register · built ${formatDate(data.register.built_at)}` : data.available ? `Dynamic discovery · ${formatDate(data.query.as_of)}` : "Dynamic discovery · unavailable"}</b></span>
         </div>
         {matches.length > 1 && (
           <div className="pill-list" style={{ flexBasis: "100%" }}>
@@ -128,6 +144,21 @@ export function GlobalEventImpactMap() {
         </div>
       )}
       {message && <div className="warning-box" data-testid="impact-message">{message}</div>}
+      {source === "discovered" && data && data.available === false && (
+        <div className="warning-box" role="status" data-testid="discovery-unavailable">
+          <b>Dynamic discovery is not available here.</b> {data.explanation}{" "}
+          <button className="btn secondary" style={{ marginLeft: 8 }} type="button" onClick={() => chooseSource("curated")}>Show the curated register</button>
+        </div>
+      )}
+      {source === "discovered" && data?.available && data.provenance && (
+        <div className="iw-banner" data-testid="discovery-provenance">
+          <b>Dynamic discovery</b> · run <code>{data.provenance.run_id}</code> · {formatDate(data.provenance.as_of)} · <b data-testid="review-status">{REVIEW_LABEL[data.review?.status ?? ""] ?? data.review?.status}</b> · {data.provenance.ai.mode}
+          <div className="pill-list" style={{ marginTop: 6 }}>
+            {data.provenance.providers.map((p) => <span key={p.id} className="pill" title={p.reason}>{p.label.split(" (")[0]}: {p.status.toLowerCase().replace("_", " ")}</span>)}
+          </div>
+          <details style={{ marginTop: 6 }}><summary>How these events were chosen</summary><ul>{data.provenance.selection_criteria.map((c, i) => <li key={i}>{c}</li>)}</ul></details>
+        </div>
+      )}
 
       <div className="iw-body">
         <section className="iw-map" aria-label="Map">
@@ -165,11 +196,11 @@ export function GlobalEventImpactMap() {
                 <>
                   <p style={{ margin: "6px 0", fontSize: 12.5 }} data-testid="overview-summary">
                     {overview.events} verified event{overview.events === 1 ? "" : "s"} at {overview.places} place{overview.places === 1 ? "" : "s"}.
-                    {" "}{overview.relations} stored relationship{overview.relations === 1 ? "" : "s"} link {overview.companies} compan{overview.companies === 1 ? "y" : "ies"} that these events name; they are drawn faintly, with arrows in their stored direction.
+                    {" "}{overview.relations} stored relationship{overview.relations === 1 ? "" : "s"} link {overview.companies} compan{overview.companies === 1 ? "y" : "ies"} that these events name; they are drawn faintly, with arrows in their stored direction.{overview.unplotted > 0 && <> {overview.unplotted} {overview.unplotted === 1 ? "has" : "have"} no place evidenced by {overview.unplotted === 1 ? "its" : "their"} source, so {overview.unplotted === 1 ? "it is" : "they are"} listed but not plotted (a location is never assumed).</>}
                   </p>
                   <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Choose an event on the map or in the list to investigate its source evidence, the documented path to the company and what this analysis cannot say. No impact is estimated.</p>
                 </>
-              ) : <p style={{ margin: "6px 0 0", fontSize: 12.5 }}>Search a company to see its recent verified events.</p>}
+              ) : <p style={{ margin: "6px 0 0", fontSize: 12.5 }}>{data?.available === false ? data.explanation : "Search a company to see its recent verified events."}</p>}
             </div>
           )}
         </aside>
@@ -177,11 +208,19 @@ export function GlobalEventImpactMap() {
 
       <footer className="iw-foot">
         <div className="pill-list" data-testid="semantics-key" aria-label="What each kind of information means">
-          <span className="pill" title="Events are read from a reviewed register; this page never searches the live web">Curated register, not live news search</span>
+          <span className="pill" title="Events are read from a reviewed register or from a discovery run an operator made; this page never searches the live web">{source === "curated" ? "Curated register, not live news search" : "Operator-run discovery in approved sources, not live news search"}</span>
+          {source === "discovered" && <span className="pill" title="The retrieved source contains the quoted text and date; that is not independent corroboration">Machine-verified, not corroborated</span>}
           <span className="pill" title="Quoted from the source and checked against the retrieved page">Confirmed: quoted in a source</span>
           <span className="pill" title="Stored relationship in the platform's dataset, with its own evidence status">Documented: stored relationship</span>
           <span className="pill" title="Nothing documented connects these; no path is drawn">Unavailable: no documented path</span>
           <span className="pill" title="No defensible impact metric exists yet">Impact: not estimated</span>
+        </div>
+        <div className="iw-about" data-testid="compare-card">
+          <div className="hstack" style={{ justifyContent: "space-between", alignItems: "center", gap: 8 }}>
+            <b style={{ fontSize: 12.5 }}>Curated register vs dynamic discovery</b>
+            <button className="btn secondary" type="button" disabled={!entityId || comparing} onClick={compare} data-testid="compare-button">{comparing ? "Comparing…" : comparison ? "Refresh comparison" : "Compare the two modes"}</button>
+          </div>
+          {comparison && <ComparisonTable c={comparison} />}
         </div>
         {data && (
           <details className="iw-about" data-testid="impact-about">
@@ -248,6 +287,8 @@ function EventPanel({ event, names, onClose }: { event: ImpactEvent; names: Reco
           <dd>{event.sources.map((s) => { const href = safeHttpsUrl(s.url); return (
             <div key={s.id}>{s.publisher} · <span style={{ color: "var(--text-muted)" }}>{s.tier.replace(/_/g, " ").toLowerCase()}</span> · {href ? <a href={href} target="_blank" rel="noreferrer noopener" data-testid="source-link">open source</a> : "link unavailable"}
               <div style={{ fontSize: 11, color: "var(--text-muted)" }}>retrieved {formatDate(s.retrieved_at.slice(0, 10))}; {event.verification.quotes_found}/{event.verification.quotes_total} passages and the date confirmed in the source</div></div>); })}</dd>
+          {event.discovery && <><dt>How found</dt><dd data-testid="how-found">Dynamic discovery via {event.discovery.provider_id.replace(/_/g, " ")}; category by {event.discovery.category_method}. <b>{REVIEW_LABEL[event.discovery.review_status] ?? event.discovery.review_status}.</b>
+            {event.discovery.also_reported_by.length > 0 && <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Also reported by {event.discovery.also_reported_by.length} other source(s).</div>}</dd></>}
           <dt>Event location</dt>
           <dd data-testid="event-location">{loc.mapped ? <>{loc.label} <span style={{ color: "var(--text-muted)" }}>({loc.precision})</span><div style={{ fontSize: 11, color: "var(--text-muted)" }}>Basis: {loc.basis}</div></> : `Not mapped: ${loc.reason}`}</dd>
           {event.regions_mentioned.length > 0 && <><dt>Countries named</dt><dd>{event.regions_mentioned.map((r) => r.label).join(", ")}</dd></>}
@@ -291,6 +332,30 @@ function EventPanel({ event, names, onClose }: { event: ImpactEvent; names: Reco
         <h4>Analytical limitations</h4>
         <ul style={{ paddingLeft: 18, margin: 0, fontSize: 12 }}>{event.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
       </div>
+    </div>
+  );
+}
+
+function ComparisonTable({ c }: { c: Comparison }) {
+  const list = (events: Comparison["curated"]["events"]) => events.length === 0 ? <em style={{ color: "var(--text-muted)" }}>none</em> : (
+    <ul style={{ margin: 0, paddingLeft: 16 }}>{events.map((e) => <li key={e.id}><a href={safeHttpsUrl(e.url) ?? undefined} target="_blank" rel="noreferrer noopener">{e.title}</a> <span style={{ color: "var(--text-muted)" }}>· {formatDate(e.published_date)} · {e.location ?? "location not evidenced"}</span></li>)}</ul>);
+  return (
+    <div data-testid="compare-panel" style={{ marginTop: 10, fontSize: 12 }}>
+      <table className="table">
+        <thead><tr><th></th><th>Curated register</th><th>Dynamic discovery</th></tr></thead>
+        <tbody>
+          <tr><td>What it is</td><td>{c.curated.label}</td><td>{c.discovered.label}</td></tr>
+          <tr><td>Events returned</td><td data-testid="compare-curated-count">{c.curated.count}</td><td data-testid="compare-discovered-count">{c.discovered.available ? c.discovered.count : "not available here"}</td></tr>
+          <tr><td>As of</td><td>{formatDate(c.curated.as_of)}</td><td>{c.discovered.available ? formatDate(c.discovered.as_of) : "—"}</td></tr>
+          <tr><td>Review</td><td>human-reviewed when built</td><td>{c.discovered.available ? (REVIEW_LABEL[c.discovered.review_status ?? ""] ?? c.discovered.review_status) : "—"}</td></tr>
+          {!c.discovered.available && <tr><td>Why not available</td><td colSpan={2}>{c.discovered.reason_unavailable}</td></tr>}
+          <tr><td>In both (same source document)</td><td colSpan={2}>{c.overlap.in_both.length === 0 ? <em style={{ color: "var(--text-muted)" }}>none</em> : <ul style={{ margin: 0, paddingLeft: 16 }}>{c.overlap.in_both.map((x) => <li key={x.curated.id}>{x.curated.title}</li>)}</ul>}</td></tr>
+          <tr><td>Only in the curated register</td><td colSpan={2}>{list(c.overlap.only_curated)}</td></tr>
+          <tr><td>Only in dynamic discovery</td><td colSpan={2}>{c.discovered.available ? list(c.overlap.only_discovered) : <em style={{ color: "var(--text-muted)" }}>not available here</em>}</td></tr>
+        </tbody>
+      </table>
+      <p style={{ color: "var(--text-muted)", margin: "6px 0 0" }}>Matching rule: {c.basis}.</p>
+      <ul style={{ margin: "6px 0 0", paddingLeft: 18, color: "var(--text-muted)" }}>{c.how_they_differ.map((t, i) => <li key={i}>{t}</li>)}</ul>
     </div>
   );
 }

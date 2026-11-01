@@ -213,6 +213,21 @@ try {
   await page.setViewportSize({ width: 1500, height: 950 });
   await page.getByRole("button", { name: "Overview", exact: true }).click();
   check("impact map: Overview returns to the unselected state", (await map.getAttribute("data-view")) === "overview" && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
+  // curated register vs dynamic discovery: curated stays the default; discovery says plainly when this deployment cannot run it
+  check("impact map: the curated register is the default source", (await page.getByTestId("source-mode").getByRole("button", { name: "Curated register" }).getAttribute("aria-pressed")) === "true" && !/[?&]source=/.test(page.url()));
+  await page.getByTestId("source-mode").getByRole("button", { name: "Dynamic discovery" }).click();
+  await page.getByTestId("discovery-unavailable").waitFor({ timeout: SLOW });
+  const unavailableText = await page.getByTestId("discovery-unavailable").innerText();
+  check("impact map: dynamic discovery without an operator-enabled Studio is disclosed, not simulated", /not available here/i.test(unavailableText) && /nothing is searched live and no result is simulated/i.test(unavailableText) && /[?&]source=discovered/.test(page.url()));
+  check("impact map: no discovered events or markers are invented", (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("event-item").count()) === 0);
+  await page.getByTestId("compare-button").click();
+  await page.getByTestId("compare-panel").waitFor({ timeout: SLOW });
+  const cmp = await page.getByTestId("compare-panel").innerText();
+  check("impact map: the comparison shows both modes, the curated count and why discovery is unavailable", (await page.getByTestId("compare-curated-count").innerText()) === "5" && /not available here/.test(await page.getByTestId("compare-discovered-count").innerText()) && /Only in the curated register/.test(cmp) && /benchmark/.test(cmp));
+  await shot(page, "02f_impact_map_discovery_unavailable");
+  await page.getByRole("button", { name: "Show the curated register" }).click();
+  await page.waitForFunction(() => document.querySelectorAll('[data-testid="event-marker"]').length > 0, null, { timeout: SLOW }).catch(() => {});
+  check("impact map: switching back restores the five curated events and removes the source flag", (await page.getByTestId("event-marker").count()) === markers && !/[?&]source=/.test(page.url()));
   await page.getByTestId("impact-window").selectOption("30");
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
   const n30 = await page.getByTestId("event-marker").count();

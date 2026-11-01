@@ -26,7 +26,24 @@ export interface ImpactEvent {
   impact: { status: string; estimate: number | null; reason: string };
   verified_exposure: { status: string; reason: string };
   limitations: string[];
+  discovery?: { provider_id: string; category_method: string; review_status: string; also_reported_by: string[]; source_sha256: string; text_method: string };
 }
+export interface DiscoveryProvenance {
+  run_id: string; ran_at: string; as_of: string; window: [string, string];
+  providers: { id: string; label: string; status: string; reason: string }[];
+  funnel: Record<string, number>; ai: { configured: boolean; mode: string };
+  selection_criteria: string[]; relationship_candidates: unknown[];
+}
+export interface ComparedEvent { id: string; title: string; published_date: string; url: string; location: string | null; category: string }
+export interface Comparison {
+  entity: { entity_id: string; name: string }; basis: string; how_they_differ: string[];
+  curated: { label: string; available: boolean; count: number; events: ComparedEvent[]; as_of: string; coverage: string };
+  discovered: { label: string; available: boolean; count: number; events: ComparedEvent[]; as_of: string; reason_unavailable: string | null; review_status: string | null; run_id: string | null };
+  overlap: { in_both: { curated: ComparedEvent; discovered: ComparedEvent }[]; only_curated: ComparedEvent[]; only_discovered: ComparedEvent[] };
+}
+export const REVIEW_LABEL: Record<string, string> = {
+  MACHINE_VERIFIED_AWAITING_REVIEW: "Machine-verified, awaiting human review", APPROVED: "Approved by a reviewer", REJECTED: "Rejected by a reviewer", NO_EVENTS: "No events found",
+};
 export interface GraphNode { id: string; type: "EVENT" | "ENTITY" | "REGION"; label: string; role?: string; ticker?: string; entity_id?: string; event_id?: string; position: Place | null }
 export interface GraphEdge {
   id: string; type: "MENTIONS" | "MENTIONS_REGION" | "DOCUMENTED_RELATION"; source: string; target: string; event_ids: string[];
@@ -42,6 +59,9 @@ export interface ImpactResponse {
   explanation: string;
   graph: { nodes: GraphNode[]; edges: GraphEdge[]; edge_types: Record<string, string> };
   limitations: string[];
+  // present only for mode=discovered (the curated response is unchanged)
+  mode?: "discovered"; available?: boolean; unavailable_code?: string; curated_available?: boolean;
+  provenance?: DiscoveryProvenance | null; review?: { status: string; job_id: string | null; decisions: { decision: string; reviewer: string; reason: string; at: string }[] } | null;
 }
 
 // ------------------------------------------------------------------ projection (Equal Earth, Savric et al. 2018)

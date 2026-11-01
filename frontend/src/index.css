@@ -330,3 +330,10 @@ button {
 .gs-marker .tag.left { right: calc(100% + 6px); left: auto; top: 50%; translate: 0 -50%; }
 .gs-note { top: auto; bottom: 12px; left: 104px; max-width: calc(100% - 118px); }
 @media (max-width: 760px) { .gs-note { bottom: 50px; left: 8px; max-width: calc(100% - 16px); } }
+
+.iw-source { align-self: center; }
+.iw-source button { padding: 5px 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text-muted); font-size: 11.5px; }
+.iw-source button:first-child { border-radius: 5px 0 0 5px; } .iw-source button:last-child { border-radius: 0 5px 5px 0; border-left: 0; }
+.iw-source button[aria-pressed="true"] { background: #1d5d78; border-color: #2b7a9a; color: #fff; }
+.iw-banner { margin: 10px 20px 0; padding: 8px 12px; border: 1px solid var(--border); border-left: 3px solid #5ec8f2; border-radius: var(--radius); background: var(--surface); font-size: 12px; }
+.iw-banner code { font-size: 11px; }

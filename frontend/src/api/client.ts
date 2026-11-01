@@ -97,6 +97,11 @@ export const api = {
     return req<any>(`/api/impact-map/${encodeURIComponent(entityId)}/events${qs ? "?" + qs : ""}`);
   },
 
+  impactMapCompare: (entityId: string, params: Record<string, string | number> = {}) => {
+    const qs = new URLSearchParams(params as any).toString();
+    return req<any>(`/api/impact-map/${encodeURIComponent(entityId)}/compare${qs ? "?" + qs : ""}`);
+  },
+
   distanceMapCounterparties: () => req<any>("/api/distance-map/counterparties"),
   distanceMapForCounterparty: (id: string, params: Record<string, string | number> = {}) => {
     const qs = new URLSearchParams(params as any).toString();
