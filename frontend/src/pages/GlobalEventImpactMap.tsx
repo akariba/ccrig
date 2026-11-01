@@ -25,9 +25,9 @@ export function GlobalEventImpactMap() {
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [hoverEventId, setHoverEventId] = useState<string | null>(null);
   const [animate, setAnimate] = useState(true);
-  const mode: Mode = params.get("view") === "flat" ? "flat" : "globe";
+  const mode: Mode = params.get("view") === "flat" ? "flat" : params.get("view") === "globe" ? "globe" : "auto";
   function setMode(m: Mode) {
-    setParams((prev) => { const next = new URLSearchParams(prev); if (m === "flat") next.set("view", "flat"); else next.delete("view"); return next; }, { replace: true });
+    setParams((prev) => { const next = new URLSearchParams(prev); if (m === "auto") next.delete("view"); else next.set("view", m); return next; }, { replace: true });
   }
   useEffect(() => {                                     // the workspace is dark and full-bleed; the sidebar and navigation stay as they are
     const el = document.querySelector(".main-content");
@@ -49,12 +49,11 @@ export function GlobalEventImpactMap() {
       const result: ImpactResponse = await api.impactMapEvents(target, { recency_days: windowDays });
       if (id !== latest.current) return;
       setEntityId(target); setData(result); setStatus("ok");
-      // Open on the newest returned event (the list is ordered by date; that is not a ranking of importance). A valid ?event= deep link wins.
+      // The page opens in the Global Overview (nothing selected). A valid ?event= deep link opens that event; an unknown one is dropped.
       setParams((prev) => {
         const next = new URLSearchParams(prev);
         const wanted = next.get("event");
-        if (result.events.length === 0) next.delete("event");
-        else if (!result.events.some((e) => e.id === wanted)) next.set("event", result.events[0].id);
+        if (wanted && !result.events.some((e) => e.id === wanted)) next.delete("event");
         return next;
       }, { replace: true });
     } catch (e) {
@@ -86,6 +85,14 @@ export function GlobalEventImpactMap() {
   const phase = phaseOf(status, data);
   const scene = useMemo(() => (data ? buildScene(data) : { markers: [], cables: [], unmapped: [] }), [data]);
   const names = useMemo(() => Object.fromEntries((data?.graph.nodes ?? []).filter((n) => n.entity_id).map((n) => [n.entity_id as string, n.label])), [data]);
+  const overview = useMemo(() => {
+    if (!data || data.events.length === 0) return null;
+    const relations = scene.cables.filter((c) => c.type === "DOCUMENTED_RELATION");
+    return {
+      events: data.events.length, places: new Set(data.events.flatMap((e) => (e.location.mapped ? [e.location.label] : []))).size,
+      relations: relations.length, companies: new Set(relations.flatMap((c) => [c.from, c.to])).size,
+    };
+  }, [data, scene]);
   const selected: ImpactEvent | undefined = data?.events.find((e) => e.id === selectedEventId);
 
   return (
@@ -126,6 +133,7 @@ export function GlobalEventImpactMap() {
         <section className="iw-map" aria-label="Map">
           <GeoStage scene={scene} phase={phase} selectedEventId={selectedEventId} selectedEntityId={selectedEntity} hoverEventId={hoverEventId}
             mode={mode} animate={animate} onMode={setMode} onAnimate={setAnimate}
+            canInvestigate={!!data && data.events.length > 0} onOverview={() => selectEvent(null)} onInvestigate={() => data?.events[0] && selectEvent(data.events[0].id)}
             onSelectEvent={selectEvent} onSelectEntity={(id) => { setSelectedEntity(id); }} onHoverEvent={setHoverEventId} />
         </section>
 
@@ -152,8 +160,16 @@ export function GlobalEventImpactMap() {
           {selectedEntity && data && <EntityBlock data={data} entityId={selectedEntity} onOpen={() => nav(`/entity?id=${selectedEntity}`)} onClose={() => setSelectedEntity(null)} />}
           {selected ? <EventPanel event={selected} names={names} onClose={() => selectEvent(null)} /> : (
             <div className="iw-card" data-testid="no-selection">
-              <div className="iw-h">Selected event</div>
-              <p style={{ margin: "6px 0 0", fontSize: 12.5 }}>{data && data.events.length ? "Choose an event on the map or in the list to see its source evidence, the documented path to the company and what this analysis cannot say." : "Search a company to see its recent verified events."}</p>
+              <div className="iw-h">Global overview</div>
+              {overview ? (
+                <>
+                  <p style={{ margin: "6px 0", fontSize: 12.5 }} data-testid="overview-summary">
+                    {overview.events} verified event{overview.events === 1 ? "" : "s"} at {overview.places} place{overview.places === 1 ? "" : "s"}.
+                    {" "}{overview.relations} stored relationship{overview.relations === 1 ? "" : "s"} link {overview.companies} compan{overview.companies === 1 ? "y" : "ies"} that these events name; they are drawn faintly, with arrows in their stored direction.
+                  </p>
+                  <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Choose an event on the map or in the list to investigate its source evidence, the documented path to the company and what this analysis cannot say. No impact is estimated.</p>
+                </>
+              ) : <p style={{ margin: "6px 0 0", fontSize: 12.5 }}>Search a company to see its recent verified events.</p>}
             </div>
           )}
         </aside>

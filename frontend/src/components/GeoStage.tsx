@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { geoEqualEarth, geoGraticule, geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 import { feature, mesh } from "topojson-client";
 import {
-  arcControl, cableStyle, categoryStyle, fitView, placeCallout, quadPoint, spreadOverlaps,
+  arcControl, cableStyle, categoryStyle, clampFlat, fitFlat, placeCallout, quadPoint, spreadOverlaps,
   type Cable, type Marker, type Phase, type Pt, type Rect, type Scene,
 } from "../impactmap/model";
-import { arcPolyline, baseRadius, globeTarget, orthoProject, pointAlong, stepCam, type ArcPoint, type GlobeCam } from "../impactmap/globe";
+import { arcPolyline, baseRadius, chooseProjection, globeTarget, orthoProject, pointAlong, stepCam, type ArcPoint, type GlobeCam } from "../impactmap/globe";
 
 // The geospatial stage of the Global Event Impact Map: an interactive globe (default) or a flat Equal Earth map, drawn on a plain 2D canvas
 // with real, bundled Natural Earth coastlines (no tiles, no external map service, no WebGL - so it behaves identically in the FastAPI
@@ -15,13 +15,13 @@ import { arcPolyline, baseRadius, globeTarget, orthoProject, pointAlong, stepCam
 //   * glow, size and thickness encode nothing: all event markers are the same size, colour is the event's explicit category;
 //   * the loop runs only while something is moving (camera, cable fades, particles) and stops on its own when idle.
 
-export type Mode = "globe" | "flat";
+export type Mode = "auto" | "globe" | "flat";
 interface FlatCam { zoom: number; tx: number; ty: number }
 interface Geo { land: any; coast: any; borders: any }
 
 const IDLE_MS = 25_000;            // particles keep running this long after the last interaction, then the map rests
 const PARTICLE_SPEED = 0.12;       // cycles per second
-const MIN_SPREAD = 34;             // px between markers before they are fanned apart (a hairline still points at the true spot)
+const MIN_SPREAD = 38;             // px between markers before they are fanned apart (a hairline still points at the true spot)
 
 function buildGeo(world: any): Geo {
   const obj = { type: "GeometryCollection", geometries: world.objects.countries.geometries.filter((g: any) => String(g.id) !== "010") }; // not Antarctica
@@ -41,17 +41,19 @@ function usePrefersReducedMotion() {
 }
 
 const flatScale = (w: number, h: number) => Math.min(w / 5.4132, h / 2.6346);          // Equal Earth is 2 x 2.7066 by 2 x 1.3173 at scale 1
+const worldSize = (w: number, h: number): [number, number] => [5.4132 * flatScale(w, h), 2.6346 * flatScale(w, h)];
 const flatProjection = (w: number, h: number, f: FlatCam) => geoEqualEarth().scale(flatScale(w, h) * f.zoom).translate([(w / 2) * f.zoom + f.tx, (h / 2) * f.zoom + f.ty]);
 
 interface Props {
   scene: Scene; phase: Phase; selectedEventId: string | null; selectedEntityId: string | null; hoverEventId: string | null;
-  mode: Mode; animate: boolean;
+  mode: Mode; animate: boolean; canInvestigate: boolean;
+  onOverview: () => void; onInvestigate: () => void;
   onMode: (m: Mode) => void; onAnimate: (on: boolean) => void;
   onSelectEvent: (id: string | null) => void; onSelectEntity: (id: string) => void; onHoverEvent: (id: string | null) => void;
 }
 
 export function GeoStage(props: Props) {
-  const { scene, phase, selectedEventId, selectedEntityId, hoverEventId, mode, animate, onMode, onAnimate, onSelectEvent, onSelectEntity, onHoverEvent } = props;
+  const { scene, phase, selectedEventId, selectedEntityId, hoverEventId, mode: setting, animate, canInvestigate, onOverview, onInvestigate, onMode, onAnimate, onSelectEvent, onSelectEntity, onHoverEvent } = props;
   const wrap = useRef<HTMLDivElement>(null), canvasRef = useRef<HTMLCanvasElement>(null), els = useRef(new Map<string, HTMLElement>());
   const [size, setSize] = useState({ w: 900, h: 600 });
   const [geo110, setGeo110] = useState<Geo | null>(null), [geo50, setGeo50] = useState<Geo | null>(null);
@@ -60,10 +62,25 @@ export function GeoStage(props: Props) {
   const [hiddenCount, setHiddenCount] = useState(0);
   const [, setTick] = useState(0);                       // re-render when the camera target changes (for data-zoom)
   const reduced = usePrefersReducedMotion();
+  const investigating = selectedEventId !== null;
+
+  // what the camera frames: the selected event with the companies it is connected to, or - in the overview - every event and company
+  const related = useMemo(() => {
+    const ids = new Set<string>();
+    if (!selectedEventId) return ids;
+    for (const m of scene.markers) if (m.kind === "event" && m.eventId === selectedEventId) ids.add(m.id);
+    for (const cb of scene.cables) if (cb.eventIds.includes(selectedEventId)) { ids.add(cb.from); ids.add(cb.to); }
+    return ids;
+  }, [scene, selectedEventId]);
+
+  const framed = useMemo(() => scene.markers.filter((m) => (related.size > 0 ? related.has(m.id) : m.kind !== "region")).map((m) => [m.lon, m.lat] as [number, number]), [scene, related]);
+  // "auto" picks the globe when everything framed lies within one readable hemisphere, otherwise the flat map (never a confusing pole-centred globe)
+  const mode: "globe" | "flat" = setting === "auto" ? chooseProjection(framed) : setting;
+  const documentedEnds = useMemo(() => new Set(scene.cables.filter((c) => c.type === "DOCUMENTED_RELATION").flatMap((c) => [c.from, c.to])), [scene]);
 
   // the loop reads the latest props through a ref, so it never works from a stale render
-  const P = useRef({ scene, phase, selectedEventId, hoverEventId, mode, animate, reduced, size, geo110, geo50 });
-  P.current = { scene, phase, selectedEventId, hoverEventId, mode, animate, reduced, size, geo110, geo50 };
+  const P = useRef({ scene, phase, selectedEventId, hoverEventId, mode, animate, reduced, size, geo110, geo50, related });
+  P.current = { scene, phase, selectedEventId, hoverEventId, mode, animate, reduced, size, geo110, geo50, related };
   const S = useRef({
     cam: null as GlobeCam | null, camT: null as GlobeCam | null, flat: { zoom: 1, tx: 0, ty: 0 } as FlatCam, flatT: { zoom: 1, tx: 0, ty: 0 } as FlatCam,
     offsets: {} as Record<string, Pt>, alphas: new Map<string, number>(), raf: 0, last: 0, lastDraw: 0, lastInteract: 0, moving: false, baseKey: "",
@@ -104,31 +121,29 @@ export function GeoStage(props: Props) {
 
   // ------------------------------------------------------------------ projection helpers (current camera)
   const projectAt = (m: "globe" | "flat", w: number, h: number, g: GlobeCam, f: FlatCam, lon: number, lat: number, lift = 0) => {
-    const edge = 18;                                   // a marker is shown only if it fits whole inside the stage
-    if (m === "globe") { const q = orthoProject(lon, lat, lift, g, w / 2, h / 2); return { ...q, visible: q.visible && q.x >= edge && q.x <= w - edge && q.y >= edge && q.y <= h - edge }; }
+    // "visible" = on the near side and not far outside the stage; a marker near the edge is drawn clamped inside it (with a hairline to its true spot)
+    const edge = -40, inside = (x: number, y: number) => x >= edge && x <= w - edge && y >= edge && y <= h - edge;
+    if (m === "globe") { const q = orthoProject(lon, lat, lift, g, w / 2, h / 2); return { ...q, visible: q.visible && inside(q.x, q.y) }; }
     const [x, y] = flatProjection(w, h, f)([lon, lat]) ?? [-9999, -9999];
-    return { x, y, z: 1, visible: x >= edge && x <= w - edge && y >= edge && y <= h - edge };
+    return { x, y, z: 1, visible: inside(x, y) };
   };
 
   // ------------------------------------------------------------------ camera targets, marker fan-out and callout placement
-  const related = useMemo(() => {
-    const ids = new Set<string>();
-    if (!selectedEventId) return ids;
-    for (const m of scene.markers) if (m.kind === "event" && m.eventId === selectedEventId) ids.add(m.id);
-    for (const cb of scene.cables) if (cb.eventIds.includes(selectedEventId)) { ids.add(cb.from); ids.add(cb.to); }
-    return ids;
-  }, [scene, selectedEventId]);
+  // A marker tied to the selected event is always drawn (clamped inside the stage if need be). Any other marker is drawn only where it really is,
+  // so the edges never pile up with stranded, unrelated markers.
+  const showable = (rel: Set<string>, m: Marker, q: { x: number; y: number; visible: boolean }, w: number, h: number) =>
+    q.visible && (rel.size === 0 || rel.has(m.id) || (q.x >= 0 && q.x <= w && q.y >= 0 && q.y <= h));
 
   const frameSelection = useCallback(() => {
     const { scene, mode, size } = P.current, s = S.current, { w, h } = size;
-    const pts = scene.markers.filter((m) => related.size === 0 || related.has(m.id));
-    const lonlat = pts.map((m) => [m.lon, m.lat] as [number, number]);
+    const lonlat = framed;
     s.camT = globeTarget(lonlat, w, h);
     const base = flatProjection(w, h, { zoom: 1, tx: 0, ty: 0 });
-    s.flatT = related.size === 0 ? { zoom: 1, tx: 0, ty: 0 } : fitView(lonlat.map((p) => (base(p) ?? [0, 0]) as Pt), w, h, Math.max(50, w * 0.1), 3.2);
+    s.flatT = lonlat.length === 0 || related.size === 0 ? { zoom: 1, tx: 0, ty: 0 } : fitFlat(lonlat.map((p) => (base(p) ?? [0, 0]) as Pt), w, h, worldSize(w, h)[0], worldSize(w, h)[1], Math.max(50, w * 0.1), 3.2);
     // fan out markers that would overlap, measured from where the camera is going to be (so the layout does not shuffle while it moves)
-    const shown = scene.markers.filter((m) => m.kind !== "region").map((m) => ({ m, q: projectAt(mode, w, h, s.camT!, s.flatT, m.lon, m.lat) })).filter((x) => x.q.visible);
-    const spread = spreadOverlaps(shown.map(({ m, q }) => ({ id: m.id, pt: [q.x, q.y] as Pt })), MIN_SPREAD);
+    const shown = scene.markers.filter((m) => m.kind !== "region").map((m) => ({ m, q: projectAt(mode, w, h, s.camT!, s.flatT, m.lon, m.lat) })).filter((x) => showable(related, x.m, x.q, w, h));
+    const priority = (m: Marker) => (m.kind === "event" ? (m.eventId === P.current.selectedEventId ? 4 : 3) : m.role === "TARGET" ? 3 : related.has(m.id) ? 2 : 0);   // events and the hub keep their true spot
+    const spread = spreadOverlaps(shown.map(({ m, q }) => ({ id: m.id, pt: [q.x, q.y] as Pt, priority: priority(m) })), w < 600 ? MIN_SPREAD - 2 : MIN_SPREAD, { w, h, edge: 18 });
     s.offsets = Object.fromEntries(shown.map(({ m, q }) => [m.id, [spread[m.id][0] - q.x, spread[m.id][1] - q.y] as Pt]));
     setHiddenCount(scene.markers.filter((m) => m.kind !== "region").length - shown.length);
     const sel = shown.find(({ m }) => m.kind === "event" && m.eventId === P.current.selectedEventId);
@@ -138,16 +153,16 @@ export function GeoStage(props: Props) {
         const hub = m.kind === "entity" && m.role === "TARGET", bw = m.kind === "event" ? 30 : hub ? 46 : dim ? 12 : 50, bh = m.kind === "event" ? 30 : hub ? 46 : dim ? 12 : 22;
         return { x: x - bw / 2, y: y - bh / 2, w: bw, h: bh };
       });
-      setCalloutSide(placeCallout(spread[sel.m.id], { w: 230, h: 64 }, boxes, { w, h }));
+      setCalloutSide(placeCallout(spread[sel.m.id], w < 600 ? { w: 184, h: 22 } : { w: 230, h: 70 }, boxes, { w, h }, w < 600 ? 14 : 13, w < 600 ? 6 : 14));
     }
     if (!s.cam || P.current.reduced) { s.cam = { ...s.camT }; s.flat = { ...s.flatT }; }
     s.lastInteract = performance.now();
     setTick((t) => t + 1);
     schedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [related]);
+  }, [related, framed]);
 
-  useEffect(() => { frameSelection(); }, [frameSelection, scene, mode, size]);
+  useEffect(() => { frameSelection(); }, [frameSelection, scene, mode, size, framed]);
 
   // ------------------------------------------------------------------ drawing
   function drawBase(ctx: CanvasRenderingContext2D, w: number, h: number, g: GlobeCam, f: FlatCam, m: "globe" | "flat", geo: Geo | null) {
@@ -222,11 +237,12 @@ export function GeoStage(props: Props) {
     for (const m of p.scene.markers) {
       const q = projectAt(p.mode, w, h, s.cam, s.flat, m.lon, m.lat);
       const [ox, oy] = s.offsets[m.id] ?? [0, 0];
-      disp[m.id] = { x: q.x + ox, y: q.y + oy, ax: q.x, ay: q.y, visible: q.visible && q.x + ox >= 18 && q.x + ox <= w - 18 && q.y + oy >= 18 && q.y + oy <= h - 18 };   // judged where the marker is drawn, after any fan-out
+      const dx = Math.min(w - 18, Math.max(18, q.x + ox)), dy = Math.min(h - 18, Math.max(18, q.y + oy));       // drawn inside the stage, hairline to the true spot
+      disp[m.id] = { x: dx, y: dy, ax: q.x, ay: q.y, visible: showable(p.related, m, q, w, h) };
       const el = els.current.get(m.id);
       if (el) {
-        el.style.transform = `translate(${(q.x + ox).toFixed(1)}px, ${(q.y + oy).toFixed(1)}px)`;
-        el.style.visibility = disp[m.id].visible && (m.kind !== "region" || p.phase === "ready") ? "visible" : "hidden";
+        el.style.transform = `translate(${dx.toFixed(1)}px, ${dy.toFixed(1)}px)`;
+        el.style.visibility = disp[m.id].visible && (m.kind !== "region" || (p.phase === "ready" && p.selectedEventId !== null)) ? "visible" : "hidden";
         el.style.setProperty("--depth", p.mode === "globe" ? String(Math.max(0.35, Math.min(1, q.z * 2.6 + 0.4))) : "1");
       }
     }
@@ -339,7 +355,7 @@ export function GeoStage(props: Props) {
     if (mode === "globe") { const k0 = baseRadius(w, h); s.camT = { ...s.camT, k: Math.max(k0 * 0.8, Math.min(k0 * 5, s.camT.k * factor)) }; }
     else {
       const z = Math.max(1, Math.min(6, s.flatT.zoom * factor)), wx = (w / 2 - s.flatT.tx) / s.flatT.zoom, wy = (h / 2 - s.flatT.ty) / s.flatT.zoom;
-      s.flatT = { zoom: z, tx: Math.min(0, Math.max(w - w * z, w / 2 - wx * z)), ty: Math.min(0, Math.max(h - h * z, h / 2 - wy * z)) };
+      s.flatT = clampFlat({ zoom: z, tx: w / 2 - wx * z, ty: h / 2 - wy * z }, w, h, worldSize(w, h)[0], worldSize(w, h)[1]);
     }
     setTick((t) => t + 1);
     touch();
@@ -348,13 +364,13 @@ export function GeoStage(props: Props) {
   // ------------------------------------------------------------------ markup
   const eventMarkers = scene.markers.filter((m) => m.kind === "event");
   const categories = [...new Set(eventMarkers.map((m) => m.category ?? ""))].filter(Boolean);
-  const dimmed = (m: Marker) => selectedEventId !== null && !related.has(m.id);
+  const dimmed = (m: Marker) => investigating ? !related.has(m.id) : m.kind === "entity" && m.role !== "TARGET" && !documentedEnds.has(m.id);
   const ref = (id: string) => (el: HTMLElement | null) => { if (el) els.current.set(id, el); else els.current.delete(id); };
   const k0 = baseRadius(size.w, size.h), zoomNow = mode === "globe" ? (S.current.camT?.k ?? k0) / k0 : S.current.flatT.zoom;
 
   return (
     <div
-      ref={wrap} className={`gs-stage ${mode}`} data-testid="impact-map" data-phase={phase} data-projection={mode} data-zoom={zoomNow.toFixed(2)}
+      ref={wrap} className={`gs-stage ${mode}`} data-testid="impact-map" data-phase={phase} data-projection={mode} data-view={investigating ? "investigation" : "overview"} data-projection-setting={setting} data-zoom={zoomNow.toFixed(2)}
       data-cables={scene.cables.length} data-animated={String(animate && !reduced && phase === "ready")} role="group" aria-busy={phase === "loading"}
       aria-label={`World map: ${eventMarkers.length} event${eventMarkers.length === 1 ? "" : "s"}, ${scene.cables.length} connections`}
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
@@ -375,7 +391,7 @@ export function GeoStage(props: Props) {
             >
               <span className="n">{m.rank}</span>
               {selected && wide && <span className={`callout ${calloutSide}`} aria-hidden="true"><i>{cat.label}</i><b>{m.place}</b><span>{m.label}</span></span>}
-              {((hovered && !(selected && wide)) || (selected && !wide)) && <span className="tag" aria-hidden="true">{m.place}</span>}
+              {((hovered && !(selected && wide)) || (selected && !wide)) && <span className={`tag ${calloutSide}`} aria-hidden="true">{m.place}</span>}
             </button>
           );
         }
@@ -390,6 +406,7 @@ export function GeoStage(props: Props) {
             ><span className="txt">{m.ticker ?? m.entityId}</span></button>
           );
         }
+        if (!investigating) return null;      // countries named in the evidence belong to a selected event; the overview does not draw them
         return <span key={m.id} ref={ref(m.id)} style={{ ["--dim" as string]: dimmed(m) ? 0.35 : 1 }} className="gs-marker region" data-testid="region-marker" role="img" aria-label={`Country named in the evidence: ${m.label}`} title={`${m.label} (named in the evidence; country centroid)`} />;
       })}
 
@@ -398,9 +415,14 @@ export function GeoStage(props: Props) {
       {unsupported && <div className="gs-overlay quiet" role="status">The map cannot be drawn in this browser. The event list and evidence panel still work.</div>}
 
       <div className="gs-controls" role="toolbar" aria-label="Map controls">
+        <div className="seg" role="group" aria-label="View">
+          <button type="button" aria-pressed={!investigating} onClick={onOverview}>Overview</button>
+          <button type="button" aria-pressed={investigating} disabled={!canInvestigate} onClick={onInvestigate}>Investigation</button>
+        </div>
         <div className="seg" role="group" aria-label="Projection">
-          <button type="button" aria-pressed={mode === "globe"} onClick={() => onMode("globe")}>Globe</button>
-          <button type="button" aria-pressed={mode === "flat"} onClick={() => onMode("flat")}>Flat</button>
+          <button type="button" aria-pressed={setting === "auto"} onClick={() => onMode("auto")} title="Globe when everything in view fits one hemisphere, otherwise the flat map">Auto</button>
+          <button type="button" aria-pressed={setting === "globe"} onClick={() => onMode("globe")}>Globe</button>
+          <button type="button" aria-pressed={setting === "flat"} onClick={() => onMode("flat")}>Flat</button>
         </div>
         <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1.35)}>+</button>
         <button type="button" aria-label="Zoom out" onClick={() => zoomBy(1 / 1.35)}>−</button>

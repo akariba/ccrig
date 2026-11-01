@@ -322,3 +322,11 @@ button {
   .main-content { padding: 16px 14px 48px; }
   .main-content.impact-dark { padding: 0; }
 }
+.gs-controls .seg button + button { border-left: 0; }
+.gs-controls .seg button:not(:first-child):not(:last-child) { border-radius: 0; }
+.gs-marker .tag.above { top: auto; bottom: calc(100% + 6px); left: 50%; translate: -50% 0; }
+.gs-marker .tag.below { top: calc(100% + 6px); bottom: auto; left: 50%; translate: -50% 0; }
+.gs-marker .tag.right { left: calc(100% + 6px); top: 50%; translate: 0 -50%; }
+.gs-marker .tag.left { right: calc(100% + 6px); left: auto; top: 50%; translate: 0 -50%; }
+.gs-note { top: auto; bottom: 12px; left: 104px; max-width: calc(100% - 118px); }
+@media (max-width: 760px) { .gs-note { bottom: 50px; left: 8px; max-width: calc(100% - 16px); } }
