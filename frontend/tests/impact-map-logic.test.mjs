@@ -184,3 +184,27 @@ test("the camera frames a selection, never zooms out past the world, and never l
   const x = 220 * tight.zoom + tight.tx, y = 215 * tight.zoom + tight.ty;       // the framed centre stays on screen
   assert.ok(x > 0 && x < 900 && y > 0 && y < 480);
 });
+
+// ------------------------------------------------------------------ callout collision avoidance (general rule)
+test("a callout goes where it overlaps the fewest markers and stays on the stage", () => {
+  const size = { w: 190, h: 64 }, bounds = { w: 900, h: 480 };
+  assert.equal(m.placeCallout([450, 300], size, [], bounds), "above");                               // free space: the default side
+  assert.equal(m.placeCallout([450, 60], size, [], bounds), "below");                                // no room above
+  assert.equal(m.placeCallout([40, 240], size, [], bounds), "right");                               // centred above/below would leave the left edge
+  const label = { x: 890, y: 230, w: 48, h: 22 };                                                    // a company label beyond the right edge
+  assert.notEqual(m.placeCallout([450, 300], size, [{ x: 400, y: 215, w: 100, h: 40 }], bounds), "above");   // blocked above -> another side
+  assert.equal(m.placeCallout([450, 300], size, [{ x: 400, y: 215, w: 100, h: 40 }, { x: 400, y: 330, w: 100, h: 30 }], bounds), "right");
+  const picked = m.placeCallout([880, 240], size, [label], bounds);
+  assert.ok(["above", "below", "left"].includes(picked));                                            // right would leave the stage
+  assert.equal(m.placeCallout([450, 300], size, [{ x: 0, y: 0, w: 900, h: 480 }], bounds), "above"); // nothing helps: stable, never throws
+});
+
+test("with bounds, spread markers stay inside the stage and still keep apart where there is room", () => {
+  const b = { w: 390, h: 200, edge: 18 };
+  const items = ["a", "b", "c", "d", "e"].map((id) => ({ id, pt: [4, 6] }));            // all piled into the top-left corner
+  const out = m.spreadOverlaps(items, 30, b);
+  for (const [x, y] of Object.values(out)) { assert.ok(x >= 18 && x <= 372 && y >= 18 && y <= 182); }
+  const pts = Object.values(out);
+  for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) assert.ok(Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]) >= 29);
+  assert.deepEqual(m.spreadOverlaps(items, 30, b), m.spreadOverlaps([...items].reverse(), 30, b));
+});

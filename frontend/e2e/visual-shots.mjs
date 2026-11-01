@@ -10,6 +10,10 @@ for (const [name, w, h] of [["desktop", 1500, 950], ["laptop", 1100, 800], ["tab
   await p.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: 60000 });
   await p.waitForTimeout(1500);
   await p.screenshot({ path: `e2e-shots/visual/${tag}-${name}.png`, fullPage: name === "phone" || name === "tablet", timeout: 60000 });
+  for (const [i, label] of [[4, "seoul"], [2, "santa-clara"]]) {          // a far event and the crowded North America cluster
+    await p.getByTestId("event-item").nth(i).click(); await p.waitForTimeout(1300);
+    await p.getByTestId("impact-map").screenshot({ path: `e2e-shots/visual/${tag}-${name}-map-${label}.png` });
+  }
   await p.close();
 }
 await b.close();
