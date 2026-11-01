@@ -106,7 +106,14 @@ try {
   const cables = Number(await map.getAttribute("data-cables"));
   check("impact map: cables are drawn only because the API returned graph edges", cables > 0, `${cables} cables`);
   const newest = await page.getByTestId("event-item").first().getAttribute("data-event-id");
-  check("impact map: the newest returned event is selected by default (list is date order, not importance)", (await page.getByTestId("event-panel").getAttribute("data-event-id")) === newest && /[?&]event=/.test(page.url()) && /not importance/.test(await page.getByTestId("top5").innerText()));
+  check("impact map: opens in the Global Overview - nothing selected, no evidence panel, a summary of what is shown", (await map.getAttribute("data-view")) === "overview" && !(await page.getByTestId("event-panel").isVisible().catch(() => false)) && /verified events? at \d+ places?/.test(await page.getByTestId("overview-summary").innerText()) && !/[?&]event=/.test(page.url()));
+  check("impact map: the overview shows every event marker, and the Top 5 list says it is date order, not importance", (await page.locator('[data-testid="event-marker"]:visible').count()) === markers && /not importance/.test(await page.getByTestId("top5").innerText()));
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.animating !== "true", null, { timeout: 8000 }).catch(() => {});   // the opening camera glide settles
+  check("impact map: the overview draws no country markers and, once settled, nothing moves", (await page.getByTestId("region-marker").locator("visible=true").count()) === 0 && (await map.getAttribute("data-animating")) !== "true");
+  check("impact map: auto projection picks the flat map for the dispersed overview", (await map.getAttribute("data-projection")) === "flat" && (await map.getAttribute("data-projection-setting")) === "auto");
+  await page.getByRole("button", { name: "Investigation", exact: true }).click();
+  await page.waitForFunction((id) => document.querySelector('[data-testid="event-panel"]')?.dataset.eventId === id, newest, { timeout: 8000 }).catch(() => {});
+  check("impact map: Investigation opens the newest event (date order, not importance) with its evidence and puts it in the URL", (await page.getByTestId("event-panel").getAttribute("data-event-id")) === newest && (await map.getAttribute("data-view")) === "investigation" && /[?&]event=/.test(page.url()));
   check("impact map: Top 5 list and the selected-event panel are both visible without opening anything", await page.getByTestId("top5").isVisible() && await page.getByTestId("event-panel").isVisible());
   const zoomNewest = Number(await map.getAttribute("data-zoom"));
   check("impact map: the camera frames the selection (never below the whole world)", zoomNewest >= 1);
@@ -135,7 +142,9 @@ try {
   check("impact map: events are selectable from the keyboard", await page.getByTestId("event-panel").waitFor({ timeout: 5000 }).then(() => true).catch(() => false));
   
   const proj = () => map.getAttribute("data-projection");
-  check("impact map: opens on the globe", (await proj()) === "globe");
+  await page.getByRole("button", { name: "Globe", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.projection === "globe");
+  check("impact map: an explicit Globe choice is respected and kept in the URL", (await proj()) === "globe" && /[?&]view=globe/.test(page.url()));
   await page.getByRole("button", { name: "Flat", exact: true }).click();
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.projection === "flat");
   check("impact map: the flat projection shows every event marker and keeps the selection", (await page.locator('[data-testid="event-marker"]:visible').count()) === markers && /[?&]view=flat/.test(page.url()));
@@ -150,6 +159,60 @@ try {
   await page.waitForTimeout(900);
   check("impact map: zoom control changes the camera", Number(await map.getAttribute("data-zoom")) > Number(before));
   await page.getByRole("button", { name: "Frame", exact: true }).click();
+  // selecting events must never change what an event says: compare the panel with the API response, event by event
+  const api = await page.evaluate(async () => (await (await fetch("/api/impact-map/NVDA/events")).json()));
+  const fmt = (d) => { const [y, mo, da] = d.split("-").map(Number); return `${da} ${["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][mo - 1]} ${y}`; };
+  let integrityProblems = [];
+  for (const ev of api.events) {
+    await page.locator(`[data-testid="event-item"][data-event-id="${ev.id}"]`).click();
+    await page.waitForFunction((id) => document.querySelector('[data-testid="event-panel"]')?.dataset.eventId === id, ev.id, { timeout: 8000 }).catch(() => {});
+    const pn = page.getByTestId("event-panel");
+    const dateShown = await pn.getByTestId("published-date").innerText().catch(() => "");
+    const href = await pn.getByTestId("source-link").first().getAttribute("href").catch(() => null);
+    const shownPaths = await pn.getByTestId("path").evaluateAll((els) => els.map((e) => `${e.closest("[data-entity-id]")?.dataset.entityId}:${e.dataset.relationshipType}`).sort());
+    const apiPaths = ev.paths.map((p) => `${p.entity_id}:${p.relationship_type}`).sort();
+    const classes = await pn.getByTestId("entity-relationship").evaluateAll((els) => els.map((e) => `${e.dataset.entityId}:${e.dataset.class}`).sort());
+    const apiClasses = ev.entities.map((x) => `${x.entity_id}:${x.relationship_to_target}`).sort();
+    const quotes = await pn.getByTestId("evidence-quote").allInnerTexts();
+    if (dateShown !== fmt(ev.published_date)) integrityProblems.push(`${ev.id}: date ${dateShown}`);
+    if (href !== ev.sources[0].url) integrityProblems.push(`${ev.id}: source ${href}`);
+    if (JSON.stringify(shownPaths) !== JSON.stringify(apiPaths)) integrityProblems.push(`${ev.id}: paths`);
+    if (JSON.stringify(classes) !== JSON.stringify(apiClasses)) integrityProblems.push(`${ev.id}: relationship classes`);
+    if (JSON.stringify(quotes.map((q) => q.trim())) !== JSON.stringify(ev.evidence.map((q) => q.quote.trim()))) integrityProblems.push(`${ev.id}: evidence`);
+    const shownDirections = await pn.getByTestId("path").evaluateAll((els) => els.map((e) => [...e.querySelectorAll(".impact-chip.relation")].map((c) => c.textContent).join("|")));
+    const apiDirections = ev.paths.map((p) => p.steps.map((st) => (st.type === "MENTIONS" ? "names" : `${st.relation}${st.traversal === "WITH_STORED_DIRECTION" ? "" : " (read in reverse)"}`)).join("|"));
+    if (JSON.stringify(shownDirections.sort()) !== JSON.stringify(apiDirections.sort())) integrityProblems.push(`${ev.id}: relationship direction`);
+  }
+  check("impact map: for all five events the selected panel shows exactly the API's dates, source link, quotes, paths, classes and relationship direction", api.events.length >= 1 && integrityProblems.length === 0, integrityProblems.join(" ; "));
+
+  // markers must never be half outside the stage, in any projection or zoom
+  const outside = () => page.evaluate(() => {
+    const st = document.querySelector('[data-testid="impact-map"]').getBoundingClientRect();
+    return [...document.querySelectorAll(".gs-marker:not(.region)")].filter((e) => e.style.visibility !== "hidden").filter((e) => { const r = e.getBoundingClientRect(); return r.left < st.left - 1 || r.right > st.right + 1 || r.top < st.top - 1 || r.bottom > st.bottom + 1; }).length;
+  });
+  await page.getByRole("button", { name: "Flat", exact: true }).click();
+  await page.getByRole("button", { name: "Zoom in" }).click(); await page.getByRole("button", { name: "Zoom in" }).click(); await page.waitForTimeout(1200);
+  check("impact map: zoomed Flat view leaves no marker clipped by the edge", (await outside()) === 0, `${await outside()} outside`);
+  await page.getByRole("button", { name: "Auto", exact: true }).click();
+  // phone-sized viewport: the selected event's company (SK hynix for Seoul) stays visible and nothing is clipped
+  await page.setViewportSize({ width: 420, height: 900 });
+  await page.waitForTimeout(500);
+  const seoul = api.events.find((e) => /Seoul/.test(e.location.label ?? ""));
+  if (seoul) {
+    await page.locator(`[data-testid="event-item"][data-event-id="${seoul.id}"]`).click();
+    await page.waitForTimeout(1800);
+    const sk = page.locator('[data-testid="entity-marker"][data-entity-id="SKHY"]');
+    check("impact map: on a phone, SK hynix is visible and fully inside the map when the Seoul event is selected", (await sk.count()) === 1 && (await sk.isVisible()) && (await outside()) === 0, `${await outside()} outside`);
+    await shot(page, "02e_impact_map_phone");
+  }
+  for (const ev of api.events) {                     // every event can be opened from the list at phone size and shows its source
+    await page.locator(`[data-testid="event-item"][data-event-id="${ev.id}"]`).click();
+    await page.waitForTimeout(250);
+  }
+  check("impact map: at phone size every event can be opened from the list and none leaves a marker clipped", (await outside()) === 0 && (await page.getByTestId("source-link").first().isVisible()));
+  await page.setViewportSize({ width: 1500, height: 950 });
+  await page.getByRole("button", { name: "Overview", exact: true }).click();
+  check("impact map: Overview returns to the unselected state", (await map.getAttribute("data-view")) === "overview" && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
   await page.getByTestId("impact-window").selectOption("30");
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
   const n30 = await page.getByTestId("event-marker").count();

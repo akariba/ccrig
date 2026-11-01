@@ -81,7 +81,12 @@ service and no WebGL. Evaluated and rejected for now: MapLibre GL / deck.gl (Web
 roughly 1 MB or more of extra JavaScript, and a software-rendering fallback), because nothing here needs more than ~30 arcs and ~20
 markers and a 2D canvas behaves identically in the FastAPI deployment, on GitHub Pages and in headless test browsers.
 
-- Two projections: an interactive **globe** (orthographic, default; drag to rotate, +/- to zoom, "Frame" to re-centre) and a **flat**
+- Two views. **Global Overview** (the initial state): every verified event at its evidenced location, company chips at their HQ country,
+  and only the stored documented relationships, faint, still and with arrows in their stored direction; no mentions, countries or particles.
+  **Event Investigation** (select an event, or press "Investigation" for the newest): the camera frames that event and its companies, its
+  documented paths brighten with directional particles, the rest fades, and the source evidence opens. `?event=` deep-links an event.
+- Two projections plus **Auto** (default): the globe is used only when everything in view lies within a ~58 degree cap that is not centred
+  near a pole; otherwise the flat map is used. Choosing Globe or Flat overrides (`?view=globe|flat`). The interactive **globe** (orthographic, default; drag to rotate, +/- to zoom, "Frame" to re-centre) and a **flat**
   Equal Earth map that shows every marker at once (`?view=flat`).
 - Selecting an event glides the camera to frame that event and the companies connected to it. Markers that would sit behind the globe are
   hidden and counted ("n markers are on the far side"); the Top 5 list always reaches every event.
