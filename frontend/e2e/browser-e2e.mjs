@@ -91,7 +91,7 @@ try {
     await navAndWait(page, label, heading);
     const got = await h1(page).catch((e) => "ERR " + e.message.slice(0, 60));
     const warn = (await page.locator(".warning-box").allInnerTexts()).filter((t) => /^\s*(\d{3}\b|Error|Failed|Cannot|TypeError)|Value error|not supported|Internal Server/i.test(t)).length;
-    check(`nav: ${label} -> "${heading}"`, got === heading && problems.filter((p) => !/Failed to load resource/.test(p)).length === before && httpErrors.slice(httpBefore).every((e) => EXPECTED_404_TWO_UNIVERSES.test(e)) && warn === 0,
+    check(`nav: ${label} -> "${heading}"`, got === heading && problems.filter((p) => !/Failed to load resource/.test(p)).length === before && httpErrors.slice(httpBefore).every((e) => (EXPECTED_404_TWO_UNIVERSES.test(e) || /\/api\/ingest\/runs\/latest/.test(e))) && warn === 0,
       got !== heading ? `h1="${got}"` : !httpErrors.slice(httpBefore).every((e) => EXPECTED_404_TWO_UNIVERSES.test(e)) ? httpErrors.slice(httpBefore).join(" ; ") : warn ? "error shown" : "");
   }
 
@@ -308,6 +308,21 @@ try {
   await shot(page, "studio_recorded");
   page.off("request", onReq);
   check("studio: no operator or server-side ingestion request was made", studioReqs.length === 0, studioReqs.join(" "));
+  // Ingest Bench: with no live run (always the case on the public site) it is the labelled simulator, and it asks no server for ingestion data in static mode
+  const ibReqs = [];
+  const onIb = (r) => { if (/\/api\/ingest\//.test(r.url())) ibReqs.push(r.url()); };
+  page.on("request", onIb);
+  await page.getByRole("link", { name: "Ingest Bench" }).click();
+  await page.getByTestId("ib-root").waitFor({ timeout: SLOW });
+  await page.waitForFunction(() => document.querySelector('[data-testid="ib-root"]')?.dataset.mode === "demo", null, { timeout: SLOW });
+  check("ingest bench: without a live run it is the simulator, labelled SIMULATED, and runs (stage letter advances, canvases painted)",
+    (await page.getByTestId("ib-badge").innerText()) === "SIMULATED" && /Simulated run with sample data/.test(await page.getByTestId("ib-note").innerText()));
+  await page.getByTestId("ib-speed-4").click();
+  await page.waitForFunction(() => ["B", "C", "D", "Done"].includes(document.querySelector('[data-testid="ib-k-stage"]')?.textContent), null, { timeout: 30000 });
+  check("ingest bench: no horizontal page scroll", await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1));
+  await shot(page, "ingest_bench");
+  page.off("request", onIb);
+  if (MODE === "static") check("ingest bench: the public static site makes no ingest request at all", ibReqs.length === 0, ibReqs.join(" "));
   await navAndWait(page, "Relationships", "Relationships");
 
   // ------------------------------------------------------------------ 3. Model Lab: results, validation errors, recovery
@@ -446,7 +461,9 @@ try {
 await browser.close();
 
 const EXPECTED_422 = /^422 POST \/api\/(model-lab\/score|event\/parse)$/;   // the two validation errors this script provokes on purpose
-const unexpectedHttp = httpErrors.filter((e) => !EXPECTED_422.test(e) && !EXPECTED_404_TWO_UNIVERSES.test(e) && !(MODE === "dev" && /^422 GET \/api\/entities\?limit=-1$/.test(e)));
+// the Ingest Bench asks for the latest live run and, finding none (the route does not exist without the operator Studio), falls back to its labelled simulator: by design
+const EXPECTED_NO_LIVE_RUN = /^40[14] GET \/api\/ingest\/runs\/latest\/events\?since=0$/;
+const unexpectedHttp = httpErrors.filter((e) => !EXPECTED_422.test(e) && !EXPECTED_404_TWO_UNIVERSES.test(e) && !EXPECTED_NO_LIVE_RUN.test(e) && !(MODE === "dev" && /^422 GET \/api\/entities\?limit=-1$/.test(e)));
 check("no unexpected HTTP errors (4xx/5xx) from the app", unexpectedHttp.length === 0, unexpectedHttp.join(" ; "));
 if (MODE === "dev") check("the provoked validation errors were really 422 responses", httpErrors.filter((e) => EXPECTED_422.test(e)).length >= 2, httpErrors.filter((e) => EXPECTED_422.test(e)).join(" ; "));
 const bad = results.filter((r) => !r.ok);
