@@ -46,7 +46,7 @@ def test_oracle_nvidia_journey_from_source_to_overlay_and_back(ws):
 
     naive = flow.run_scenario(ws, "oracle-nvidia", "cooccurrence", operator="op")
     pn = flow.project(ws, naive["job"]["job_id"])
-    assert states(pn) == {"SOURCE": "COMPLETED", "PARSE": "COMPLETED", "PROFILE": "COMPLETED", "VALIDATE": "COMPLETED", "RESOLVE": "COMPLETED", "EVIDENCE": "FAILED_CHECKS", "REVIEW": "BLOCKED", "PROMOTE": "SKIPPED"}
+    assert states(pn) == {"SOURCE": "COMPLETED", "PARSE": "COMPLETED", "PROFILE": "COMPLETED", "VALIDATE": "COMPLETED", "RESOLVE": "COMPLETED", "LLM": "SKIPPED", "EVIDENCE": "FAILED_CHECKS", "REVIEW": "BLOCKED", "PROMOTE": "SKIPPED"}
     assert pn["state"] == "BLOCKED" and "UNSUPPORTED_RELATIONSHIP_ASSERTION" in codes(pn, "EVIDENCE")
     rec = next(s for s in pn["stages"] if s["id"] == "EVIDENCE")["records"]
     assert (rec["processed"], rec["accepted"], rec["rejected"]) == (1, 0, 1)                    # the claim is counted as rejected, not proposed
@@ -186,7 +186,7 @@ def test_invalid_schema_and_refused_content_skip_the_remaining_stages(ws):
     assert states(p)["VALIDATE"] == "FAILED_CHECKS" and p["state"] == "BLOCKED" and "MISSING_REQUIRED_COLUMN" in {f["code"] for f in p["quality"]["findings"]}
     refused = pipeline.ingest(ws, b"%PDF-1.7 not a table", source_id="a-pdf", filename="x.json", target="relationship_evidence", as_of=AS_OF)
     r = flow.project(ws, refused["job"]["job_id"])
-    assert r["state"] == "REFUSED" and states(r)["SOURCE"] == "FAILED" and all(states(r)[s] == "SKIPPED" for s in ("PARSE", "PROFILE", "VALIDATE", "RESOLVE", "EVIDENCE", "REVIEW", "PROMOTE"))
+    assert r["state"] == "REFUSED" and states(r)["SOURCE"] == "FAILED" and all(states(r)[s] == "SKIPPED" for s in ("PARSE", "PROFILE", "VALIDATE", "RESOLVE", "LLM", "EVIDENCE", "REVIEW", "PROMOTE"))
     assert r["job"]["error_code"] == "FORBIDDEN_CONTENT"
 
 
@@ -281,3 +281,41 @@ def test_api_run_poll_and_stream_agree_with_the_ledger(client):
     assert detail["state"] == "APPROVED" and detail["destination"]["status"] == "LIVE_IN_OVERLAY"
     assert client.get("/api/studio/flow/jobs/job-99999-none", headers=J).status_code == 404
     assert client.post("/api/studio/flow/run", headers=J, json={"scenario": "oracle-nvidia", "claim": "invented"}).status_code == 422
+
+
+# ------------------------------------------------------------------ the language-model stage
+def test_a_job_with_no_model_invocation_shows_the_llm_stage_as_skipped_never_as_running(ws):
+    p = flow.project(ws, flow.run_scenario(ws, "oracle-nvidia", "asserted")["job"]["job_id"])
+    llm = next(s for s in p["stages"] if s["id"] == "LLM")
+    assert llm["state"] == "SKIPPED" and llm["llm"] is None and "no model invocation was recorded" in llm["message"]
+    assert not any(e["stage_id"] == "LLM" and e["state"] in ("RUNNING", "COMPLETED") for e in p["events"])
+
+
+def _with_llm_rows(ws, monkeypatch, *rows):
+    """SYNTHETIC: make the pipeline write the given ledger rows for the LLM stage between RESOLVE and CHECK, as a model-assisted step would. The real pipeline writes none."""
+    real = pipeline._resolve_rows
+
+    def wrapped(contract, typed, findings):
+        out = real(contract, typed, findings)
+        jid = ws.list_jobs()[0]["job_id"]
+        for kind, counts, error in rows:
+            ws.add_event(jid, "LLM", kind, counts=counts, error=error)
+        return out
+
+    monkeypatch.setattr(pipeline, "_resolve_rows", wrapped)
+
+
+def test_recorded_model_invocations_are_shown_exactly_as_recorded(ws, monkeypatch):
+    _with_llm_rows(ws, monkeypatch, ("STARTED", None, None), ("COMPLETED", {"provider": "test-provider", "model": "test-model", "calls": 1, "latency_ms": 812, "input_tokens": 1500}, None))
+    job = ingest_rows(ws, [rel_row(oracle_source(ws), "NVDA", "ORCL", "SUPPLIES", [ORACLE_QUOTE])], source_id="llm-shape")
+    p = flow.project(ws, job["job_id"])
+    ev = [e for e in p["events"] if e["stage_id"] == "LLM"]
+    assert [e["state"] for e in ev] == ["RUNNING", "COMPLETED"] and states(p)["LLM"] == "COMPLETED"             # no skip event is added when a call was recorded
+    assert ev[1]["llm"] == {"provider": "test-provider", "model": "test-model", "calls": 1, "latency_ms": 812, "input_tokens": 1500, "output_tokens": None}      # unrecorded stays null
+
+
+def test_a_failed_model_call_is_a_failed_stage(ws, monkeypatch):
+    _with_llm_rows(ws, monkeypatch, ("STARTED", None, None), ("FAILED", None, {"type": "ConnectError", "message": "provider unreachable"}))
+    job = ingest_rows(ws, [rel_row(oracle_source(ws), "NVDA", "ORCL", "SUPPLIES", [ORACLE_QUOTE])], source_id="llm-fail")
+    p = flow.project(ws, job["job_id"])
+    assert states(p)["LLM"] == "FAILED" and next(e for e in p["events"] if e["type"] == "STAGE_FAILED" and e["stage_id"] == "LLM")["error"]["type"] == "ConnectError"

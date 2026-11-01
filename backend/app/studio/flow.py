@@ -21,7 +21,7 @@ from .contracts import CONTRACTS, RELATION_SEMANTICS
 from .store import StudioStore
 
 STAGES = [("SOURCE", "Source"), ("PARSE", "Parse"), ("PROFILE", "Profile"), ("VALIDATE", "Validate"), ("RESOLVE", "Resolve"),
-          ("EVIDENCE", "Evidence"), ("REVIEW", "Review"), ("PROMOTE", "Promote")]
+          ("LLM", "Language model"), ("EVIDENCE", "Evidence"), ("REVIEW", "Review"), ("PROMOTE", "Promote")]
 STAGE_IDS = [s for s, _ in STAGES]
 PIPE_TO_STAGE = {"ACQUIRE": "SOURCE", "PARSE": "PARSE", "PROFILE": "PROFILE", "VALIDATE": "VALIDATE", "RESOLVE": "RESOLVE", "CHECK": "EVIDENCE", "STAGE": "EVIDENCE"}
 
@@ -58,6 +58,9 @@ SCENARIOS = {
         },
     }
 }
+
+
+LLM_NOT_INVOKED = "no model invocation was recorded for this job: parsing, validation, resolution and evidence checks are deterministic"
 
 
 class FlowError(ValueError):
@@ -213,7 +216,7 @@ def structure(store: StudioStore, raw_events: list) -> list:
         ctx = ctxs.setdefault(r["job_id"], {})
         base = {"id": str(r["seq"]), "seq": r["seq"], "hash": r["hash"], "job_id": r["job_id"], "source_id": j["source_id"] if j else None, "source_sha256": j["sha256"] if j else None,
                 "ts": r["ts"], "pipeline_stage": r["stage"], "message": r.get("message") or "", "elapsed_ms": r.get("elapsed_ms"), "error": r.get("error"),
-                "stage_id": None, "state": None, "records": None, "resolution": None, "evidence": None, "review_state": None, "destination": None, "validation": None, "counts": r.get("counts")}
+                "stage_id": None, "state": None, "records": None, "resolution": None, "evidence": None, "review_state": None, "destination": None, "validation": None, "llm": None, "counts": r.get("counts")}
 
         def emit(n, **kw):
             out.append({**base, "id": base["id"] if n == 0 else f"{base['id']}.{n}", **kw})
@@ -236,6 +239,15 @@ def structure(store: StudioStore, raw_events: list) -> list:
                     emit(0, type="STAGE_COMPLETED", stage_id=sid, state=COMPLETED, records=rec, **extra)
             elif kind == "FAILED":
                 emit(0, type="STAGE_FAILED", stage_id=sid, state=FAILED)
+        elif stage == "LLM":                                         # a recorded model invocation (nothing in the pipeline writes these unless a model really ran)
+            ctx["llm_seen"] = True
+            llm = {k: counts.get(k) for k in ("provider", "model", "calls", "latency_ms", "input_tokens", "output_tokens")}
+            if kind == "STARTED":
+                emit(0, type="STAGE_STARTED", stage_id="LLM", state=RUNNING, llm=llm)
+            elif kind == "COMPLETED":
+                emit(0, type="STAGE_COMPLETED", stage_id="LLM", state=COMPLETED, llm=llm)
+            elif kind == "FAILED":
+                emit(0, type="STAGE_FAILED", stage_id="LLM", state=FAILED, llm=llm)
         elif stage == "JOB":
             if kind == "STARTED":
                 emit(0, type="JOB_STARTED")
@@ -261,6 +273,9 @@ def structure(store: StudioStore, raw_events: list) -> list:
                             rec = {"unit": "rows", "processed": total, "accepted": max(0, total - len(rows_in_error)), "rejected": min(total, len(rows_in_error))}
                         emit(n, type="VALIDATION_RESULT", stage_id=sid, state=FAILED_CHECKS if d["errors"] else WARNINGS, validation=d, records=rec)
                 if final == "PENDING_REVIEW":
+                    if not ctx.get("llm_seen"):
+                        n += 1
+                        emit(n, type="STAGE_SKIPPED", stage_id="LLM", state=SKIPPED, message=LLM_NOT_INVOKED)
                     n += 1
                     if j["blocking"]:
                         emit(n, type="REVIEW_BLOCKED", stage_id="REVIEW", state=BLOCKED, review_state=BLOCKED, message=f"{j['findings_summary']['errors']} blocking finding(s): this proposal cannot be approved")
@@ -269,13 +284,15 @@ def structure(store: StudioStore, raw_events: list) -> list:
                     else:
                         emit(n, type="REVIEW_AWAITING", stage_id="REVIEW", state=AWAITING, review_state=AWAITING, message="waiting for a named reviewer")
                 elif final == "PROFILED_ONLY":
-                    for sid in ("VALIDATE", "RESOLVE", "EVIDENCE", "REVIEW", "PROMOTE"):
+                    for sid in ("VALIDATE", "RESOLVE", "LLM", "EVIDENCE", "REVIEW", "PROMOTE"):
                         n += 1
                         emit(n, type="STAGE_SKIPPED", stage_id=sid, state=SKIPPED, message="profile-only target: profiled, never promoted")
                 else:
                     failed = ctx.get("failed_stage")
                     start = STAGE_IDS.index(failed) + 1 if failed in STAGE_IDS else 0
                     for sid in STAGE_IDS[start:]:
+                        if sid == "LLM" and ctx.get("llm_seen"):
+                            continue
                         n += 1
                         emit(n, type="STAGE_SKIPPED", stage_id=sid, state=SKIPPED, message=f"not reached: {final.lower().replace('_', ' ')}")
         elif stage == "SUBMIT":
@@ -447,7 +464,7 @@ def project(store: StudioStore, job_id: str) -> dict | None:
     findings = store.findings(job_id)
     decisions = store.decisions(job_id)
 
-    st = {sid: {"id": sid, "label": label, "state": QUEUED, "started_at": None, "finished_at": None, "duration_ms": None, "records": None, "events": [], "findings": [], "resolution": None, "evidence": None, "destination": None, "message": None}
+    st = {sid: {"id": sid, "label": label, "state": QUEUED, "started_at": None, "finished_at": None, "duration_ms": None, "records": None, "events": [], "findings": [], "resolution": None, "evidence": None, "destination": None, "llm": None, "message": None}
           for sid, label in STAGES}
     for e in events:
         sid = e["stage_id"]
@@ -464,7 +481,7 @@ def project(store: StudioStore, job_id: str) -> dict | None:
             s["duration_ms"] = (s["duration_ms"] or 0) + e["elapsed_ms"]
         if e["type"] == "STEP_COMPLETED" and e["elapsed_ms"] is not None:
             s["duration_ms"] = (s["duration_ms"] or 0) + e["elapsed_ms"]
-        for k in ("records", "resolution", "evidence", "destination"):
+        for k in ("records", "resolution", "evidence", "destination", "llm"):
             if e.get(k):
                 s[k] = e[k]
         if e["message"] and e["type"] in ("STAGE_SKIPPED", "REVIEW_BLOCKED", "REVIEW_AWAITING"):
