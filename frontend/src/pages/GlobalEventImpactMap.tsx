@@ -2,9 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api, apiErrorMessage } from "../api/client";
 import { DataBadge } from "../components/Badge";
-import { ImpactMapCanvas } from "../components/ImpactMapCanvas";
+import { GeoStage, type Mode } from "../components/GeoStage";
 import {
-  RELATIONSHIP_LABEL, buildScene, formatDate, pathChips, phaseOf, safeHttpsUrl,
+  RELATIONSHIP_LABEL, buildScene, categoryStyle, formatDate, pathChips, phaseOf, safeHttpsUrl,
   type ImpactEvent, type ImpactResponse,
 } from "../impactmap/model";
 
@@ -24,6 +24,16 @@ export function GlobalEventImpactMap() {
   const [entityId, setEntityId] = useState<string | null>(null);
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [hoverEventId, setHoverEventId] = useState<string | null>(null);
+  const [animate, setAnimate] = useState(true);
+  const mode: Mode = params.get("view") === "flat" ? "flat" : "globe";
+  function setMode(m: Mode) {
+    setParams((prev) => { const next = new URLSearchParams(prev); if (m === "flat") next.set("view", "flat"); else next.delete("view"); return next; }, { replace: true });
+  }
+  useEffect(() => {                                     // the workspace is dark and full-bleed; the sidebar and navigation stay as they are
+    const el = document.querySelector(".main-content");
+    el?.classList.add("impact-dark");
+    return () => el?.classList.remove("impact-dark");
+  }, []);
   const latest = useRef(0);
   const selectedEventId = params.get("event");
 
@@ -79,24 +89,31 @@ export function GlobalEventImpactMap() {
   const selected: ImpactEvent | undefined = data?.events.find((e) => e.id === selectedEventId);
 
   return (
-    <div className="stack impact-page">
-      <div className="page-header">
-        <h1>Global Event Impact Map</h1>
-        <div className="subtitle">Verified events about a company, placed where they happened, with the documented relationships that connect the companies they name. Pilot: NVIDIA. <b>Impact size is not estimated.</b></div>
-      </div>
-
-      <form className="impact-toolbar" onSubmit={submit} aria-label="Search a company">
-        <input className="input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Company name or ticker, e.g. NVIDIA" aria-label="Company" data-testid="impact-query" />
-        <select value={days} onChange={(e) => { const d = Number(e.target.value); setDays(d); run(query, d, entityId ?? undefined); }} aria-label="Recency window" data-testid="impact-window">
-          {WINDOWS.map((w) => <option key={w} value={w}>last {w} days</option>)}
-        </select>
-        <button className="btn" type="submit" disabled={status === "loading" || !query.trim()}>{status === "loading" ? "Searching…" : "Search"}</button>
+    <div className="iw">
+      <header className="iw-toolbar">
+        <div className="iw-title">
+          <h1>Global Event Impact Map</h1>
+          <span>Verified events and documented relationships · impact is not estimated</span>
+        </div>
+        <form className="iw-search" onSubmit={submit} aria-label="Search a company">
+          <input className="input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Company or ticker, e.g. NVIDIA" aria-label="Company" data-testid="impact-query" />
+          <select value={days} onChange={(e) => { const d = Number(e.target.value); setDays(d); run(query, d, entityId ?? undefined); }} aria-label="Recency window" data-testid="impact-window">
+            {WINDOWS.map((w) => <option key={w} value={w}>last {w} days</option>)}
+          </select>
+          <button className="btn" type="submit" disabled={status === "loading" || !query.trim()}>{status === "loading" ? "Searching…" : "Search"}</button>
+        </form>
+        <div className="iw-stats" data-testid="impact-status" data-phase={phase} aria-label="Search summary">
+          <span><em>Entity</em><b>{data ? `${data.entity.name.replace(/ Corporation$/, "")}${data.entity.ticker ? ` · ${data.entity.ticker}` : ""}` : "—"}</b></span>
+          <span><em>Events</em><b>{data ? `${data.events.length} of ≤${data.query.limit}` : "—"}</b></span>
+          <span><em>Window</em><b>{data ? `${data.query.recency_days} d to ${formatDate(data.query.as_of)}` : "—"}</b></span>
+          <span title="Events are read from a reviewed register; this page never searches the live web"><em>Source</em><b>{data ? `Curated register · built ${formatDate(data.register.built_at)}` : "—"}</b></span>
+        </div>
         {matches.length > 1 && (
           <div className="pill-list" style={{ flexBasis: "100%" }}>
             {matches.map((m) => <span key={m.entity_id} className="pill" role="button" tabIndex={0} onClick={() => run(query, days, m.entity_id)}>{m.name}{m.event_coverage ? "" : " (no events)"}</span>)}
           </div>
         )}
-      </form>
+      </header>
 
       {error && (
         <div className="warning-box" role="alert" data-testid="impact-error">
@@ -105,58 +122,17 @@ export function GlobalEventImpactMap() {
       )}
       {message && <div className="warning-box" data-testid="impact-message">{message}</div>}
 
-      <div className="impact-layout">
-        <div className="stack impact-main">
-          <div className="card impact-map-card">
-            <div className="impact-map-status" data-testid="impact-status" data-phase={phase}>
-              <span>ENTITY <b>{data ? `${data.entity.name}${data.entity.ticker ? ` (${data.entity.ticker})` : ""}` : "—"}</b></span>
-              <span>EVENTS <b>{data ? `${data.events.length} of ≤${data.query.limit}` : "—"}</b></span>
-              <span>WINDOW <b>{data ? `${data.query.recency_days} days to ${formatDate(data.query.as_of)}` : "—"}</b></span>
-              <span className={phase === "loading" ? "busy" : ""}>STATE <b>{phase === "loading" ? "requesting…" : phase}</b></span>
-            </div>
-            <ImpactMapCanvas scene={scene} phase={phase} selectedEventId={selectedEventId} selectedEntityId={selectedEntity} hoverEventId={hoverEventId}
-              onSelectEvent={selectEvent} onSelectEntity={(id) => { setSelectedEntity(id); }} onHoverEvent={setHoverEventId} />
-            <div className="impact-legend" aria-label="Legend">
-              <span><i className="lg-event" />event location (numbered; all markers the same size, order is by date)</span>
-              <span><i className="lg-hq" />company headquarters country (approximate, not a facility)</span>
-              <span><i className="lg-doc" />documented relationship, arrow = stored direction</span>
-              <span><i className="lg-mention" />event names the company</span>
-              <span><i className="lg-region" />country named in the evidence</span>
-            </div>
-          </div>
+      <div className="iw-body">
+        <section className="iw-map" aria-label="Map">
+          <GeoStage scene={scene} phase={phase} selectedEventId={selectedEventId} selectedEntityId={selectedEntity} hoverEventId={hoverEventId}
+            mode={mode} animate={animate} onMode={setMode} onAnimate={setAnimate}
+            onSelectEvent={selectEvent} onSelectEntity={(id) => { setSelectedEntity(id); }} onHoverEvent={setHoverEventId} />
+        </section>
 
-          <div className="pill-list" data-testid="semantics-key" aria-label="What each kind of information means">
-            <span className="pill" title="Events are read from a reviewed register; this page never searches the live web">Curated register, not live news search</span>
-            <span className="pill" title="Quoted from the source and checked against the retrieved page">Confirmed: quoted in a source</span>
-            <span className="pill" title="Stored relationship in the platform's dataset, with its own evidence status">Documented: stored relationship</span>
-            <span className="pill" title="Nothing documented connects these; no path is drawn">Unavailable: no documented path</span>
-          </div>
-
-          {data && (
-            <details className="card impact-about" data-testid="impact-about">
-              <summary>About this view, coverage and records not shown</summary>
-              <div aria-live="polite" data-testid="impact-explanation">
-                <p>{data.explanation}</p>
-                <p style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
-                  Events come from the approved-source register built {formatDate(data.register.built_at)} ({data.register.events_total} verified records; coverage: {data.register.coverage}). The page does not search the live web.
-                </p>
-              </div>
-              {scene.unmapped.length > 0 && <p style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Not plotted: {scene.unmapped.map((u) => `${u.label} (${u.reason})`).join("; ")}.</p>}
-              {data.not_returned.length > 0 && (
-                <div data-testid="not-returned">
-                  <div className="section-title">Other records in the register that are not shown ({data.not_returned.length})</div>
-                  <table className="table"><tbody>{data.not_returned.map((r) => <tr key={r.id}><td>{formatDate(r.published_date)}</td><td>{r.title}</td><td style={{ color: "var(--text-muted)" }}>{r.reason}</td></tr>)}</tbody></table>
-                </div>
-              )}
-              <ul style={{ paddingLeft: 18, margin: "8px 0 0", fontSize: 12, color: "var(--text-muted)" }}>{data.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
-            </details>
-          )}
-        </div>
-
-        <aside className="impact-side" aria-label="Events and evidence">
-          <div className="card impact-top5" data-testid="top5">
-            <div className="hstack" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
-              <div className="section-title" style={{ marginBottom: 0 }}>Top 5 events</div>
+        <aside className="iw-panel" aria-label="Events and evidence">
+          <div className="iw-top5" data-testid="top5">
+            <div className="iw-top5-head">
+              <span className="iw-h">Top 5 events</span>
               <span className="impact-note">newest first · date order, not importance</span>
             </div>
             {phase === "loading" && <div className="impact-skeleton" aria-hidden="true">{[0, 1, 2].map((i) => <div key={i} />)}</div>}
@@ -164,10 +140,10 @@ export function GlobalEventImpactMap() {
             <div className="impact-event-list" role="list">
               {phase !== "loading" && data?.events.map((e, i) => (
                 <button key={e.id} role="listitem" type="button" data-testid="event-item" data-event-id={e.id} aria-pressed={e.id === selectedEventId}
-                  className={`impact-event-item${e.id === selectedEventId ? " selected" : ""}`} onClick={() => selectEvent(e.id === selectedEventId ? null : e.id)}
+                  className={`impact-event-item${e.id === selectedEventId ? " selected" : ""}`} style={{ ["--cat" as string]: categoryStyle(e.category).color }} onClick={() => selectEvent(e.id === selectedEventId ? null : e.id)}
                   onMouseEnter={() => setHoverEventId(e.id)} onMouseLeave={() => setHoverEventId(null)} onFocus={() => setHoverEventId(e.id)} onBlur={() => setHoverEventId(null)}>
                   <span className="rank">{i + 1}</span>
-                  <span><b>{e.title}</b><span className="meta">{formatDate(e.published_date)} · {e.location.mapped ? e.location.label : "location not mapped"} · {e.sources[0]?.publisher}</span></span>
+                  <span><b>{e.title}</b><span className="meta">{formatDate(e.published_date)} · {e.location.mapped ? e.location.label : "location not mapped"} · {categoryStyle(e.category).label}</span></span>
                 </button>
               ))}
             </div>
@@ -175,13 +151,42 @@ export function GlobalEventImpactMap() {
 
           {selectedEntity && data && <EntityBlock data={data} entityId={selectedEntity} onOpen={() => nav(`/entity?id=${selectedEntity}`)} onClose={() => setSelectedEntity(null)} />}
           {selected ? <EventPanel event={selected} names={names} onClose={() => selectEvent(null)} /> : (
-            <div className="card" data-testid="no-selection">
-              <div className="section-title">Selected event</div>
-              <p style={{ margin: 0, fontSize: 12.5 }}>{data && data.events.length ? "Choose an event on the map or in the list to see its source evidence, the documented path to the company and what this analysis cannot say." : "Search a company to see its recent verified events."}</p>
+            <div className="iw-card" data-testid="no-selection">
+              <div className="iw-h">Selected event</div>
+              <p style={{ margin: "6px 0 0", fontSize: 12.5 }}>{data && data.events.length ? "Choose an event on the map or in the list to see its source evidence, the documented path to the company and what this analysis cannot say." : "Search a company to see its recent verified events."}</p>
             </div>
           )}
         </aside>
       </div>
+
+      <footer className="iw-foot">
+        <div className="pill-list" data-testid="semantics-key" aria-label="What each kind of information means">
+          <span className="pill" title="Events are read from a reviewed register; this page never searches the live web">Curated register, not live news search</span>
+          <span className="pill" title="Quoted from the source and checked against the retrieved page">Confirmed: quoted in a source</span>
+          <span className="pill" title="Stored relationship in the platform's dataset, with its own evidence status">Documented: stored relationship</span>
+          <span className="pill" title="Nothing documented connects these; no path is drawn">Unavailable: no documented path</span>
+          <span className="pill" title="No defensible impact metric exists yet">Impact: not estimated</span>
+        </div>
+        {data && (
+          <details className="iw-about" data-testid="impact-about">
+            <summary>About this view, coverage and records not shown</summary>
+            <div aria-live="polite" data-testid="impact-explanation">
+              <p>{data.explanation}</p>
+              <p style={{ fontSize: 11.5, color: "var(--text-muted)" }}>
+                Events come from the approved-source register built {formatDate(data.register.built_at)} ({data.register.events_total} verified records; coverage: {data.register.coverage}). The page does not search the live web.
+              </p>
+            </div>
+            {scene.unmapped.length > 0 && <p style={{ fontSize: 11.5, color: "var(--text-muted)" }}>Not plotted: {scene.unmapped.map((u) => `${u.label} (${u.reason})`).join("; ")}.</p>}
+            {data.not_returned.length > 0 && (
+              <div data-testid="not-returned">
+                <div className="iw-h">Other records in the register that are not shown ({data.not_returned.length})</div>
+                <table className="table"><tbody>{data.not_returned.map((r) => <tr key={r.id}><td>{formatDate(r.published_date)}</td><td>{r.title}</td><td style={{ color: "var(--text-muted)" }}>{r.reason}</td></tr>)}</tbody></table>
+              </div>
+            )}
+            <ul style={{ paddingLeft: 18, margin: "8px 0 0", fontSize: 12, color: "var(--text-muted)" }}>{data.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
+          </details>
+        )}
+      </footer>
     </div>
   );
 }
