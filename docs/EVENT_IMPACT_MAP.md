@@ -72,18 +72,32 @@ Approved sources are configured in `data/events/approved_sources.json`. Press, a
 
 ## The page (frontend)
 
-`/event-impact-map` ("Event Impact Map" in the sidebar). Code: `frontend/src/pages/GlobalEventImpactMap.tsx`,
-`components/ImpactMapCanvas.tsx`, and the pure, unit-tested logic in `src/impactmap/model.ts`
-(projection, arcs, overlap spreading, cable styling, path chips).
+`/event-impact-map` ("Event Impact Map" in the sidebar). Code: `pages/GlobalEventImpactMap.tsx`, `components/GeoStage.tsx` (the map),
+`impactmap/globe.ts` (pure globe geometry) and `impactmap/model.ts` (pure scene, cable and category logic); all tested without a browser.
 
-- Map: Equal Earth projection over bundled Natural Earth geometry (offline; works in the static build).
-- Cables come only from the API's graph edges. A travelling pulse appears only on a documented relationship and runs in its stored
-  direction. Nothing is drawn while loading, empty or in error; with `prefers-reduced-motion` there are no pulses.
-- Markers are real buttons (keyboard and screen-reader accessible); Escape deselects; the selected event is kept in the URL (`?event=`).
-- Entity markers sit at the HQ country (approximate); a marker is never an epicentre.
-- Impact is shown as "Not estimated", verified exposure as "Not available", separately from the relationship evidence.
+**Rendering architecture.** A 2D canvas with real Natural Earth coastlines bundled with the app (`world-atlas` 110m, then 50m loaded
+lazily; drawn with `d3-geo`), HTML buttons for markers (so they are keyboard- and screen-reader accessible), no tiles, no external map
+service and no WebGL. Evaluated and rejected for now: MapLibre GL / deck.gl (WebGL; would need a vector-tile source or a bundled style,
+roughly 1 MB or more of extra JavaScript, and a software-rendering fallback), because nothing here needs more than ~30 arcs and ~20
+markers and a 2D canvas behaves identically in the FastAPI deployment, on GitHub Pages and in headless test browsers.
 
-Verification: `npm test` (node:test, logic), `node e2e/browser-e2e.mjs dev|static` (real Edge, both deployment modes).
+- Two projections: an interactive **globe** (orthographic, default; drag to rotate, +/- to zoom, "Frame" to re-centre) and a **flat**
+  Equal Earth map that shows every marker at once (`?view=flat`).
+- Selecting an event glides the camera to frame that event and the companies connected to it. Markers that would sit behind the globe are
+  hidden and counted ("n markers are on the far side"); the Top 5 list always reaches every event.
+- Cables come only from the API graph and follow the real great circle between the two real positions (height depends on distance only).
+  A particle travels only along a documented relationship, in its stored direction, and an arrowhead marks that direction.
+  Unselected paths stay faint; the selected event's paths are bright.
+- Event markers are all one size. Colour is the event's explicit register category and nothing else. Glow, pulse and line thickness
+  encode nothing. Company nodes are shown at their headquarters country (approximate, not a facility); the searched company is the hub.
+- Overlapping markers are fanned apart in screen space with a hairline to the true position; the selected event's callout picks the
+  side that overlaps the fewest other markers.
+- Motion: the render loop runs only while the camera, a cable fade or a particle is moving, stops after 25 s without interaction,
+  pauses when the tab is hidden or the map is off screen, and never runs with `prefers-reduced-motion`. An "Animation" switch turns
+  particles and camera glides off. If a 2D canvas is unavailable the list and evidence panel still work.
+
+Verification: `npm test` (node:test, logic), `node e2e/browser-e2e.mjs dev|static` (real Edge, both deployment modes),
+`node e2e/visual-shots.mjs <tag>` (screenshots at four viewport sizes).
 
 ### Known gaps
 - The "global impact map design concept" referred to in the brief was not supplied to this work, so the visual design is original

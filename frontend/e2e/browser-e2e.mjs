@@ -112,7 +112,8 @@ try {
   check("impact map: the camera frames the selection (never below the whole world)", zoomNewest >= 1);
   check("impact map: states plainly that events come from a curated register, not live news search", /Curated register, not live news search/.test(await page.getByTestId("semantics-key").innerText()));
   await shot(page, "02b_impact_map");
-  const second = page.getByTestId("event-marker").nth(1);
+  const second = page.locator('[data-testid="event-marker"][aria-pressed="false"]:visible').first();     // markers on the far side of the globe are not clickable by design
+  check("impact map: at least one other event marker is visible on the framed globe", await second.count() === 1);
   const secondId = await second.getAttribute("data-event-id");
   await second.click();
   const panel = page.getByTestId("event-panel");
@@ -127,13 +128,29 @@ try {
   check("impact map: every drawn path is typed (direct mention / documented direct / indirect), none invented", typed.length >= 1 && typed.every((t) => /^(DIRECT_MENTION|DOCUMENTED_DIRECT|DOCUMENTED_INDIRECT)$/.test(t)), typed.join(","));
   await shot(page, "02c_impact_map_selected");
   await page.keyboard.press("Escape");
-  await page.getByTestId("event-marker").first().focus();
+  await page.locator('[data-testid="event-marker"][aria-pressed="true"]').first().focus();
   await page.keyboard.press("Escape");
   await page.waitForFunction(() => !document.querySelector('[data-testid="event-panel"]'), null, { timeout: 5000 }).catch(() => {});
   check("impact map: Escape on a focused marker deselects", !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
   await page.getByTestId("event-item").nth(1).focus(); await page.keyboard.press("Enter");
   check("impact map: events are selectable from the keyboard", await page.getByTestId("event-panel").waitFor({ timeout: 5000 }).then(() => true).catch(() => false));
   
+  const proj = () => map.getAttribute("data-projection");
+  check("impact map: opens on the globe", (await proj()) === "globe");
+  await page.getByRole("button", { name: "Flat", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.projection === "flat");
+  check("impact map: the flat projection shows every event marker and keeps the selection", (await page.locator('[data-testid="event-marker"]:visible').count()) === markers && /[?&]view=flat/.test(page.url()));
+  await shot(page, "02d_impact_map_flat");
+  await page.getByRole("button", { name: "Globe", exact: true }).click();
+  const anim = page.getByRole("button", { name: /^Animation (on|off)$/ });
+  await anim.click();
+  check("impact map: animation can be switched off and the map stops animating", /off/.test(await anim.innerText()) && (await map.getAttribute("data-animated")) === "false");
+  await anim.click();
+  const before = await map.getAttribute("data-zoom");
+  await page.getByRole("button", { name: "Zoom in" }).click();
+  await page.waitForTimeout(900);
+  check("impact map: zoom control changes the camera", Number(await map.getAttribute("data-zoom")) > Number(before));
+  await page.getByRole("button", { name: "Frame", exact: true }).click();
   await page.getByTestId("impact-window").selectOption("30");
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
   const n30 = await page.getByTestId("event-marker").count();
