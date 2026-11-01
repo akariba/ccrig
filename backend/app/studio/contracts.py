@@ -11,7 +11,7 @@ from typing import Optional
 @dataclass(frozen=True)
 class Field:
     name: str
-    type: str = "str"                    # str | float | int | bool | date | enum | object | url
+    type: str = "str"                    # str | float | int | bool | date | enum | object | url | list
     required: bool = False
     enum: tuple = ()
     min: Optional[float] = None
@@ -19,6 +19,8 @@ class Field:
     pattern: Optional[str] = None
     ref: Optional[str] = None            # entity | issuer | portfolio_counterparty : must resolve to a canonical id
     fields: tuple = ()                   # sub-fields for type == "object"
+    item: str = "str"                    # item type for type == "list" (str | url)
+    min_items: int = 0
     nullable: bool = True
 
 
@@ -44,6 +46,8 @@ NODE_TYPES = ("Company/Issuer", "Counterparty", "Country", "Sector", "Country/Re
 FACT_RELATIONS = ("SUPPLIES", "LICENSES_TO", "PARENT_OF", "SUBSIDIARY_OF", "BELONGS_TO_SECTOR", "OPERATES_IN")
 DOCUMENTED = ("WELL_DOCUMENTED_PUBLIC", "REPORTED_NEWS")
 EXPOSURE_RELATIONS = ("HOLDS_EQUITY", "HOLDS_BONDS", "LENDS_TO", "HOLDS_VIA_FUND")
+EVENT_CATEGORIES = ("CORPORATE_ANNOUNCEMENT", "EARNINGS_RELEASE", "PARTNERSHIP_ANNOUNCEMENT", "PRODUCT_ANNOUNCEMENT", "REGULATORY_ACTION")
+SOURCE_TIERS = ("PRIMARY_ISSUER", "PRIMARY_REGULATOR", "PRIMARY_RELATED_PARTY")
 LIMIT_TYPES = ("PFE_LIMIT", "SETTLEMENT_LIMIT", "STRESS_LIMIT")
 CCR_TYPES = ("Hedge Fund", "Sovereign", "Bank", "Bank Treasury", "Asset Manager", "Family Office", "SPV", "Sovereign Wealth Fund")
 
@@ -90,6 +94,24 @@ CONTRACTS: dict[str, Contract] = {c.name: c for c in (
         (Field("date", "date", required=True, nullable=False), Field("close", "float", required=True, min=0.0, nullable=False)),
         None, None, scoped=True, scope_ref="issuer", checks=("price_series",),
         notes="Scope is the entity id (its ticker file in data/raw_prices is the canonical copy).",
+    ),
+    Contract(
+        "discovered_events", "Events found by Event Discovery in approved sources: machine-verified against the retrieved text, awaiting or after human review",
+        ("id",),
+        (Field("id", required=True, pattern=r"^[a-z0-9][a-z0-9\-]{5,100}$"), Field("entity_id", required=True, ref="issuer"), Field("kind", "enum", required=True, enum=("REAL_EVENT",)),
+         Field("title", required=True), Field("category", "enum", required=True, enum=EVENT_CATEGORIES),
+         Field("published_date", "date", required=True, nullable=False), Field("event_date", "date", required=True, nullable=False), Field("event_date_basis", required=True),
+         Field("location", "object", required=True, fields=(Field("gazetteer_key"), Field("basis"), Field("basis_text"), Field("unmapped_reason"))),
+         Field("source_url", "url", required=True), Field("source_publisher", required=True), Field("source_tier", "enum", required=True, enum=SOURCE_TIERS),
+         Field("approved_source_id", required=True), Field("source_title"), Field("source_published_date", "date", required=True), Field("retrieved_at", required=True),
+         Field("source_sha256", required=True, pattern=r"^[0-9a-f]{64}$"), Field("text_method", "enum", required=True, enum=("html_text", "api_json")),
+         Field("evidence_quotes", "list", required=True, min_items=1),
+         Field("verification", "object", required=True, fields=(Field("status", "enum", enum=("VERIFIED_BY_RETRIEVAL",)), Field("method"), Field("checked_at"),
+                                                                Field("quotes_total", "int", min=0), Field("quotes_found", "int", min=0), Field("date_confirmed", "bool"),
+                                                                Field("date_basis"))),
+         Field("discovery", "object", required=True, fields=(Field("run_id"), Field("provider_id"), Field("category_method"), Field("also_reported_by", "list", item="url")))),
+        None, None, scoped=True, scope_ref="issuer", checks=("discovered_event_evidence",),
+        notes="Machine-verified evidence is not truth and not impact: it shows the source says it. Review status comes from the Studio decision on the job.",
     ),
     Contract(
         "profile_only", "Any CSV/JSON table: profile and validate structure, never promoted", (),

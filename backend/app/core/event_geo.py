@@ -30,7 +30,7 @@ def event_location(event: dict) -> dict:
     loc = event.get("location") or {}
     place = _place(loc.get("gazetteer_key", ""))
     if not place:
-        return {"mapped": False, "reason": f"place '{loc.get('gazetteer_key')}' is not in the gazetteer", "basis": loc.get("basis")}
+        return {"mapped": False, "reason": loc.get("unmapped_reason") or f"place '{loc.get('gazetteer_key')}' is not in the gazetteer", "basis": loc.get("basis")}
     return {"mapped": True, **place, "basis": loc["basis"], "basis_text": loc.get("basis_text")}
 
 

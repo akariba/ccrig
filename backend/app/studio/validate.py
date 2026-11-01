@@ -48,6 +48,8 @@ def _clip(v, n=80):
 def coerce(field: Field, value, *, from_text: bool):
     """Return (typed_value, error_code, message). A missing value is None with no error here (requiredness is checked by the caller)."""
     if value is None or (isinstance(value, str) and value.strip() == ""):
+        if field.type == "list" and field.min_items and value is None:
+            return None, None, None
         return None, None, None
     t = field.type
     if t in ("str", "enum", "url"):
@@ -89,6 +91,19 @@ def coerce(field: Field, value, *, from_text: bool):
         if s in ("false", "0"):
             return False, None, None
         return None, "WRONG_TYPE", f"'{_clip(value)}' is not true/false"
+    if t == "list":
+        if not isinstance(value, list):
+            return None, "WRONG_TYPE", "expected a list"
+        item = Field("item", field.item)
+        out = []
+        for i, v in enumerate(value):
+            typed, code, msg = coerce(item, v, from_text=from_text)
+            if code or typed is None:
+                return None, code or "MISSING_REQUIRED_VALUE", f"item {i + 1}: {msg or 'empty'}"
+            out.append(typed)
+        if len(out) < field.min_items:
+            return None, "TOO_FEW_ITEMS", f"at least {field.min_items} item(s) required"
+        return out, None, None
     if t == "date":
         s = str(value).strip()
         try:
@@ -161,7 +176,7 @@ def _key(contract: Contract, r: dict):
     return tuple(r.get(k) for k in contract.key)
 
 
-def consistency(contract: Contract, rows: list, findings: Findings, *, as_of: date) -> list:
+def consistency(contract: Contract, rows: list, findings: Findings, *, as_of: date, ctx: dict | None = None) -> list:
     """Duplicates and cross-record rules on rows whose references are already resolved. Returns the rows that may be proposed."""
     if not contract.key:
         return rows
@@ -182,29 +197,29 @@ def consistency(contract: Contract, rows: list, findings: Findings, *, as_of: da
             findings.add("CHECK", "ERROR", "DUPLICATE_CONFLICT", f"record {list(key)} appears {len(grp)} times with different values (rows {[g['_row'] for g in grp]}); none is proposed", row=grp[0]["_row"])
     kept.sort(key=lambda r: r["_row"])
     for name in contract.checks:
-        _CHECKS[name](contract, kept, findings, as_of)
+        _CHECKS[name](contract, kept, findings, as_of, ctx or {})
     return kept
 
 
-def _no_self_loop(c, rows, findings, as_of):
+def _no_self_loop(c, rows, findings, as_of, ctx=None):
     for r in rows:
         if r.get("source") and r["source"] == r.get("target"):
             findings.add("CHECK", "ERROR", "SELF_LOOP", f"'{r['source']}' cannot be related to itself", row=r["_row"])
 
 
-def _documented_needs_link(c, rows, findings, as_of):
+def _documented_needs_link(c, rows, findings, as_of, ctx=None):
     for r in rows:
         if r.get("evidence_status") in DOCUMENTED and not r.get("evidence_url"):
             findings.add("CHECK", "ERROR", "DOCUMENTED_WITHOUT_LINK", f"status {r['evidence_status']} needs an https evidence_url; use UNVERIFIED if there is none", row=r["_row"])
 
 
-def _synthetic_not_documented(c, rows, findings, as_of):
+def _synthetic_not_documented(c, rows, findings, as_of, ctx=None):
     for r in rows:
         if r.get("is_synthetic") is True and r.get("evidence_status") in DOCUMENTED:
             findings.add("CHECK", "ERROR", "SYNTHETIC_CLAIMS_DOCUMENTED", "a synthetic relationship cannot be labelled documented or reported", row=r["_row"])
 
 
-def _holdings_total(c, rows, findings, as_of):
+def _holdings_total(c, rows, findings, as_of, ctx=None):
     totals: Counter = Counter()
     for r in rows:
         if r.get("counterparty") and r.get("exposure_pct") is not None:
@@ -214,7 +229,7 @@ def _holdings_total(c, rows, findings, as_of):
             findings.add("CHECK", "ERROR", "HOLDINGS_EXCEED_100", f"holdings of {cp} add up to {total:.4f}, more than 100%")
 
 
-def _limit_consistency(c, rows, findings, as_of):
+def _limit_consistency(c, rows, findings, as_of, ctx=None):
     for r in rows:
         lim = r.get("limit")
         if not lim:
@@ -225,7 +240,7 @@ def _limit_consistency(c, rows, findings, as_of):
             findings.add("CHECK", "ERROR", "LIMIT_TYPE_MISSING", "a limit value without a limit type cannot be used (a bare number is never compared with an exposure)", row=r["_row"])
 
 
-def _price_series(c, rows, findings, as_of):
+def _price_series(c, rows, findings, as_of, ctx=None):
     pts = [(r["date"], r["close"], r["_row"]) for r in rows if r.get("date") and r.get("close") is not None]
     if any(a[0] > b[0] for a, b in zip(pts, pts[1:])):
         findings.add("CHECK", "WARN", "NOT_SORTED", "dates are not in ascending order in the source (they are sorted for staging)")
@@ -246,5 +261,28 @@ def _price_series(c, rows, findings, as_of):
         prev = (dd, close)
 
 
-_CHECKS = {"no_self_loop": _no_self_loop, "documented_needs_link": _documented_needs_link, "synthetic_not_documented": _synthetic_not_documented,
+SCENARIO_WORDS = ("scenario", "hypothetical", "what if", "simulation", "stress test", "could face", "would face")
+
+
+def _discovered_event_evidence(c, rows, findings, as_of, ctx):
+    """Re-verify every discovered event against the STORED source text (not against what the extractor said)."""
+    from ..discovery import verify as dverify
+
+    store = ctx.get("store")
+    for r in rows:
+        if store is None:
+            findings.add("CHECK", "ERROR", "NO_EVIDENCE_STORE", "the evidence store is not available, so quotes cannot be re-verified", row=r["_row"])
+            continue
+        for problem in dverify.reverify_row(store, r):
+            findings.add("CHECK", "ERROR", problem["code"], problem["message"], row=r["_row"])
+        if r["event_date"] and r["published_date"] and r["event_date"] > r["published_date"]:
+            findings.add("CHECK", "ERROR", "EVENT_AFTER_PUBLICATION", "event_date is after published_date", row=r["_row"])
+        if r["published_date"] and r["published_date"] > as_of.isoformat():
+            findings.add("CHECK", "ERROR", "PUBLISHED_IN_THE_FUTURE", f"published {r['published_date']} is after {as_of.isoformat()}", row=r["_row"])
+        lead = f"{r['title']} {' '.join(r['evidence_quotes'])}".lower()
+        if any(w in lead for w in SCENARIO_WORDS):
+            findings.add("CHECK", "ERROR", "SCENARIO_NOT_EVENT", "the title or evidence reads as a scenario or hypothetical, not a real event", row=r["_row"])
+
+
+_CHECKS = {"discovered_event_evidence": _discovered_event_evidence, "no_self_loop": _no_self_loop, "documented_needs_link": _documented_needs_link, "synthetic_not_documented": _synthetic_not_documented,
            "holdings_total": _holdings_total, "limit_consistency": _limit_consistency, "price_series": _price_series}

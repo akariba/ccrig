@@ -137,7 +137,7 @@ def ingest(store: StudioStore, data: bytes, *, source_id: str, filename: str, ta
         # ---------------- CHECK (duplicates and cross-record consistency)
         with _Timer(store, job_id, "CHECK") as st:
             clean = [r for r in typed if not row_has_error(findings.items, r["_row"])]
-            proposed = consistency(contract, clean, findings, as_of=as_of)
+            proposed = consistency(contract, clean, findings, as_of=as_of, ctx={"store": store})
             excluded = [{"row": r["_row"], "reasons": sorted({f["code"] for f in findings.items if f.get("row") == r["_row"] and f["severity"] == "ERROR"})}
                         for r in typed if r not in proposed]
             if not proposed and not findings.summary()["blocking"]:
