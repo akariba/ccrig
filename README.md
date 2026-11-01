@@ -68,7 +68,22 @@ cd backend
 python3 -m pytest -q
 ```
 
-12 tests covering the 7 mandate-required invariants (candidate generation precedes scoring, signed correlation never abs()'d, directionality preserved, Layer A/B/C never summed, two Event Studio ranking modes never mixed in units, typed-path determinism, evidence-quality labels never rendered as fake confidence %) plus pipeline sanity checks.
+The suite (run it for the current count) covers the 7 mandate-required invariants (candidate generation precedes scoring, signed correlation never abs()'d, directionality preserved, Layer A/B/C never summed, two Event Studio ranking modes never mixed in units, typed-path determinism, evidence-quality labels never rendered as fake confidence %) plus pipeline sanity checks.
+
+### 5. Validation harness and analytical baseline
+
+`backend/validation/` is a **read-only** harness that is not imported by the app and not shipped in the static build.
+
+```bash
+cd backend
+python3 -m validation.run                   # print leave-edge-out retrieval, baselines and inversion report
+python3 -m validation.run --check           # fail if any analytical output drifts from the recorded baseline
+python3 -m validation.run --write-baseline  # re-record, ONLY when a change is intended to alter analytics
+```
+
+* `baseline/analytics_snapshot.json` pins the output of ~27 representative endpoints (Entity 360, Model Lab, Event Studio, Backtest, priority queue, Distance Map, ...). `tests/test_validation_baseline.py` fails if a change that is not meant to alter analytics moves a score, rank or priority.
+* `baseline/validation_baseline.json` records how the relationship ranking performs against documented supply/licence edges (with the edge-derived components masked) versus simple single-feature baselines, plus an inversion count and the documented hard cases. These numbers are descriptive and carry the caveats printed by the report (21 queries; curated inputs).
+* Three pre-existing process-level non-determinisms in the app (hash-seed dependent ordering in Counterparty 360 and Event Studio) are neutralised in the snapshot and documented in `validation/snapshot.py`; they are not fixed by the harness.
 
 ## Project layout
 

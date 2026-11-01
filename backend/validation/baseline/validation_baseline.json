@@ -1,0 +1,261 @@
+{
+ "availability": {
+  "issuer_pairs": 903,
+  "pairs_with_component": {
+   "geography": 903,
+   "market_negative": 91,
+   "market_positive": 91,
+   "news": 903,
+   "ownership": 0,
+   "sector": 903,
+   "semantic": 903,
+   "supply_chain": 34
+  }
+ },
+ "caveats": [
+  "Small sample (21 queries, 68 directed positives): read the bootstrap intervals, not the point estimates.",
+  "The news feature is built from keyword weights curated by the same author as the documented edges; its strong baseline performance may reflect curation leakage rather than independent signal.",
+  "Ties are broken by seeded random shuffles averaged over several trials (deterministic, not exact ranks).",
+  "Reference variants (zero-fill, shrinkage) are analysis aids only; the application does not use them."
+ ],
+ "default_weights": {
+  "geography": 0.08,
+  "market_negative": 0.05,
+  "market_positive": 0.1,
+  "news": 0.15,
+  "ownership": 0.1,
+  "sector": 0.15,
+  "semantic": 0.12,
+  "supply_chain": 0.25
+ },
+ "ground_truth": {
+  "directed_positives": 68,
+  "queries_with_documented_edge": 21
+ },
+ "hard_cases": {
+  "expectation": "documented customer (NVDA) ranks above a peer with no documented edge (SSNLF)",
+  "expectation_met": false,
+  "tsm_rank_of_nvda_documented_customer_crit_0.95": 3,
+  "tsm_rank_of_ssnlf_no_documented_supply_edge": 1,
+  "tsm_ranking_current_top8": [
+   "SSNLF",
+   "ASML",
+   "NVDA",
+   "AMD",
+   "SKHY",
+   "MU",
+   "AMAT",
+   "AVGO"
+  ]
+ },
+ "inversions": {
+  "current_composite": {
+   "all_edges": {
+    "directed_pairs": 68,
+    "max_outrankers": 16,
+    "mean_outrankers": 5.529,
+    "share_with_at_least_one_outranker": 0.9853
+   },
+   "criticality_ge_0.8": {
+    "directed_pairs": 8,
+    "max_outrankers": 6,
+    "mean_outrankers": 2.5,
+    "share_with_at_least_one_outranker": 0.875
+   }
+  },
+  "reference_shrinkage": {
+   "all_edges": {
+    "directed_pairs": 68,
+    "max_outrankers": 31,
+    "mean_outrankers": 6.544,
+    "share_with_at_least_one_outranker": 0.8676
+   },
+   "criticality_ge_0.8": {
+    "directed_pairs": 8,
+    "max_outrankers": 8,
+    "mean_outrankers": 1.5,
+    "share_with_at_least_one_outranker": 0.375
+   }
+  },
+  "reference_zero_fill": {
+   "all_edges": {
+    "directed_pairs": 68,
+    "max_outrankers": 13,
+    "mean_outrankers": 2.206,
+    "share_with_at_least_one_outranker": 0.5
+   },
+   "criticality_ge_0.8": {
+    "directed_pairs": 8,
+    "max_outrankers": 1,
+    "mean_outrankers": 0.125,
+    "share_with_at_least_one_outranker": 0.125
+   }
+  }
+ },
+ "leave_edge_out": {
+  "all_issuers": {
+   "baseline_news_only": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.9016,
+    "map": 0.4721,
+    "map_ci95": [
+     0.4116,
+     0.5304
+    ],
+    "n_queries": 21
+   },
+   "baseline_random": {
+    "hit_at_10": 0.546,
+    "hit_at_5": 0.3397,
+    "map": 0.1524,
+    "map_ci95": [
+     0.1319,
+     0.1772
+    ],
+    "n_queries": 21
+   },
+   "baseline_sector_only": {
+    "hit_at_10": 0.8143,
+    "hit_at_5": 0.6333,
+    "map": 0.3227,
+    "map_ci95": [
+     0.2393,
+     0.3936
+    ],
+    "n_queries": 21
+   },
+   "baseline_sector_plus_semantic": {
+    "hit_at_10": 0.8571,
+    "hit_at_5": 0.5238,
+    "map": 0.3128,
+    "map_ci95": [
+     0.2093,
+     0.4056
+    ],
+    "n_queries": 21
+   },
+   "baseline_semantic_only": {
+    "hit_at_10": 0.8095,
+    "hit_at_5": 0.5714,
+    "map": 0.2851,
+    "map_ci95": [
+     0.1836,
+     0.3852
+    ],
+    "n_queries": 21
+   },
+   "current_composite": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.5714,
+    "map": 0.3826,
+    "map_ci95": [
+     0.2778,
+     0.467
+    ],
+    "n_queries": 21
+   },
+   "reference_shrinkage": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.5238,
+    "map": 0.3897,
+    "map_ci95": [
+     0.2843,
+     0.4748
+    ],
+    "n_queries": 21
+   },
+   "reference_zero_fill": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.5714,
+    "map": 0.3845,
+    "map_ci95": [
+     0.2832,
+     0.4709
+    ],
+    "n_queries": 21
+   }
+  },
+  "priced_issuers_only": {
+   "baseline_news_only": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 1.0,
+    "map": 0.6337,
+    "map_ci95": [
+     0.5196,
+     0.7432
+    ],
+    "n_queries": 7
+   },
+   "baseline_random": {
+    "hit_at_10": 0.8952,
+    "hit_at_5": 0.6238,
+    "map": 0.3142,
+    "map_ci95": [
+     0.2552,
+     0.3842
+    ],
+    "n_queries": 7
+   },
+   "baseline_sector_only": {
+    "hit_at_10": 0.9381,
+    "hit_at_5": 0.8143,
+    "map": 0.4851,
+    "map_ci95": [
+     0.3183,
+     0.64
+    ],
+    "n_queries": 7
+   },
+   "baseline_sector_plus_semantic": {
+    "hit_at_10": 0.8571,
+    "hit_at_5": 0.7143,
+    "map": 0.3368,
+    "map_ci95": [
+     0.2213,
+     0.471
+    ],
+    "n_queries": 7
+   },
+   "baseline_semantic_only": {
+    "hit_at_10": 0.7143,
+    "hit_at_5": 0.4286,
+    "map": 0.253,
+    "map_ci95": [
+     0.1412,
+     0.3727
+    ],
+    "n_queries": 7
+   },
+   "current_composite": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.8571,
+    "map": 0.4597,
+    "map_ci95": [
+     0.3477,
+     0.5585
+    ],
+    "n_queries": 7
+   },
+   "reference_shrinkage": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.8571,
+    "map": 0.4597,
+    "map_ci95": [
+     0.3477,
+     0.5585
+    ],
+    "n_queries": 7
+   },
+   "reference_zero_fill": {
+    "hit_at_10": 1.0,
+    "hit_at_5": 0.8571,
+    "map": 0.4597,
+    "map_ci95": [
+     0.3477,
+     0.5585
+    ],
+    "n_queries": 7
+   }
+  }
+ }
+}
