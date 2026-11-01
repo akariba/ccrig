@@ -83,11 +83,12 @@ export function quadPoint(a: Pt, c: Pt, b: Pt, t: number): Pt {
 }
 
 /** Nudge markers that would sit on top of each other apart, deterministically (by id order), in small rings. Display only. */
-export function spreadOverlaps(items: { id: string; pt: Pt }[], minDist = 20, bounds?: { w: number; h: number; edge: number }): Record<string, Pt> {
+export function spreadOverlaps(items: { id: string; pt: Pt; priority?: number }[], minDist = 20, bounds?: { w: number; h: number; edge: number }): Record<string, Pt> {
   const placed: Pt[] = [], out: Record<string, Pt> = {};
   const inside = (q: Pt) => !bounds || (q[0] >= bounds.edge && q[0] <= bounds.w - bounds.edge && q[1] >= bounds.edge && q[1] <= bounds.h - bounds.edge);
   const clamp = (q: Pt): Pt => !bounds ? q : [Math.min(bounds.w - bounds.edge, Math.max(bounds.edge, q[0])), Math.min(bounds.h - bounds.edge, Math.max(bounds.edge, q[1]))];
-  for (const item of [...items].sort((x, y) => (x.id < y.id ? -1 : 1))) {
+  // higher priority claims its true spot first; ties are broken by id, so the result never depends on input order
+  for (const item of [...items].sort((x, y) => (y.priority ?? 0) - (x.priority ?? 0) || (x.id < y.id ? -1 : 1))) {
     const home = clamp(item.pt);
     let pt: Pt = home;
     for (let ring = 0, tries = 0; (placed.some((q) => Math.hypot(q[0] - pt[0], q[1] - pt[1]) < minDist) || !inside(pt)) && tries < 120; tries++) {
@@ -159,9 +160,10 @@ export function cableStyle(cable: Cable, ctx: { phase: Phase; selectedEventId: s
   const active = selected && cable.eventIds.includes(ctx.selectedEventId as string);
   const hovered = !active && !!ctx.hoverEventId && cable.eventIds.includes(ctx.hoverEventId);
   // A quiet contextual network by default; only the selected event's paths are emphasised (hover previews at medium strength).
-  const context = kind === "documented" ? 0.3 : kind === "mention" ? 0.14 : 0.1;
+  // Overview (nothing selected): only the stored documented relationships, subdued and still. Mentions and countries belong to a selected event.
+  const context = kind === "documented" ? 0.3 : 0;
   const alpha = active ? (kind === "documented" ? 1 : kind === "mention" ? 0.85 : 0.5) : hovered ? 0.6 : selected ? (kind === "documented" ? 0.12 : 0.05) : context;
-  const pulses = ctx.reducedMotion || kind !== "documented" ? 0 : active ? 3 : selected ? 0 : 1;
+  const pulses = ctx.reducedMotion || kind !== "documented" ? 0 : active ? 3 : 0;
   return { ...base, draw: true, alpha, pulses, glow: active, width: active ? base.width + 0.8 : base.width };
 }
 
@@ -174,6 +176,24 @@ export function fitView(points: Pt[], w: number, h: number, pad = 110, maxZoom =
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
   return { zoom, tx: clamp(w / 2 - cx * zoom, w - w * zoom, 0), ty: clamp(h / 2 - cy * zoom, h - h * zoom, 0) };
+}
+
+/** Keep a flat-map camera on the world: no empty band beside it when it fills the stage, and centred when it is smaller than the stage. Pure. */
+export function clampFlat(f: { zoom: number; tx: number; ty: number }, w: number, h: number, worldW: number, worldH: number) {
+  const axis = (t: number, stage: number, world: number) => {
+    const c = stage / 2, lo = stage - (c + world / 2) * f.zoom, hi = -(c - world / 2) * f.zoom;
+    return world * f.zoom <= stage ? stage / 2 - c * f.zoom : Math.min(hi, Math.max(lo, t));
+  };
+  return { zoom: f.zoom, tx: axis(f.tx, w, worldW), ty: axis(f.ty, h, worldH) };
+}
+
+/** Frame a set of points on the flat map (zoom 1 = the whole world, centred), without leaving the world. */
+export function fitFlat(points: Pt[], w: number, h: number, worldW: number, worldH: number, pad = 90, maxZoom = 3.2) {
+  if (points.length === 0) return { zoom: 1, tx: 0, ty: 0 };
+  const xs = points.map((p) => p[0]), ys = points.map((p) => p[1]);
+  const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  const zoom = Math.max(1, Math.min(maxZoom, w / (x1 - x0), h / (y1 - y0)));
+  return clampFlat({ zoom, tx: w / 2 - ((x0 + x1) / 2) * zoom, ty: h / 2 - ((y0 + y1) / 2) * zoom }, w, h, worldW, worldH);
 }
 
 export interface Rect { x: number; y: number; w: number; h: number }

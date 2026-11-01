@@ -72,7 +72,8 @@ test("nothing is drawn or animated unless there is data to show", () => {
 });
 
 test("only documented relationships carry a travelling pulse; mentions and regions never do", () => {
-  assert.equal(m.cableStyle(documented, ctx()).pulses, 1);
+  assert.equal(m.cableStyle(documented, ctx()).pulses, 0);                   // the overview is still: nothing travels until an event is selected
+  assert.equal(m.cableStyle(documented, ctx({ selectedEventId: "e1" })).pulses, 3);
   assert.equal(m.cableStyle(mention, ctx()).pulses, 0);
   assert.equal(m.cableStyle(region, ctx()).pulses, 0);
   for (const sel of ["e1", "e2"]) for (const c of [mention, region]) assert.equal(m.cableStyle(c, ctx({ selectedEventId: sel })).pulses, 0);
@@ -160,6 +161,8 @@ test("dates and links are formatted safely", () => {
 test("by default the network is a quiet context; only the selected event's paths are emphasised", () => {
   const ctxQuiet = ctx({});
   for (const c of [documented, mention, region]) assert.ok(m.cableStyle(c, ctxQuiet).alpha <= 0.3);
+  assert.ok(m.cableStyle(documented, ctxQuiet).alpha > 0);                                              // the stored relationships are visible, faintly
+  assert.equal(m.cableStyle(mention, ctxQuiet).alpha, 0); assert.equal(m.cableStyle(region, ctxQuiet).alpha, 0);   // mentions and countries belong to a selected event
   const sel = ctx({ selectedEventId: "e1" });
   assert.equal(m.cableStyle(documented, sel).alpha, 1);
   for (const c of [mention, region]) assert.ok(m.cableStyle({ ...c, eventIds: ["e2"] }, sel).alpha <= 0.05);
@@ -218,4 +221,37 @@ test("event colour comes only from the explicit category; unknown categories are
   const s = m.buildScene({ ...response, events: [{ id: "e1", category: "EARNINGS_RELEASE" }, { id: "e2", category: "PRODUCT_ANNOUNCEMENT" }] });
   assert.equal(s.markers.find((x) => x.id === "event:e1").category, "EARNINGS_RELEASE");
   assert.equal(s.markers.find((x) => x.id === "entity:NVDA").category, undefined);
+});
+
+test("the scene never reverses a stored relationship or changes what an event says", () => {
+  const edge = { id: "x", type: "DOCUMENTED_RELATION", source: "entity:TSM", target: "entity:NVDA", event_ids: ["e1"], relation: "SUPPLIES" };
+  const withEdge = { ...response, graph: { ...response.graph, nodes: [...response.graph.nodes, { id: "entity:TSM", type: "ENTITY", label: "TSMC", entity_id: "TSM", position: pos("Taiwan", 23.7, 121, "country centroid") }], edges: [...response.graph.edges, edge] } };
+  const cable = m.buildScene(withEdge).cables.find((c) => c.id === "x");
+  assert.equal(cable.from, "entity:TSM"); assert.equal(cable.to, "entity:NVDA");                    // source -> target exactly as stored
+  assert.equal(cable.type, "DOCUMENTED_RELATION"); assert.equal(cable.relation, "SUPPLIES");
+  const again = m.buildScene(JSON.parse(JSON.stringify(withEdge)));
+  assert.deepEqual(again, m.buildScene(withEdge));                                                  // a pure function of the response
+  for (const sel of [null, "e1", "e2"]) assert.equal(m.cableStyle(cable, { phase: "ready", selectedEventId: sel, reducedMotion: false }).kind, "documented");
+});
+
+test("a higher-priority marker keeps its true spot and the rest fan around it", () => {
+  const items = [{ id: "entity:SKHY", pt: [100, 100], priority: 1 }, { id: "event:seoul", pt: [102, 101], priority: 4 }];
+  const out = m.spreadOverlaps(items, 36);
+  assert.deepEqual(out["event:seoul"], [102, 101]);                                    // the selected event is not pushed aside by a company
+  assert.ok(Math.hypot(out["entity:SKHY"][0] - 102, out["entity:SKHY"][1] - 101) >= 35);
+  assert.deepEqual(m.spreadOverlaps([...items].reverse(), 36), out);
+});
+
+test("the flat camera stays on the world: centred when the world is smaller than the stage, gap-free when it fills it", () => {
+  const w = 840, h = 780, ww = 840, wh = 408;                                               // a wide stage: the world is shorter than it is tall
+  const centred = m.fitFlat([[300, 380], [420, 400]], w, h, ww, wh);
+  assert.ok(centred.zoom >= 1);
+  const world = (t, c, half, z) => [(c - half) * z + t, (c + half) * z + t];
+  const [top, bottom] = world(centred.ty, h / 2, wh / 2, centred.zoom);
+  assert.ok(Math.abs((top + bottom) / 2 - h / 2) < 1e-6 || (top <= 0 && bottom >= h));      // either centred, or covering the stage
+  const tight = m.fitFlat([[60, 390], [100, 400]], w, h, ww, wh, 40, 6);
+  const [left, right] = world(tight.tx, w / 2, ww / 2, tight.zoom);
+  assert.ok(left <= 1e-9 && right >= w - 1e-9);                                             // no empty band beside the map
+  assert.deepEqual(m.fitFlat([], w, h, ww, wh), { zoom: 1, tx: 0, ty: 0 });
+  assert.deepEqual(m.clampFlat({ zoom: 1, tx: 55, ty: -70 }, w, h, ww, wh), { zoom: 1, tx: 0, ty: 0 });
 });
