@@ -41,8 +41,10 @@ def test_validation_metrics_match_baseline():
 
 
 def test_snapshot_independent_of_hash_seed():
-    """The app has process-level non-determinism (see snapshot._stabilise).
-    The snapshot must neutralise it, or the baseline would be flaky."""
+    """The snapshot records responses exactly as served (no sorting or
+    masking), so it is only a stable baseline if the application itself is
+    deterministic across processes. Checked here against a fresh process with
+    an unrelated hash seed; the full sweep is tests/test_determinism.py."""
     env = {**os.environ, "PYTHONHASHSEED": "4242", "PYTHONWARNINGS": "ignore"}
     proc = subprocess.run(
         [sys.executable, "-m", "validation.run", "--check"],
@@ -68,28 +70,6 @@ def test_diff_uses_float_tolerance_and_reports_structure():
     assert "$.a.length" in paths and "$.b" in paths
     assert snapshot.diff({"a": None}, {"a": 0}) != []   # None is not 0
     assert snapshot.diff({"a": True}, {"a": 1}) != []   # bool is not int
-
-
-def test_stabilise_makes_known_unordered_lists_order_insensitive():
-    rows = [{"via_direct_holding": "NVDA", "indirect_entity": "MU", "relatedness_score": 0.5},
-            {"via_direct_holding": "AMD", "indirect_entity": "QCOM", "relatedness_score": 0.8}]
-    a = snapshot._stabilise("counterparty_360:X", {"indirect_relationships": rows})
-    b = snapshot._stabilise("counterparty_360:X", {"indirect_relationships": list(reversed(rows))})
-    assert a == b
-    # at the 20-row cap membership is process-dependent -> only the cap is kept
-    capped = snapshot._stabilise("counterparty_360:X", {"indirect_relationships": [rows[0]] * 20})
-    assert capped["indirect_relationships"] == {"truncated_at_cap": 20}
-
-    ev1 = {"direct_relevance": [{"entity_id": "A"}, {"entity_id": "B"}],
-           "typed_paths": [{"pattern": "P1"}, {"pattern": "P2"}, {"pattern": "P1"}],
-           "mode2_personalized_pagerank": {"results": [{"entity_id": "A"}, {"entity_id": "B"}]}}
-    ev2 = {"direct_relevance": [{"entity_id": "B"}, {"entity_id": "A"}],
-           "typed_paths": [{"pattern": "P2"}, {"pattern": "P1"}, {"pattern": "P1"}],
-           "mode2_personalized_pagerank": {"results": [{"entity_id": "A"}, {"entity_id": "B"}]}}
-    assert snapshot._stabilise("event_parse:x", ev1) == snapshot._stabilise("event_parse:x", ev2)
-    # ...but the PPR ordering is NOT neutralised: a reordering there must show up
-    ev3 = {**ev2, "mode2_personalized_pagerank": {"results": [{"entity_id": "B"}, {"entity_id": "A"}]}}
-    assert snapshot._stabilise("event_parse:x", ev1) != snapshot._stabilise("event_parse:x", ev3)
 
 
 def test_harness_reports_the_documented_hard_case_and_masks_edges():

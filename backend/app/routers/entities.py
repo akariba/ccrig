@@ -122,7 +122,7 @@ def entity_360(entity_id: str, top_k: int = Query(10, ge=1, le=MAX_TOP_K)):
         "market": market_block,
         "counterparties_exposed": cp_exposure,
         "evidence": {
-            "fact_edge_sources": list({l.get("evidence_status") for l in fact_links if l.get("evidence_status")}),
+            "fact_edge_sources": sorted({l.get("evidence_status") for l in fact_links if l.get("evidence_status")}),
             "gleif_record_present": gleif is not None,
         },
     }

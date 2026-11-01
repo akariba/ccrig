@@ -43,9 +43,17 @@ def counterparty_360(cp_id: str):
     # direct vs indirect exposure paths: direct = held issuer directly;
     # indirect = related-to-a-held-issuer via Layer A/B (one more hop),
     # kept in separate units from direct exposure_pct.
-    held_issuers = {h["issuer"] for h in holdings}
+    # ORDER IS PART OF THE RESULT (the list is capped at 20 below): direct
+    # holdings are visited by the counterparty's total exposure to that issuer,
+    # largest first, ties by issuer id. The cap therefore keeps relationships
+    # reached through the counterparty's biggest positions, and the output no
+    # longer depends on Python's per-process string-hash order.
+    exposure_by_issuer = {}
+    for h in holdings:
+        exposure_by_issuer[h["issuer"]] = exposure_by_issuer.get(h["issuer"], 0) + (h.get("exposure_pct") or 0)
+    held_issuers = set(exposure_by_issuer)
     indirect = []
-    for issuer_id in held_issuers:
+    for issuer_id in sorted(exposure_by_issuer, key=lambda i: (-exposure_by_issuer[i], i)):
         cand = candidates.generate_candidates(issuer_id)
         if not cand:
             continue

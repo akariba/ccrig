@@ -336,6 +336,8 @@ def counterparty_join(relevant_issuer_ids, event_relevance):
     issuer's event relevance fixes that."""
     cp_paths = []
     cp_scores = {}
+    # callers pass an ORDERED sequence (see parse_event); a set would make the
+    # path order and the float accumulation order depend on the hash seed
     for issuer_id in relevant_issuer_ids:
         rel = event_relevance.get(issuer_id, 0.0)
         for p in path_mod.counterparty_exposure_paths(issuer_id):
@@ -369,7 +371,10 @@ def parse_event(text, max_hops=2, min_score=0.05, sector=None, geography=None, t
         for p in path_mod.geographic_paths(c):
             geo_entities.append(p["company"])
 
-    direct = direct_relevance(list(set(entities + geo_entities)), themes)
+    # Order matters downstream (Mode 1 path order, tie-breaks, the 40-path cap),
+    # so it is explicit: mentioned entities first (detect_entities returns them
+    # sorted by id), then geographic ones in entity-master order, no duplicates.
+    direct = direct_relevance(list(dict.fromkeys(entities + geo_entities)), themes)
     direct_ids = list(direct.keys())
 
     propagated, typed_paths = mode1_bounded_traversal(direct_ids, themes, max_hops=max_hops)
@@ -387,14 +392,18 @@ def parse_event(text, max_hops=2, min_score=0.05, sector=None, geography=None, t
 
     mode1_ranked = sorted(
         [{"entity_id": eid, **data} for eid, data in propagated.items() if data["score"] >= min_score and passes_filters(eid)],
-        key=lambda r: -r["score"],
+        key=lambda r: (-r["score"], r["entity_id"]),   # ties: entity id, never insertion order
     )[:top_k]
     mode2_ranked = [r for r in ppr_result.get("results", []) if passes_filters(r["entity_id"])][:top_k]
 
     relevant_issuers = set(direct_ids) | {r["entity_id"] for r in mode1_ranked} | {r["entity_id"] for r in mode2_ranked}
     relevant_issuers &= set(STORE.issuer_ids)
     event_relevance = event_relevance_map(direct, mode1_ranked, mode2_ranked)
-    cp_scores, cp_paths = counterparty_join(relevant_issuers, event_relevance)
+    # The join accumulates floating-point sums and lists issuers per
+    # counterparty, so its iteration order must be fixed: most event-relevant
+    # issuer first, ties by issuer id.
+    ordered_issuers = sorted(relevant_issuers, key=lambda i: (-event_relevance.get(i, 0.0), i))
+    cp_scores, cp_paths = counterparty_join(ordered_issuers, event_relevance)
 
     return {
         "input_text": text,
@@ -416,7 +425,7 @@ def parse_event(text, max_hops=2, min_score=0.05, sector=None, geography=None, t
         "typed_paths": typed_paths[:40],
         "relevant_counterparties": [
             {"counterparty": cp, **data} for cp, data in
-            sorted(cp_scores.items(), key=lambda x: -x[1]["exposure_weighted_relevance"])
+            sorted(cp_scores.items(), key=lambda x: (-x[1]["exposure_weighted_relevance"], x[0]))
         ],
         "counterparty_exposure_paths": cp_paths,
         "filters_applied": {"max_hops": max_hops, "min_score": min_score, "sector": sector, "geography": geography},

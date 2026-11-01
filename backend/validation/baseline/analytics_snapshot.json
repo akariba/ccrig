@@ -434,9 +434,21 @@
    },
    "indirect_relationships": [
     {
-     "indirect_entity": "INTC",
+     "indirect_entity": "QCOM",
      "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.6737,
+     "relatedness_score": 0.8219,
+     "via_direct_holding": "NVDA"
+    },
+    {
+     "indirect_entity": "MU",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.6698,
+     "via_direct_holding": "NVDA"
+    },
+    {
+     "indirect_entity": "QCOM",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.7958,
      "via_direct_holding": "AMD"
     },
     {
@@ -446,10 +458,28 @@
      "via_direct_holding": "AMD"
     },
     {
-     "indirect_entity": "QCOM",
+     "indirect_entity": "INTC",
      "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.7958,
+     "relatedness_score": 0.6737,
      "via_direct_holding": "AMD"
+    },
+    {
+     "indirect_entity": "SSNLF",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.7032,
+     "via_direct_holding": "TSM"
+    },
+    {
+     "indirect_entity": "ASML",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.6921,
+     "via_direct_holding": "TSM"
+    },
+    {
+     "indirect_entity": "SKHY",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.6278,
+     "via_direct_holding": "TSM"
     },
     {
      "indirect_entity": "INTC",
@@ -470,6 +500,12 @@
      "via_direct_holding": "AVGO"
     },
     {
+     "indirect_entity": "ORCL",
+     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
+     "relatedness_score": 0.9128,
+     "via_direct_holding": "MSFT"
+    },
+    {
      "indirect_entity": "AMZN",
      "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
      "relatedness_score": 0.8304,
@@ -482,52 +518,16 @@
      "via_direct_holding": "MSFT"
     },
     {
-     "indirect_entity": "IBM",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.661,
-     "via_direct_holding": "MSFT"
-    },
-    {
      "indirect_entity": "META",
      "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
      "relatedness_score": 0.7851,
      "via_direct_holding": "MSFT"
     },
     {
-     "indirect_entity": "ORCL",
+     "indirect_entity": "IBM",
      "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.9128,
+     "relatedness_score": 0.661,
      "via_direct_holding": "MSFT"
-    },
-    {
-     "indirect_entity": "MU",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.6698,
-     "via_direct_holding": "NVDA"
-    },
-    {
-     "indirect_entity": "QCOM",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.8219,
-     "via_direct_holding": "NVDA"
-    },
-    {
-     "indirect_entity": "ASML",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.6921,
-     "via_direct_holding": "TSM"
-    },
-    {
-     "indirect_entity": "SKHY",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.6278,
-     "via_direct_holding": "TSM"
-    },
-    {
-     "indirect_entity": "SSNLF",
-     "note": "This is a RELATEDNESS score (Layer B units), NOT an exposure percentage (Layer C units) - never sum these with exposure_pct.",
-     "relatedness_score": 0.7032,
-     "via_direct_holding": "TSM"
     }
    ],
    "risk_cluster_note": "Risk clustering is approximated here by sector/theme concentration; no dedicated clustering algorithm (e.g. community detection) is run in this POC pass - see docs/LIMITATIONS.md.",
@@ -4536,26 +4536,26 @@
    "ai_summary": "AI explanation (deterministic): classified as 'Geographic / Natural Disaster'. Directly mentioned/theme-relevant entities: 17. Themes detected: semiconductors, foundry, Taiwan, earthquake. Bounded typed-path traversal (Mode 1) surfaced 15 propagated entities; relation-aware Personalized PageRank (Mode 2) surfaced 15 entities (different units - not directly comparable). 14 synthetic counterparties are exposed to the resulting relevant issuer set via the Layer C exposure join.",
    "counterparty_exposure_paths": [
     {
-     "counterparty": "CP_ALPHA",
-     "exposure_pct": 0.15,
+     "counterparty": "CP_PACIFIC",
+     "exposure_pct": 0.13,
      "is_synthetic": true,
-     "issuer": "AVGO",
+     "issuer": "AAPL",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_VIA_FUND"
+    },
+    {
+     "counterparty": "CP_SUMMIT",
+     "exposure_pct": 0.14,
+     "is_synthetic": true,
+     "issuer": "AAPL",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_ALPHA",
-     "exposure_pct": 0.15,
+     "counterparty": "CP_KESTREL",
+     "exposure_pct": 0.3,
      "is_synthetic": true,
-     "issuer": "MSFT",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_ALPHA",
-     "exposure_pct": 0.18,
-     "is_synthetic": true,
-     "issuer": "TSM",
+     "issuer": "AAPL",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
@@ -4576,76 +4576,28 @@
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_ANCHOR",
-     "exposure_pct": 0.24,
-     "is_synthetic": true,
-     "issuer": "BAC",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_ANCHOR",
-     "exposure_pct": 0.24,
-     "is_synthetic": true,
-     "issuer": "WFC",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_ANCHOR",
-     "exposure_pct": 0.28,
-     "is_synthetic": true,
-     "issuer": "JPM",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_CASCADE",
-     "exposure_pct": 0.2,
-     "is_synthetic": true,
-     "issuer": "C",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_CASCADE",
+     "counterparty": "CP_HELIX",
      "exposure_pct": 0.25,
      "is_synthetic": true,
-     "issuer": "BAC",
+     "issuer": "NVDA",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
+     "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_CASCADE",
-     "exposure_pct": 0.25,
+     "counterparty": "CP_LATTICE",
+     "exposure_pct": 0.22,
      "is_synthetic": true,
-     "issuer": "WFC",
+     "issuer": "NVDA",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
+     "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_CASCADE",
-     "exposure_pct": 0.3,
+     "counterparty": "CP_KESTREL",
+     "exposure_pct": 0.45,
      "is_synthetic": true,
-     "issuer": "JPM",
+     "issuer": "NVDA",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_DELTA",
-     "exposure_pct": 0.3,
-     "is_synthetic": true,
-     "issuer": "GS",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_VIA_FUND"
-    },
-    {
-     "counterparty": "CP_DELTA",
-     "exposure_pct": 0.3,
-     "is_synthetic": true,
-     "issuer": "MS",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_VIA_FUND"
+     "relation": "HOLDS_EQUITY"
     },
     {
      "counterparty": "CP_DELTA",
@@ -4659,23 +4611,39 @@
      "counterparty": "CP_EQUINOX",
      "exposure_pct": 0.2,
      "is_synthetic": true,
-     "issuer": "DBK",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_EQUINOX",
-     "exposure_pct": 0.2,
-     "is_synthetic": true,
      "issuer": "NVDA",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_HELIX",
-     "exposure_pct": 0.15,
+     "counterparty": "CP_ALPHA",
+     "exposure_pct": 0.18,
      "is_synthetic": true,
-     "issuer": "ARM",
+     "issuer": "TSM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_PACIFIC",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "TSM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_LATTICE",
+     "exposure_pct": 0.24,
+     "is_synthetic": true,
+     "issuer": "TSM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_PACIFIC",
+     "exposure_pct": 0.13,
+     "is_synthetic": true,
+     "issuer": "ASML",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
@@ -4684,6 +4652,30 @@
      "exposure_pct": 0.2,
      "is_synthetic": true,
      "issuer": "ASML",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_LATTICE",
+     "exposure_pct": 0.18,
+     "is_synthetic": true,
+     "issuer": "ASML",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_VANTAGE",
+     "exposure_pct": 0.18,
+     "is_synthetic": true,
+     "issuer": "ASML",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_ALPHA",
+     "exposure_pct": 0.15,
+     "is_synthetic": true,
+     "issuer": "AVGO",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
@@ -4704,134 +4696,6 @@
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_HELIX",
-     "exposure_pct": 0.25,
-     "is_synthetic": true,
-     "issuer": "NVDA",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_IRONGATE",
-     "exposure_pct": 0.25,
-     "is_synthetic": true,
-     "issuer": "GD",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "LENDS_TO"
-    },
-    {
-     "counterparty": "CP_KESTREL",
-     "exposure_pct": 0.25,
-     "is_synthetic": true,
-     "issuer": "MSFT",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_KESTREL",
-     "exposure_pct": 0.3,
-     "is_synthetic": true,
-     "issuer": "AAPL",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_KESTREL",
-     "exposure_pct": 0.45,
-     "is_synthetic": true,
-     "issuer": "NVDA",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_pct": 0.18,
-     "is_synthetic": true,
-     "issuer": "ASML",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_pct": 0.18,
-     "is_synthetic": true,
-     "issuer": "GOOGL",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_pct": 0.18,
-     "is_synthetic": true,
-     "issuer": "MSFT",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_pct": 0.22,
-     "is_synthetic": true,
-     "issuer": "NVDA",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_pct": 0.24,
-     "is_synthetic": true,
-     "issuer": "TSM",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_NORTHBRIDGE",
-     "exposure_pct": 0.24,
-     "is_synthetic": true,
-     "issuer": "DBK",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_NORTHBRIDGE",
-     "exposure_pct": 0.28,
-     "is_synthetic": true,
-     "issuer": "C",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_NORTHBRIDGE",
-     "exposure_pct": 0.35,
-     "is_synthetic": true,
-     "issuer": "JPM",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_ORION",
-     "exposure_pct": 0.3,
-     "is_synthetic": true,
-     "issuer": "HSBC",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_BONDS"
-    },
-    {
-     "counterparty": "CP_PACIFIC",
-     "exposure_pct": 0.13,
-     "is_synthetic": true,
-     "issuer": "AAPL",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_VIA_FUND"
-    },
-    {
-     "counterparty": "CP_PACIFIC",
-     "exposure_pct": 0.13,
-     "is_synthetic": true,
-     "issuer": "ASML",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
      "counterparty": "CP_PACIFIC",
      "exposure_pct": 0.22,
      "is_synthetic": true,
@@ -4848,18 +4712,10 @@
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_PACIFIC",
-     "exposure_pct": 0.3,
+     "counterparty": "CP_HELIX",
+     "exposure_pct": 0.15,
      "is_synthetic": true,
-     "issuer": "TSM",
-     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
-     "relation": "HOLDS_EQUITY"
-    },
-    {
-     "counterparty": "CP_SUMMIT",
-     "exposure_pct": 0.06,
-     "is_synthetic": true,
-     "issuer": "HSBC",
+     "issuer": "ARM",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
@@ -4872,18 +4728,18 @@
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_SUMMIT",
-     "exposure_pct": 0.12,
+     "counterparty": "CP_LATTICE",
+     "exposure_pct": 0.18,
      "is_synthetic": true,
-     "issuer": "JPM",
+     "issuer": "GOOGL",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_SUMMIT",
-     "exposure_pct": 0.14,
+     "counterparty": "CP_ALPHA",
+     "exposure_pct": 0.15,
      "is_synthetic": true,
-     "issuer": "AAPL",
+     "issuer": "MSFT",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
     },
@@ -4896,12 +4752,124 @@
      "relation": "HOLDS_EQUITY"
     },
     {
-     "counterparty": "CP_VANTAGE",
+     "counterparty": "CP_LATTICE",
      "exposure_pct": 0.18,
      "is_synthetic": true,
-     "issuer": "ASML",
+     "issuer": "MSFT",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_KESTREL",
+     "exposure_pct": 0.25,
+     "is_synthetic": true,
+     "issuer": "MSFT",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_CASCADE",
+     "exposure_pct": 0.25,
+     "is_synthetic": true,
+     "issuer": "BAC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_pct": 0.24,
+     "is_synthetic": true,
+     "issuer": "BAC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_NORTHBRIDGE",
+     "exposure_pct": 0.28,
+     "is_synthetic": true,
+     "issuer": "C",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_CASCADE",
+     "exposure_pct": 0.2,
+     "is_synthetic": true,
+     "issuer": "C",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_NORTHBRIDGE",
+     "exposure_pct": 0.35,
+     "is_synthetic": true,
+     "issuer": "JPM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_SUMMIT",
+     "exposure_pct": 0.12,
+     "is_synthetic": true,
+     "issuer": "JPM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_CASCADE",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "JPM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_pct": 0.28,
+     "is_synthetic": true,
+     "issuer": "JPM",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_CASCADE",
+     "exposure_pct": 0.25,
+     "is_synthetic": true,
+     "issuer": "WFC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_pct": 0.24,
+     "is_synthetic": true,
+     "issuer": "WFC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_DELTA",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "GS",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_VIA_FUND"
+    },
+    {
+     "counterparty": "CP_DELTA",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "MS",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_VIA_FUND"
+    },
+    {
+     "counterparty": "CP_NORTHBRIDGE",
+     "exposure_pct": 0.24,
+     "is_synthetic": true,
+     "issuer": "DBK",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
     },
     {
      "counterparty": "CP_VANTAGE",
@@ -4910,6 +4878,38 @@
      "issuer": "DBK",
      "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
      "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_EQUINOX",
+     "exposure_pct": 0.2,
+     "is_synthetic": true,
+     "issuer": "DBK",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_SUMMIT",
+     "exposure_pct": 0.06,
+     "is_synthetic": true,
+     "issuer": "HSBC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_EQUITY"
+    },
+    {
+     "counterparty": "CP_ORION",
+     "exposure_pct": 0.3,
+     "is_synthetic": true,
+     "issuer": "HSBC",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "HOLDS_BONDS"
+    },
+    {
+     "counterparty": "CP_IRONGATE",
+     "exposure_pct": 0.25,
+     "is_synthetic": true,
+     "issuer": "GD",
+     "pattern": "P3_ISSUER_EXPOSURE_COUNTERPARTY",
+     "relation": "LENDS_TO"
     }
    ],
    "detected_countries": [
@@ -4950,13 +4950,6 @@
      ]
     },
     {
-     "entity_id": "AMAT",
-     "score": 0.9,
-     "sources": [
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
      "entity_id": "AMD",
      "score": 1.0,
      "sources": [
@@ -4965,17 +4958,59 @@
      ]
     },
     {
-     "entity_id": "ARM",
-     "score": 0.7,
+     "entity_id": "NVDA",
+     "score": 1.0,
+     "sources": [
+      "MENTION",
+      "THEME:SEMICONDUCTORS"
+     ]
+    },
+    {
+     "entity_id": "TSM",
+     "score": 1.0,
+     "sources": [
+      "MENTION",
+      "THEME:SEMICONDUCTORS",
+      "THEME:FOUNDRY",
+      "THEME:TAIWAN",
+      "THEME:EARTHQUAKE"
+     ]
+    },
+    {
+     "entity_id": "INTC",
+     "score": 1.0,
+     "sources": [
+      "THEME:SEMICONDUCTORS",
+      "THEME:FOUNDRY"
+     ]
+    },
+    {
+     "entity_id": "SKHY",
+     "score": 0.9,
      "sources": [
       "THEME:SEMICONDUCTORS"
+     ]
+    },
+    {
+     "entity_id": "SSNLF",
+     "score": 0.9,
+     "sources": [
+      "THEME:SEMICONDUCTORS",
+      "THEME:FOUNDRY"
      ]
     },
     {
      "entity_id": "ASML",
      "score": 0.9,
      "sources": [
-      "THEME:FOUNDRY",
+      "THEME:SEMICONDUCTORS",
+      "THEME:FOUNDRY"
+     ]
+    },
+    {
+     "entity_id": "AMAT",
+     "score": 0.9,
+     "sources": [
       "THEME:SEMICONDUCTORS"
      ]
     },
@@ -4987,21 +5022,28 @@
      ]
     },
     {
+     "entity_id": "MU",
+     "score": 0.9,
+     "sources": [
+      "THEME:SEMICONDUCTORS"
+     ]
+    },
+    {
+     "entity_id": "QCOM",
+     "score": 0.8,
+     "sources": [
+      "THEME:SEMICONDUCTORS"
+     ]
+    },
+    {
+     "entity_id": "ARM",
+     "score": 0.7,
+     "sources": [
+      "THEME:SEMICONDUCTORS"
+     ]
+    },
+    {
      "entity_id": "CP_ALPHA",
-     "score": 0.4,
-     "sources": [
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "CP_HELIX",
-     "score": 0.5,
-     "sources": [
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "CP_LATTICE",
      "score": 0.4,
      "sources": [
       "THEME:SEMICONDUCTORS"
@@ -5016,59 +5058,17 @@
      ]
     },
     {
-     "entity_id": "INTC",
-     "score": 1.0,
-     "sources": [
-      "THEME:FOUNDRY",
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "MU",
-     "score": 0.9,
+     "entity_id": "CP_HELIX",
+     "score": 0.5,
      "sources": [
       "THEME:SEMICONDUCTORS"
      ]
     },
     {
-     "entity_id": "NVDA",
-     "score": 1.0,
-     "sources": [
-      "MENTION",
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "QCOM",
-     "score": 0.8,
+     "entity_id": "CP_LATTICE",
+     "score": 0.4,
      "sources": [
       "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "SKHY",
-     "score": 0.9,
-     "sources": [
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "SSNLF",
-     "score": 0.9,
-     "sources": [
-      "THEME:FOUNDRY",
-      "THEME:SEMICONDUCTORS"
-     ]
-    },
-    {
-     "entity_id": "TSM",
-     "score": 1.0,
-     "sources": [
-      "MENTION",
-      "THEME:EARTHQUAKE",
-      "THEME:FOUNDRY",
-      "THEME:SEMICONDUCTORS",
-      "THEME:TAIWAN"
      ]
     }
    ],
@@ -5266,16 +5266,16 @@
     "max_hops": 2,
     "results": [
      {
-      "entity_id": "AAPL",
+      "entity_id": "NVDA",
       "hops": 1,
-      "score": 0.8,
+      "score": 0.95,
       "via": "TSM"
      },
      {
-      "entity_id": "AMAT",
+      "entity_id": "TSM",
       "hops": 1,
-      "score": 0.55,
-      "via": "TSM"
+      "score": 0.95,
+      "via": "NVDA"
      },
      {
       "entity_id": "AMD",
@@ -5284,15 +5284,51 @@
       "via": "TSM"
      },
      {
+      "entity_id": "ASML",
+      "hops": 1,
+      "score": 0.85,
+      "via": "TSM"
+     },
+     {
+      "entity_id": "AAPL",
+      "hops": 1,
+      "score": 0.8,
+      "via": "TSM"
+     },
+     {
+      "entity_id": "SKHY",
+      "hops": 1,
+      "score": 0.78,
+      "via": "NVDA"
+     },
+     {
       "entity_id": "ARM",
       "hops": 1,
       "score": 0.75,
       "via": "AAPL"
      },
      {
-      "entity_id": "ASML",
+      "entity_id": "SSNLF",
       "hops": 1,
-      "score": 0.85,
+      "score": 0.75,
+      "via": "ASML"
+     },
+     {
+      "entity_id": "QCOM",
+      "hops": 1,
+      "score": 0.7,
+      "via": "TSM"
+     },
+     {
+      "entity_id": "INTC",
+      "hops": 1,
+      "score": 0.65,
+      "via": "ASML"
+     },
+     {
+      "entity_id": "AMAT",
+      "hops": 1,
+      "score": 0.55,
       "via": "TSM"
      },
      {
@@ -5308,12 +5344,6 @@
       "via": "AVGO"
      },
      {
-      "entity_id": "INTC",
-      "hops": 1,
-      "score": 0.65,
-      "via": "ASML"
-     },
-     {
       "entity_id": "MSFT",
       "hops": 1,
       "score": 0.55,
@@ -5324,36 +5354,6 @@
       "hops": 1,
       "score": 0.55,
       "via": "AMAT"
-     },
-     {
-      "entity_id": "NVDA",
-      "hops": 1,
-      "score": 0.95,
-      "via": "TSM"
-     },
-     {
-      "entity_id": "QCOM",
-      "hops": 1,
-      "score": 0.7,
-      "via": "TSM"
-     },
-     {
-      "entity_id": "SKHY",
-      "hops": 1,
-      "score": 0.78,
-      "via": "NVDA"
-     },
-     {
-      "entity_id": "SSNLF",
-      "hops": 1,
-      "score": 0.75,
-      "via": "ASML"
-     },
-     {
-      "entity_id": "TSM",
-      "hops": 1,
-      "score": 0.95,
-      "via": "NVDA"
      }
     ]
    },
@@ -5424,27 +5424,45 @@
    },
    "relevant_counterparties": [
     {
-     "counterparty": "CP_ALPHA",
-     "exposure_weighted_relevance": 0.9175,
+     "counterparty": "CP_PACIFIC",
+     "exposure_weighted_relevance": 0.943,
      "issuers": [
       {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.15,
-       "issuer": "MSFT",
+       "event_relevance": 1.0,
+       "exposure_pct": 0.13,
+       "issuer": "AAPL",
+       "relation": "HOLDS_VIA_FUND"
+      },
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.3,
+       "issuer": "TSM",
        "relation": "HOLDS_EQUITY"
       },
       {
        "event_relevance": 0.9,
-       "exposure_pct": 0.15,
-       "issuer": "AVGO",
+       "exposure_pct": 0.13,
+       "issuer": "ASML",
        "relation": "HOLDS_EQUITY"
       },
       {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.18,
-       "issuer": "TSM",
+       "event_relevance": 0.9,
+       "exposure_pct": 0.22,
+       "issuer": "SKHY",
        "relation": "HOLDS_EQUITY"
       },
+      {
+       "event_relevance": 0.9,
+       "exposure_pct": 0.22,
+       "issuer": "SSNLF",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_ALPHA",
+     "exposure_weighted_relevance": 0.9175,
+     "issuers": [
       {
        "event_relevance": 1.0,
        "exposure_pct": 0.2,
@@ -5456,101 +5474,23 @@
        "exposure_pct": 0.32,
        "issuer": "NVDA",
        "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_ANCHOR",
-     "exposure_weighted_relevance": 0.0001,
-     "issuers": [
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.24,
-       "issuer": "BAC",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.24,
-       "issuer": "WFC",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.28,
-       "issuer": "JPM",
-       "relation": "HOLDS_BONDS"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_CASCADE",
-     "exposure_weighted_relevance": 0.0002,
-     "issuers": [
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.2,
-       "issuer": "C",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.25,
-       "issuer": "BAC",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.25,
-       "issuer": "WFC",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.3,
-       "issuer": "JPM",
-       "relation": "HOLDS_BONDS"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_DELTA",
-     "exposure_weighted_relevance": 0.4001,
-     "issuers": [
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.3,
-       "issuer": "GS",
-       "relation": "HOLDS_VIA_FUND"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.3,
-       "issuer": "MS",
-       "relation": "HOLDS_VIA_FUND"
       },
       {
        "event_relevance": 1.0,
-       "exposure_pct": 0.4,
-       "issuer": "NVDA",
+       "exposure_pct": 0.18,
+       "issuer": "TSM",
        "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_EQUINOX",
-     "exposure_weighted_relevance": 0.2,
-     "issuers": [
-      {
-       "event_relevance": 0.0001,
-       "exposure_pct": 0.2,
-       "issuer": "DBK",
-       "relation": "HOLDS_BONDS"
       },
       {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.2,
-       "issuer": "NVDA",
+       "event_relevance": 0.9,
+       "exposure_pct": 0.15,
+       "issuer": "AVGO",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.15,
+       "issuer": "MSFT",
        "relation": "HOLDS_EQUITY"
       }
      ]
@@ -5560,9 +5500,9 @@
      "exposure_weighted_relevance": 0.9025,
      "issuers": [
       {
-       "event_relevance": 0.75,
-       "exposure_pct": 0.15,
-       "issuer": "ARM",
+       "event_relevance": 1.0,
+       "exposure_pct": 0.25,
+       "issuer": "NVDA",
        "relation": "HOLDS_EQUITY"
       },
       {
@@ -5584,10 +5524,244 @@
        "relation": "HOLDS_EQUITY"
       },
       {
+       "event_relevance": 0.75,
+       "exposure_pct": 0.15,
+       "issuer": "ARM",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_KESTREL",
+     "exposure_weighted_relevance": 0.8875,
+     "issuers": [
+      {
        "event_relevance": 1.0,
-       "exposure_pct": 0.25,
+       "exposure_pct": 0.3,
+       "issuer": "AAPL",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.45,
        "issuer": "NVDA",
        "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.25,
+       "issuer": "MSFT",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_LATTICE",
+     "exposure_weighted_relevance": 0.82,
+     "issuers": [
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.22,
+       "issuer": "NVDA",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.24,
+       "issuer": "TSM",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.9,
+       "exposure_pct": 0.18,
+       "issuer": "ASML",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.18,
+       "issuer": "GOOGL",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.18,
+       "issuer": "MSFT",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_DELTA",
+     "exposure_weighted_relevance": 0.4001,
+     "issuers": [
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.4,
+       "issuer": "NVDA",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.3,
+       "issuer": "GS",
+       "relation": "HOLDS_VIA_FUND"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.3,
+       "issuer": "MS",
+       "relation": "HOLDS_VIA_FUND"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_SUMMIT",
+     "exposure_weighted_relevance": 0.283,
+     "issuers": [
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.14,
+       "issuer": "AAPL",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.12,
+       "issuer": "GOOGL",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.55,
+       "exposure_pct": 0.14,
+       "issuer": "MSFT",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.12,
+       "issuer": "JPM",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.06,
+       "issuer": "HSBC",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_EQUINOX",
+     "exposure_weighted_relevance": 0.2,
+     "issuers": [
+      {
+       "event_relevance": 1.0,
+       "exposure_pct": 0.2,
+       "issuer": "NVDA",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.2,
+       "issuer": "DBK",
+       "relation": "HOLDS_BONDS"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_VANTAGE",
+     "exposure_weighted_relevance": 0.162,
+     "issuers": [
+      {
+       "event_relevance": 0.9,
+       "exposure_pct": 0.18,
+       "issuer": "ASML",
+       "relation": "HOLDS_EQUITY"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.18,
+       "issuer": "DBK",
+       "relation": "HOLDS_EQUITY"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_CASCADE",
+     "exposure_weighted_relevance": 0.0002,
+     "issuers": [
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.25,
+       "issuer": "BAC",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.2,
+       "issuer": "C",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.3,
+       "issuer": "JPM",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.25,
+       "issuer": "WFC",
+       "relation": "HOLDS_BONDS"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_NORTHBRIDGE",
+     "exposure_weighted_relevance": 0.0002,
+     "issuers": [
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.28,
+       "issuer": "C",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.35,
+       "issuer": "JPM",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0001,
+       "exposure_pct": 0.24,
+       "issuer": "DBK",
+       "relation": "HOLDS_BONDS"
+      }
+     ]
+    },
+    {
+     "counterparty": "CP_ANCHOR",
+     "exposure_weighted_relevance": 0.0001,
+     "issuers": [
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.24,
+       "issuer": "BAC",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.28,
+       "issuer": "JPM",
+       "relation": "HOLDS_BONDS"
+      },
+      {
+       "event_relevance": 0.0002,
+       "exposure_pct": 0.24,
+       "issuer": "WFC",
+       "relation": "HOLDS_BONDS"
       }
      ]
     },
@@ -5604,90 +5778,6 @@
      ]
     },
     {
-     "counterparty": "CP_KESTREL",
-     "exposure_weighted_relevance": 0.8875,
-     "issuers": [
-      {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.25,
-       "issuer": "MSFT",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.3,
-       "issuer": "AAPL",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.45,
-       "issuer": "NVDA",
-       "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_LATTICE",
-     "exposure_weighted_relevance": 0.82,
-     "issuers": [
-      {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.18,
-       "issuer": "GOOGL",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.18,
-       "issuer": "MSFT",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.9,
-       "exposure_pct": 0.18,
-       "issuer": "ASML",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.22,
-       "issuer": "NVDA",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.24,
-       "issuer": "TSM",
-       "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_NORTHBRIDGE",
-     "exposure_weighted_relevance": 0.0002,
-     "issuers": [
-      {
-       "event_relevance": 0.0001,
-       "exposure_pct": 0.24,
-       "issuer": "DBK",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.28,
-       "issuer": "C",
-       "relation": "HOLDS_BONDS"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.35,
-       "issuer": "JPM",
-       "relation": "HOLDS_BONDS"
-      }
-     ]
-    },
-    {
      "counterparty": "CP_ORION",
      "exposure_weighted_relevance": 0.0,
      "issuers": [
@@ -5698,104 +5788,839 @@
        "relation": "HOLDS_BONDS"
       }
      ]
-    },
-    {
-     "counterparty": "CP_PACIFIC",
-     "exposure_weighted_relevance": 0.943,
-     "issuers": [
-      {
-       "event_relevance": 0.9,
-       "exposure_pct": 0.13,
-       "issuer": "ASML",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.9,
-       "exposure_pct": 0.22,
-       "issuer": "SKHY",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.9,
-       "exposure_pct": 0.22,
-       "issuer": "SSNLF",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.13,
-       "issuer": "AAPL",
-       "relation": "HOLDS_VIA_FUND"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.3,
-       "issuer": "TSM",
-       "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_SUMMIT",
-     "exposure_weighted_relevance": 0.283,
-     "issuers": [
-      {
-       "event_relevance": 0.0001,
-       "exposure_pct": 0.06,
-       "issuer": "HSBC",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.0002,
-       "exposure_pct": 0.12,
-       "issuer": "JPM",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.12,
-       "issuer": "GOOGL",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.55,
-       "exposure_pct": 0.14,
-       "issuer": "MSFT",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 1.0,
-       "exposure_pct": 0.14,
-       "issuer": "AAPL",
-       "relation": "HOLDS_EQUITY"
-      }
-     ]
-    },
-    {
-     "counterparty": "CP_VANTAGE",
-     "exposure_weighted_relevance": 0.162,
-     "issuers": [
-      {
-       "event_relevance": 0.0001,
-       "exposure_pct": 0.18,
-       "issuer": "DBK",
-       "relation": "HOLDS_EQUITY"
-      },
-      {
-       "event_relevance": 0.9,
-       "exposure_pct": 0.18,
-       "issuer": "ASML",
-       "relation": "HOLDS_EQUITY"
-      }
-     ]
     }
    ],
-   "typed_paths": {
-    "by_pattern": {
-     "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY": 40
+   "typed_paths": [
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
     },
-    "count": 40
-   }
+    {
+     "hops": [
+      {
+       "criticality": 0.3,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "MU",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.45,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "SSNLF",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.35,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "QCOM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.3,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AVGO",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.75,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "ARM",
+       "relation": "LICENSES_TO",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.95,
+       "direction": "FORWARD",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.88,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.2,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "INTC"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.85,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "ASML",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.8,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMAT",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.3,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AVGO",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AVGO",
+       "relation": "SUPPLIES",
+       "to": "GOOGL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AAPL",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.25,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMD",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.42,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "SKHY",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.25,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMD",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.8,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.2,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "INTC"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.7,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "QCOM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AVGO"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.15,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "ARM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.85,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "ASML",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.88,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AMD"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMAT",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "AMD",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.55,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.5,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "GOOGL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.5,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "AMZN"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.5,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "META"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.78,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://finance.yahoo.com/news/ai-capital-expenditure-shows-no-093005586.html",
+       "from": "SKHY",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.45,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "MU",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.3,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "SSNLF",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.4,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "ARM",
+       "relation": "LICENSES_TO",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.55,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      },
+      {
+       "criticality": 0.25,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMD",
+       "relation": "SUPPLIES",
+       "to": "MSFT"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.5,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "NVDA",
+       "relation": "SUPPLIES",
+       "to": "GOOGL"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AVGO",
+       "relation": "SUPPLIES",
+       "to": "GOOGL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      },
+      {
+       "criticality": 0.8,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "AAPL"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      },
+      {
+       "criticality": 0.2,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "INTC"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      },
+      {
+       "criticality": 0.7,
+       "direction": "FORWARD",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "QCOM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      },
+      {
+       "criticality": 0.85,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "ASML",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "REVERSE",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      },
+      {
+       "criticality": 0.55,
+       "direction": "REVERSE",
+       "evidence_status": "WELL_DOCUMENTED_PUBLIC",
+       "evidence_url": null,
+       "from": "AMAT",
+       "relation": "SUPPLIES",
+       "to": "TSM"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "NVDA",
+     "theme_id": "SEMICONDUCTORS"
+    },
+    {
+     "hops": [
+      {
+       "criticality": 0.95,
+       "direction": "FORWARD",
+       "evidence_status": "REPORTED_NEWS",
+       "evidence_url": "https://www.bloomberg.com/news/articles/2026-06-04/tsmc-ceo-warns-chip-supply-won-t-meet-ai-fueled-demand-for-years",
+       "from": "TSM",
+       "relation": "SUPPLIES",
+       "to": "NVDA"
+      }
+     ],
+     "pattern": "P2_EVENT_CONCEPT_COMPANY_SUPPLY_COMPANY",
+     "root": "TSM",
+     "theme_id": "SEMICONDUCTORS"
+    }
+   ]
   },
   "status": 200
  },

@@ -8,6 +8,11 @@ can be proven not to have moved a score, a rank, or a priority.
 `(status, json_body)`. The tests drive it through both the FastAPI app and
 the in-browser (Pyodide) dispatcher and require identical output.
 
+Responses are recorded exactly as served: nothing is sorted, masked or
+reduced. The application's output is deterministic across processes and
+Python hash seeds (see validation/determinism.py and tests/test_determinism.py),
+so list ORDER is part of what the baseline pins.
+
 Deliberately excluded: anything time- or environment-dependent (the
 scalability benchmark's timings) and the SLSQP calibration endpoints (their
 last digits depend on the scipy build).
@@ -62,73 +67,13 @@ REQUESTS: list = [
 ]
 
 
-_EVENT_UNORDERED = ("direct_relevance", "relevant_counterparties", "counterparty_exposure_paths")
-
-
-def _canonical(value: Any) -> Any:
-    """Recursively sort every list by its JSON form (order-insensitive compare)."""
-    if isinstance(value, dict):
-        return {k: _canonical(v) for k, v in value.items()}
-    if isinstance(value, list):
-        return sorted((_canonical(v) for v in value), key=lambda v: json.dumps(v, sort_keys=True))
-    return value
-
-
-def _stabilise(name: str, data: Any) -> Any:
-    """Remove process-level non-determinism that exists in the application
-    itself, so the snapshot compares analytics and not hash-seed luck.
-
-    KNOWN DEFECT (not fixed here - it is outside the scope of the
-    hardening phase): routers/counterparties.py builds
-    `indirect_relationships` by iterating a `set` of held issuers and then
-    truncating with `[:20]`. Python's per-process string-hash randomisation
-    therefore changes the ORDER of that list on every server start, and -
-    for counterparties whose list reaches the 20-row cap (CP_SUMMIT,
-    CP_VANTAGE, CP_EQUINOX) - also WHICH rows are shown.
-    Here: lists are sorted, and a list at the cap is reduced to its length.
-
-    KNOWN DEFECT 2 (same class, same decision): core/event_parser.py
-    iterates sets of issuer ids, so several Event Studio lists
-    (`direct_relevance`, Mode 1 `results`, `typed_paths`,
-    `relevant_counterparties`, `counterparty_exposure_paths`) come back in
-    a process-dependent order. Those lists are compared order-insensitively;
-    the PPR (Mode 2) list is stable and keeps its order.
-
-    KNOWN DEFECT 3: `typed_paths` is `typed_paths[:40]` over that same
-    unordered iteration, so WHICH 40 paths appear differs per process. Only
-    the stable summary (count + per-pattern histogram) is snapshotted.
-    """
-    if name.startswith("event_parse:") and isinstance(data, dict):
-        data = dict(data)
-        for key in _EVENT_UNORDERED:
-            if isinstance(data.get(key), list):
-                data[key] = _canonical(data[key])
-        if isinstance(data.get("typed_paths"), list):
-            patterns: dict = {}
-            for tp in data["typed_paths"]:
-                patterns[tp.get("pattern")] = patterns.get(tp.get("pattern"), 0) + 1
-            data["typed_paths"] = {"count": len(data["typed_paths"]), "by_pattern": patterns}
-        m1 = data.get("mode1_bounded_traversal")
-        if isinstance(m1, dict) and isinstance(m1.get("results"), list):
-            data["mode1_bounded_traversal"] = {**m1, "results": _canonical(m1["results"])}
-    if name.startswith("counterparty_360:") and isinstance(data, dict):
-        rows = data.get("indirect_relationships")
-        if isinstance(rows, list):
-            if len(rows) >= 20:
-                data = {**data, "indirect_relationships": {"truncated_at_cap": len(rows)}}
-            else:
-                data = {**data, "indirect_relationships": sorted(
-                    rows, key=lambda r: (r["via_direct_holding"], r["indirect_entity"]))}
-    return data
-
-
 def capture(request: Request) -> dict:
     out = {}
     for name, method, path, body, keys in REQUESTS:
         status, data = request(method, path, body)
         if keys is not None and isinstance(data, dict):
             data = {k: data[k] for k in keys if k in data}
-        out[name] = {"status": status, "body": _stabilise(name, data)}
+        out[name] = {"status": status, "body": data}
     return out
 
 
