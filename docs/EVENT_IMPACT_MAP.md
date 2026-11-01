@@ -69,3 +69,24 @@ Approved sources are configured in `data/events/approved_sources.json`. Press, a
 * All approved sources are first-party (the issuer, a counterparty's newsroom, a regulator): statements are promotional and unverified for truth.
 * Documented relationships are structural. A path does not say the event affects the company, in which direction, or by how much.
 * Many named companies in the evidence are not in the platform's dataset (Amkor, IBIDEN, KYEC, SPIL, Unimicron, Synopsys, ...), so they cannot be connected.
+
+## The page (frontend)
+
+`/event-impact-map` ("Event Impact Map" in the sidebar). Code: `frontend/src/pages/GlobalEventImpactMap.tsx`,
+`components/ImpactMapCanvas.tsx`, and the pure, unit-tested logic in `src/impactmap/model.ts`
+(projection, arcs, overlap spreading, cable styling, path chips).
+
+- Map: Equal Earth projection over bundled Natural Earth geometry (offline; works in the static build).
+- Cables come only from the API's graph edges. A travelling pulse appears only on a documented relationship and runs in its stored
+  direction. Nothing is drawn while loading, empty or in error; with `prefers-reduced-motion` there are no pulses.
+- Markers are real buttons (keyboard and screen-reader accessible); Escape deselects; the selected event is kept in the URL (`?event=`).
+- Entity markers sit at the HQ country (approximate); a marker is never an epicentre.
+- Impact is shown as "Not estimated", verified exposure as "Not available", separately from the relationship evidence.
+
+Verification: `npm test` (node:test, logic), `node e2e/browser-e2e.mjs dev|static` (real Edge, both deployment modes).
+
+### Known gaps
+- The "global impact map design concept" referred to in the brief was not supplied to this work, so the visual design is original
+  rather than derived from it.
+- The "Neural Cable Graph" is used as a technique only (gradient bezier cables, travelling pulses, glow on selected routes). Its random
+  colours, jitter and invented readouts are deliberately not reused: every visual state here is derived from API data.
