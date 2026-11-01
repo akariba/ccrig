@@ -1,0 +1,149 @@
+{
+ "count": 7,
+ "description": "Documents matching '\"NVIDIA\"' and published from 08/05/2025 to 02/01/2026",
+ "results": [
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-01377",
+   "html_url": "https://www.federalregister.gov/documents/2026/01/26/2026-01377/self-regulatory-organizations-cboe-edgx-exchange-inc-notice-of-filing-and-immediate-effectiveness-of",
+   "publication_date": "2026-01-26",
+   "title": "Self-Regulatory Organizations; Cboe EDGX Exchange, Inc.; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend the Short Term Option Series Program in Rule 19.6, Interpretation and Policy .05",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-01376",
+   "html_url": "https://www.federalregister.gov/documents/2026/01/26/2026-01376/self-regulatory-organizations-cboe-bzx-exchange-inc-notice-of-filing-and-immediate-effectiveness-of",
+   "publication_date": "2026-01-26",
+   "title": "Self-Regulatory Organizations; Cboe BZX Exchange, Inc.; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend the Short Term Option Series Program in Rule 19.6, Interpretation and Policy .05",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-01374",
+   "html_url": "https://www.federalregister.gov/documents/2026/01/26/2026-01374/self-regulatory-organizations-cboe-exchange-inc-notice-of-filing-and-immediate-effectiveness-of-a",
+   "publication_date": "2026-01-26",
+   "title": "Self-Regulatory Organizations; Cboe Exchange, Inc.; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend the Short Term Option Series Program in Rule 4.5(d)",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-01118",
+   "html_url": "https://www.federalregister.gov/documents/2026/01/22/2026-01118/self-regulatory-organizations-nasdaq-ise-llc-order-approving-a-proposed-rule-change-as-modified-by",
+   "publication_date": "2026-01-22",
+   "title": "Self-Regulatory Organizations; Nasdaq ISE, LLC; Order Approving a Proposed Rule Change, as Modified by Amendment No. 1, To Amend the Short Term Option Series Program To List Qualifying Securities",
+   "type": "Notice"
+  },
+  {
+   "abstract": "The Bureau of Industry and Security (BIS) is revising its license review policy for exports of certain semiconductors to China and Macau--changing it from a presumption of denial to a case-by-case review. The semiconductors covered by this rule are the Nvidia H200 and its equivalents, as well as less advanced chips--provided that (1) the semiconductors are commercially available in the United States at the time of publication of this rule and (2) the exporter certifies that: there is sufficient supply of this product in the United States; production of this product for exports to China will not divert global foundry capacity for similar or more advanced products for end users in the United States; the recipient has demonstrated sufficient security procedures; and the item undergoes independent, third-party testing in the United States to verify its performance specifications.",
+   "agencies": [
+    {
+     "id": 54,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/54",
+     "name": "Commerce Department",
+     "parent_id": null,
+     "raw_name": "DEPARTMENT OF COMMERCE",
+     "slug": "commerce-department",
+     "url": "https://www.federalregister.gov/agencies/commerce-department"
+    },
+    {
+     "id": 241,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/241",
+     "name": "Industry and Security Bureau",
+     "parent_id": 54,
+     "raw_name": "Bureau of Industry and Security",
+     "slug": "industry-and-security-bureau",
+     "url": "https://www.federalregister.gov/agencies/industry-and-security-bureau"
+    }
+   ],
+   "document_number": "2026-00789",
+   "html_url": "https://www.federalregister.gov/documents/2026/01/15/2026-00789/revision-to-license-review-policy-for-advanced-computing-commodities",
+   "publication_date": "2026-01-15",
+   "title": "Revision to License Review Policy for Advanced Computing Commodities",
+   "type": "Rule"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2025-23533",
+   "html_url": "https://www.federalregister.gov/documents/2025/12/22/2025-23533/self-regulatory-organizations-cboe-exchange-inc-order-instituting-proceedings-to-determine-whether",
+   "publication_date": "2025-12-22",
+   "title": "Self-Regulatory Organizations; Cboe Exchange, Inc.; Order Instituting Proceedings To Determine Whether To Approve or Disapprove a Proposed Rule Change To Amend Rule 5.4 to Change the Minimum Increment for Options on the Cboe Magnificent 10 Index",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2025-15258",
+   "html_url": "https://www.federalregister.gov/documents/2025/08/12/2025-15258/self-regulatory-organizations-nasdaq-ise-llc-order-instituting-proceedings-to-determine-whether-to",
+   "publication_date": "2025-08-12",
+   "title": "Self-Regulatory Organizations; Nasdaq ISE, LLC; Order Instituting Proceedings To Determine Whether To Approve or Disapprove a Proposed Rule Change, as Modified by Amendment No. 1, To Amend the Short Term Option Series Program To List Qualifying Securities",
+   "type": "Notice"
+  }
+ ],
+ "total_pages": 1
+}

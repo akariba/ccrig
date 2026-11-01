@@ -1,0 +1,197 @@
+{
+ "count": 10,
+ "description": "Documents matching '\"Advanced Micro Devices\"' and published from 05/05/2026 to 11/01/2026",
+ "results": [
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-21149",
+   "html_url": "https://www.federalregister.gov/documents/2026/10/16/2026-21149/self-regulatory-organizations-cboe-exchange-inc-notice-of-filing-of-amendment-no-1-and-order",
+   "publication_date": "2026-10-16",
+   "title": "Self-Regulatory Organizations; Cboe Exchange, Inc.; Notice of Filing of Amendment No. 1 and Order Granting Accelerated Approval of a Proposed Rule Change, as Modified by Amendment No. 1, To Permit the Listing of Binary Options Overlying Key Performance Indicators Reported by Certain Issuers of Stock",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-19868",
+   "html_url": "https://www.federalregister.gov/documents/2026/09/29/2026-19868/self-regulatory-organizations-box-exchange-llc-notice-of-filing-and-immediate-effectiveness-of-a",
+   "publication_date": "2026-09-29",
+   "title": "Self-Regulatory Organizations; BOX Exchange LLC; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend Rule 5050 To Amend the Short Term Option Series Program With Respect to Qualifying Securities",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-19139",
+   "html_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19139/self-regulatory-organizations-nyse-arca-inc-notice-of-filing-of-a-proposed-rule-change-to-permit-the",
+   "publication_date": "2026-09-18",
+   "title": "Self-Regulatory Organizations; NYSE Arca, Inc.; Notice of Filing of a Proposed Rule Change To Permit the Listing of Binary KPI Options",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-19132",
+   "html_url": "https://www.federalregister.gov/documents/2026/09/18/2026-19132/self-regulatory-organizations-nyse-american-llc-notice-of-filing-of-a-proposed-rule-change-to-permit",
+   "publication_date": "2026-09-18",
+   "title": "Self-Regulatory Organizations; NYSE American LLC; Notice of Filing of a Proposed Rule Change To Permit the Listing of Binary KPI Options",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-17460",
+   "html_url": "https://www.federalregister.gov/documents/2026/08/27/2026-17460/self-regulatory-organizations-miax-sapphire-llc-notice-of-filing-and-immediate-effectiveness-of-a",
+   "publication_date": "2026-08-27",
+   "title": "Self-Regulatory Organizations; MIAX Sapphire, LLC; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend Exchange Rule 404, Series of Option Contracts Open for Trading, To Amend the Short Term Option Series Program With Respect to Qualifying Securities",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-17458",
+   "html_url": "https://www.federalregister.gov/documents/2026/08/27/2026-17458/self-regulatory-organizations-miax-pearl-llc-notice-of-filing-and-immediate-effectiveness-of-a",
+   "publication_date": "2026-08-27",
+   "title": "Self-Regulatory Organizations; MIAX PEARL, LLC; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend Rule 404, Series of Option Contracts Open for Trading, To Amend the Short Term Option Series Program With Respect to Qualifying Securities",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-17457",
+   "html_url": "https://www.federalregister.gov/documents/2026/08/27/2026-17457/self-regulatory-organizations-miami-international-securities-exchange-llc-notice-of-filing-and",
+   "publication_date": "2026-08-27",
+   "title": "Self-Regulatory Organizations: Miami International Securities Exchange, LLC; Notice of Filing and Immediate Effectiveness of a Proposed Rule Change To Amend Rule 404, Series of Option Contracts Open for Trading, To Amend the Short Term Option Series Program With Respect to Qualifying Securities",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-14201",
+   "html_url": "https://www.federalregister.gov/documents/2026/07/15/2026-14201/self-regulatory-organizations-cboe-exchange-inc-notice-of-filing-of-a-proposed-rule-change-to-amend",
+   "publication_date": "2026-07-15",
+   "title": "Self-Regulatory Organizations; Cboe Exchange, Inc.; Notice of Filing of a Proposed Rule Change To Amend its Rules To Permit the Listing of Binary Options Overlying Key Performance Indicators (\u201cKPIs\u201d) Reported by Certain Issuers of Stock (\u201cBinary KPI Options\u201d)",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-13651",
+   "html_url": "https://www.federalregister.gov/documents/2026/07/07/2026-13651/self-regulatory-organizations-nyse-arca-inc-notice-of-filing-of-a-proposed-rule-change-to-amend",
+   "publication_date": "2026-07-07",
+   "title": "Self-Regulatory Organizations; NYSE Arca, Inc.; Notice of Filing of a Proposed Rule Change To Amend Rules 5.32-O and 5.35-O",
+   "type": "Notice"
+  },
+  {
+   "abstract": null,
+   "agencies": [
+    {
+     "id": 466,
+     "json_url": "https://www.federalregister.gov/api/v1/agencies/466",
+     "name": "Securities and Exchange Commission",
+     "parent_id": null,
+     "raw_name": "SECURITIES AND EXCHANGE COMMISSION",
+     "slug": "securities-and-exchange-commission",
+     "url": "https://www.federalregister.gov/agencies/securities-and-exchange-commission"
+    }
+   ],
+   "document_number": "2026-13650",
+   "html_url": "https://www.federalregister.gov/documents/2026/07/07/2026-13650/self-regulatory-organizations-nyse-american-llc-notice-of-filing-of-a-proposed-rule-change-to-amend",
+   "publication_date": "2026-07-07",
+   "title": "Self-Regulatory Organizations; NYSE American LLC; Notice of Filing of a Proposed Rule Change To Amend Rule 903G and 906G",
+   "type": "Notice"
+  }
+ ],
+ "total_pages": 1
+}

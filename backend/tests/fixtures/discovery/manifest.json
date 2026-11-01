@@ -1,0 +1,16 @@
+{
+ "federal_register": {
+  "amd_2026-11-01|Advanced Micro Devices": "fr_amd_2026-11-01_advanced-micro-devices.json",
+  "jpm_2026-11-01|JPMorgan Chase": "fr_jpm_2026-11-01_jpmorgan-chase.json",
+  "nvda_2026-02-01|NVIDIA": "fr_nvda_2026-02-01_nvidia.json",
+  "nvda_2026-11-01|NVIDIA": "fr_nvda_2026-11-01_nvidia.json"
+ },
+ "feed": "feed_nvidia.xml",
+ "pages": {
+  "https://nvidianews.nvidia.com/news/nvidia-and-meta-to-expand-collaboration-on-muse-and-muse-family-of-models-amid-robust-growth": "page_nvidia-and-meta-to-expand-collaboration-.html",
+  "https://nvidianews.nvidia.com/news/nvidia-and-oracle-expand-nvidia-vera-rubin-to-multi-gigawatt-scale-and-bring-nvidia-vera-cpu-to-oracle-cloud-infrastructure": "page_nvidia-and-oracle-expand-nvidia-vera-rub.html",
+  "https://nvidianews.nvidia.com/news/nvidia-and-supply-chain-partners-expand-capacity-to-accelerate-ai-infrastructure-buildout": "page_nvidia-and-supply-chain-partners-expand-.html",
+  "https://nvidianews.nvidia.com/news/nvidia-sets-conference-call-for-third-quarter-financial-results-6928873": "page_nvidia-sets-conference-call-for-third-qu.html"
+ },
+ "recorded_at": "2026-11-01"
+}
