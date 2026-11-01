@@ -105,12 +105,19 @@ try {
   check("impact map: the list shows the same events as the map", (await page.getByTestId("event-item").count()) === markers);
   const cables = Number(await map.getAttribute("data-cables"));
   check("impact map: cables are drawn only because the API returned graph edges", cables > 0, `${cables} cables`);
-  check("impact map: no event is selected at first, and the empty panel says so", await page.getByTestId("no-selection").isVisible() && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
+  const newest = await page.getByTestId("event-item").first().getAttribute("data-event-id");
+  check("impact map: the newest returned event is selected by default (list is date order, not importance)", (await page.getByTestId("event-panel").getAttribute("data-event-id")) === newest && /[?&]event=/.test(page.url()) && /not importance/.test(await page.getByTestId("top5").innerText()));
+  check("impact map: Top 5 list and the selected-event panel are both visible without opening anything", await page.getByTestId("top5").isVisible() && await page.getByTestId("event-panel").isVisible());
+  const zoomNewest = Number(await map.getAttribute("data-zoom"));
+  check("impact map: the camera frames the selection (never below the whole world)", zoomNewest >= 1);
   check("impact map: states plainly that events come from a curated register, not live news search", /Curated register, not live news search/.test(await page.getByTestId("semantics-key").innerText()));
   await shot(page, "02b_impact_map");
-  await page.getByTestId("event-marker").first().click();
+  const second = page.getByTestId("event-marker").nth(1);
+  const secondId = await second.getAttribute("data-event-id");
+  await second.click();
   const panel = page.getByTestId("event-panel");
-  await panel.waitFor({ timeout: 5000 });
+  await page.waitForFunction((id) => document.querySelector('[data-testid="event-panel"]')?.dataset.eventId === id, secondId, { timeout: 5000 }).catch(() => {});
+  check("impact map: selecting another marker moves the panel and the list highlight to that event", (await panel.getAttribute("data-event-id")) === secondId && (await page.locator(`[data-testid="event-item"][data-event-id="${secondId}"]`).getAttribute("aria-pressed")) === "true");
   check("impact map: selecting a marker opens the panel with an https source link", /^https:\/\//.test((await panel.getByTestId("source-link").first().getAttribute("href")) ?? ""));
   check("impact map: panel shows verbatim evidence, a published date and a location basis", (await panel.getByTestId("evidence-quote").count()) >= 1 && /\d{4}/.test(await panel.getByTestId("published-date").innerText()) && /Basis:/.test(await panel.getByTestId("event-location").innerText()));
   check("impact map: impact is 'Not estimated' and kept apart from relationship evidence", /Not estimated/.test(await panel.getByTestId("impact-block").innerText()) && /Not available/.test(await panel.getByTestId("impact-block").innerText()));
@@ -126,18 +133,17 @@ try {
   check("impact map: Escape on a focused marker deselects", !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
   await page.getByTestId("event-item").nth(1).focus(); await page.keyboard.press("Enter");
   check("impact map: events are selectable from the keyboard", await page.getByTestId("event-panel").waitFor({ timeout: 5000 }).then(() => true).catch(() => false));
-  await page.getByTestId("event-marker").first().click(); // restore a neutral state
-
+  
   await page.getByTestId("impact-window").selectOption("30");
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
   const n30 = await page.getByTestId("event-marker").count();
-  check("impact map: a 30-day window returns fewer events and explains the shortfall", n30 < markers && /fewer|window|not returned|older|only/i.test(await page.getByTestId("impact-explanation").innerText()), `${n30} markers`);
+  check("impact map: a 30-day window returns fewer events and explains the shortfall", n30 < markers && /fewer|window|not returned|older|only/i.test(await page.getByTestId("impact-explanation").textContent()), `${n30} markers`);
   await page.getByTestId("impact-window").selectOption("180");
 
   await page.getByTestId("impact-query").fill("TSMC");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase !== "loading", null, { timeout: SLOW }).catch(() => {});
-  check("impact map: a company with no register coverage shows no markers and says why", (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("impact-map").getAttribute("data-cables")) === "0" && /no|not/i.test(await page.getByTestId("impact-explanation").innerText().catch(() => "") + await page.getByTestId("impact-message").innerText().catch(() => "")));
+  check("impact map: a company with no register coverage shows no markers and says why", (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("impact-map").getAttribute("data-cables")) === "0" && /no|not/i.test(await page.getByTestId("impact-explanation").textContent().catch(() => "") + await page.getByTestId("impact-message").innerText().catch(() => "")));
   await page.getByTestId("impact-query").fill("zzzz not a company");
   await page.getByRole("button", { name: "Search", exact: true }).click();
   await page.getByTestId("impact-message").waitFor({ timeout: SLOW });
