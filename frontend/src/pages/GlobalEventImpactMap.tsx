@@ -25,6 +25,7 @@ export function GlobalEventImpactMap() {
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
   const [hoverEventId, setHoverEventId] = useState<string | null>(null);
   const [animate, setAnimate] = useState(true);
+  const includeStudio = params.get("studio") === "1";
   const source: "curated" | "discovered" = params.get("source") === "discovered" ? "discovered" : "curated";
   const [comparison, setComparison] = useState<Comparison | null>(null);
   const [comparing, setComparing] = useState(false);
@@ -49,7 +50,8 @@ export function GlobalEventImpactMap() {
       setMatches(found.matches);
       if (found.matches.length === 0) { setData(null); setEntityId(null); setMessage(found.message); setStatus("ok"); return; }
       const target = chosen ?? found.matches[0].entity_id;
-      const result: ImpactResponse = await api.impactMapEvents(target, src === "discovered" ? { recency_days: windowDays, mode: "discovered" } : { recency_days: windowDays });
+      const wantsStudio = new URLSearchParams(window.location.search).get("studio") === "1";
+      const result: ImpactResponse = await api.impactMapEvents(target, { recency_days: windowDays, ...(src === "discovered" ? { mode: "discovered" } : {}), ...(wantsStudio ? { include_studio: "true" } : {}) });
       if (id !== latest.current) return;
       setEntityId(target); setData(result); setStatus("ok");
       // The page opens in the Global Overview (nothing selected). A valid ?event= deep link opens that event; an unknown one is dropped.
@@ -120,6 +122,9 @@ export function GlobalEventImpactMap() {
           </select>
           <button className="btn" type="submit" disabled={status === "loading" || !query.trim()}>{status === "loading" ? "Searching…" : "Search"}</button>
         </form>
+        <label className="hstack" style={{ fontSize: 11.5, color: "var(--text-muted)", cursor: "pointer" }} title="Use relationships approved in an operator's Data Studio (not in the canonical dataset) when finding documented paths">
+          <input type="checkbox" data-testid="include-studio-map" checked={includeStudio} onChange={(e) => { setParams((prev) => { const p = new URLSearchParams(prev); if (e.target.checked) p.set("studio", "1"); else p.delete("studio"); return p; }, { replace: true }); setTimeout(() => run(query, days, entityId ?? undefined), 0); }} /> Include approved relationships
+        </label>
         <div className="seg iw-source" role="group" aria-label="Where events come from" data-testid="source-mode">
           <button type="button" aria-pressed={source === "curated"} onClick={() => chooseSource("curated")} title="A fixed, human-reviewed register: reproducible, the benchmark">Curated register</button>
           <button type="button" aria-pressed={source === "discovered"} onClick={() => chooseSource("discovered")} title="Events found in approved sources by an operator-run discovery, machine-verified">Dynamic discovery</button>
@@ -144,6 +149,13 @@ export function GlobalEventImpactMap() {
         </div>
       )}
       {message && <div className="warning-box" data-testid="impact-message">{message}</div>}
+      {includeStudio && data?.studio_overlay && (
+        <div className={data.studio_overlay.available ? "iw-banner" : "warning-box"} data-testid="studio-overlay-note">
+          {data.studio_overlay.available
+            ? <><b>Approved relationships included.</b> {data.studio_overlay.edges_added} relationship(s) approved in the Data Studio are used for the documented paths below; they are not in the canonical dataset, carry no criticality, and are marked STUDIO_APPROVED.</>
+            : data.studio_overlay.reason}
+        </div>
+      )}
       {source === "discovered" && data && data.available === false && (
         <div className="warning-box" role="status" data-testid="discovery-unavailable">
           <b>Dynamic discovery is not available here.</b> {data.explanation}{" "}

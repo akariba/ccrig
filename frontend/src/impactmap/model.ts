@@ -61,6 +61,7 @@ export interface ImpactResponse {
   limitations: string[];
   // present only for mode=discovered (the curated response is unchanged)
   mode?: "discovered"; available?: boolean; unavailable_code?: string; curated_available?: boolean;
+  studio_overlay?: { requested: boolean; available: boolean; reason: string | null; edges_added?: number; release?: { version: number; approved_by: string } | null; note?: string };
   provenance?: DiscoveryProvenance | null; review?: { status: string; job_id: string | null; decisions: { decision: string; reviewer: string; reason: string; at: string }[] } | null;
 }
 

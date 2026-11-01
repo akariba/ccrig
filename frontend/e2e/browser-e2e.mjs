@@ -212,6 +212,7 @@ try {
   check("impact map: at phone size every event can be opened from the list and none leaves a marker clipped", (await outside()) === 0 && (await page.getByTestId("source-link").first().isVisible()));
   await page.setViewportSize({ width: 1500, height: 950 });
   await page.getByRole("button", { name: "Overview", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.view === "overview", null, { timeout: 8000 }).catch(() => {});
   check("impact map: Overview returns to the unselected state", (await map.getAttribute("data-view")) === "overview" && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
   // curated register vs dynamic discovery: curated stays the default; discovery says plainly when this deployment cannot run it
   check("impact map: the curated register is the default source", (await page.getByTestId("source-mode").getByRole("button", { name: "Curated register" }).getAttribute("aria-pressed")) === "true" && !/[?&]source=/.test(page.url()));
@@ -254,6 +255,17 @@ try {
     await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: 15_000 }).catch(() => {});
     check("impact map: Retry recovers", (await page.getByTestId("event-marker").count()) >= 1);
   }
+  // approved relationships (Data Studio overlay): off by default; where no Studio exists the page says so and shows only the canonical graph
+  await navAndWait(page, "Graph Explorer", "Interactive Graph Explorer");
+  check("graph explorer: approved relationships are off by default", (await page.getByTestId("include-studio").isChecked()) === false && (await page.getByTestId("studio-overlay-note").count()) === 0);
+  await page.getByTestId("include-studio").click();
+  await page.getByTestId("studio-overlay-note").waitFor({ timeout: SLOW });
+  const noteText = await page.getByTestId("studio-overlay-note").innerText();
+  check("graph explorer: without an operator's Studio the overlay is declared unavailable and the canonical graph is unchanged", /canonical dataset only/i.test(noteText) && /[?&]studio=1/.test(page.url()));
+  await page.getByTestId("include-studio").click();
+  await page.waitForFunction(() => !location.search.includes("studio=1"), null, { timeout: 8000 }).catch(() => {});
+  await page.getByTestId("studio-overlay-note").waitFor({ state: "detached", timeout: 8000 }).catch(() => {});
+  check("graph explorer: switching it off removes the note and the URL flag", (await page.getByTestId("studio-overlay-note").count()) === 0 && !/[?&]studio=1/.test(page.url()));
   await navAndWait(page, "Relationships", "Relationships");
 
   // ------------------------------------------------------------------ 3. Model Lab: results, validation errors, recovery
