@@ -83,15 +83,19 @@ export function quadPoint(a: Pt, c: Pt, b: Pt, t: number): Pt {
 }
 
 /** Nudge markers that would sit on top of each other apart, deterministically (by id order), in small rings. Display only. */
-export function spreadOverlaps(items: { id: string; pt: Pt }[], minDist = 20): Record<string, Pt> {
+export function spreadOverlaps(items: { id: string; pt: Pt }[], minDist = 20, bounds?: { w: number; h: number; edge: number }): Record<string, Pt> {
   const placed: Pt[] = [], out: Record<string, Pt> = {};
+  const inside = (q: Pt) => !bounds || (q[0] >= bounds.edge && q[0] <= bounds.w - bounds.edge && q[1] >= bounds.edge && q[1] <= bounds.h - bounds.edge);
+  const clamp = (q: Pt): Pt => !bounds ? q : [Math.min(bounds.w - bounds.edge, Math.max(bounds.edge, q[0])), Math.min(bounds.h - bounds.edge, Math.max(bounds.edge, q[1]))];
   for (const item of [...items].sort((x, y) => (x.id < y.id ? -1 : 1))) {
-    let pt: Pt = item.pt;
-    for (let ring = 0, tries = 0; placed.some((q) => Math.hypot(q[0] - pt[0], q[1] - pt[1]) < minDist) && tries < 60; tries++) {
+    const home = clamp(item.pt);
+    let pt: Pt = home;
+    for (let ring = 0, tries = 0; (placed.some((q) => Math.hypot(q[0] - pt[0], q[1] - pt[1]) < minDist) || !inside(pt)) && tries < 120; tries++) {
       ring = 1 + Math.floor(tries / 8);
       const angle = ((tries % 8) / 8) * 2 * Math.PI + (ring % 2) * (Math.PI / 8);
-      pt = [item.pt[0] + Math.cos(angle) * minDist * ring * 0.9, item.pt[1] + Math.sin(angle) * minDist * ring * 0.9];
+      pt = [home[0] + Math.cos(angle) * minDist * ring * 0.9, home[1] + Math.sin(angle) * minDist * ring * 0.9];
     }
+    if (!inside(pt)) pt = home;                          // nowhere free inside the stage: stay put rather than leave it
     placed.push(pt);
     out[item.id] = pt;
   }
@@ -169,6 +173,31 @@ export function fitView(points: Pt[], w: number, h: number, pad = 110, maxZoom =
   const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
   const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
   return { zoom, tx: clamp(w / 2 - cx * zoom, w - w * zoom, 0), ty: clamp(h / 2 - cy * zoom, h - h * zoom, 0) };
+}
+
+export interface Rect { x: number; y: number; w: number; h: number }
+export type Side = "above" | "below" | "right" | "left";
+
+const overlap = (a: Rect, b: Rect) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+
+/**
+ * Where to put a label of size `size` next to a marker at `anchor` (screen px): the side whose box overlaps the fewest other markers
+ * and leaves the stage least. A general rule, not tied to any place; ties keep the order above, below, right, left. Pure.
+ */
+export function placeCallout(anchor: Pt, size: { w: number; h: number }, obstacles: Rect[], bounds: { w: number; h: number }, radius = 13, gap = 12): Side {
+  const { w, h } = size, d = radius + gap;
+  const boxes: Record<Side, Rect> = {
+    above: { x: anchor[0] - w / 2, y: anchor[1] - d - h, w, h }, below: { x: anchor[0] - w / 2, y: anchor[1] + d, w, h },
+    right: { x: anchor[0] + d, y: anchor[1] - h / 2, w, h }, left: { x: anchor[0] - d - w, y: anchor[1] - h / 2, w, h },
+  };
+  const world: Rect = { x: 0, y: 0, w: bounds.w, h: bounds.h };
+  let best: Side = "above", bestScore = Infinity;
+  for (const side of ["above", "below", "right", "left"] as Side[]) {
+    const box = boxes[side];
+    const score = obstacles.reduce((t, o) => t + overlap(box, o), 0) + 2 * (w * h - overlap(box, world));
+    if (score < bestScore - 1e-9) { best = side; bestScore = score; }
+  }
+  return best;
 }
 
 // ------------------------------------------------------------------ reading a path
