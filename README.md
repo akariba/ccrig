@@ -89,6 +89,8 @@ npm run verify:static       # boots the pinned in-browser runtime headlessly and
 
 `npm run verify:static` is the check for the GitHub Pages build: it vendors the backend exactly as `build:static` does, boots Pyodide with the pinned packages from `frontend/src/api/pyodide-pins.json`, asserts every installed version equals its pin (and that pandas is absent), and runs the analytical baseline plus all shared request-validation cases through the in-browser dispatcher. Run it whenever `pyodide-pins.json`, `requirements.txt` or the dispatcher changes.
 
+**Real-browser check of both deployment modes** (`frontend/e2e/browser-e2e.mjs`, not part of CI): drives a headless Chromium-based browser (Edge, Chrome or Chromium) through all 13 views, the Model Lab and Event Studio validation errors, the Distance Map, Counterparty 360 (including CCR-only records), the Backtest Lab, the "Connecting..." and "Backend unreachable" states with self-recovery, and - for the static build - the boot overlay and the failure screen with a working Retry when the Python runtime's CDN is blocked. It also fails on unexpected console, page or HTTP errors. The header of the script lists the exact commands for both modes; it needs `npm install --no-save playwright-core` (deliberately not a project dependency) and saves screenshots to `frontend/e2e-shots/` (git-ignored).
+
 ### 5. Validation harness and analytical baseline
 
 `backend/validation/` is a **read-only** harness that is not imported by the app and not shipped in the static build.
