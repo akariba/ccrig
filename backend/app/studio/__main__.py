@@ -30,7 +30,7 @@ def main(argv=None) -> int:
     for name in ("approve", "reject"):
         q = sub.add_parser(name); q.add_argument("job_id"); q.add_argument("--reviewer", required=True); q.add_argument("--reason", required=True)
         if name == "approve":
-            q.add_argument("--ack-mappings", action="store_true"); q.add_argument("--ack-changes", action="store_true")
+            q.add_argument("--ack-mappings", action="store_true"); q.add_argument("--ack-changes", action="store_true"); q.add_argument("--ack-assertions", action="store_true")
     sub.add_parser("jobs"); sub.add_parser("datasets"); sub.add_parser("verify-ledger")
     q = sub.add_parser("releases"); q.add_argument("dataset"); q.add_argument("--scope", default="")
     q = sub.add_parser("export"); q.add_argument("dataset"); q.add_argument("--scope", default="")
@@ -40,7 +40,10 @@ def main(argv=None) -> int:
     q = sub.add_parser("discover", help="find, verify and stage recent events for a company from approved sources (needs CCRIG_DISCOVERY_NETWORK=1 for a live search)")
     q.add_argument("query"); q.add_argument("--window", type=int, default=180); q.add_argument("--limit", type=int, default=5); q.add_argument("--no-stage", action="store_true")
     q.add_argument("--as-of", help="YYYY-MM-DD (default: today, UTC)")
-    sub.add_parser("providers"); sub.add_parser("runs")
+    sub.add_parser("providers"); sub.add_parser("runs"); sub.add_parser("relationships")
+    q = sub.add_parser("report"); q.add_argument("job_id")
+    q = sub.add_parser("source-add", help="store a copy of an approved-source page as evidence (no network)")
+    q.add_argument("file"); q.add_argument("--url", required=True); q.add_argument("--published-date", required=True); q.add_argument("--title", required=True)
     q = sub.add_parser("run"); q.add_argument("run_id")
     a = ap.parse_args(argv)
 
@@ -60,7 +63,7 @@ def main(argv=None) -> int:
         elif a.cmd == "events":
             _out(store.events(a.job_id))
         elif a.cmd == "approve":
-            _out(review.approve(store, a.job_id, reviewer=a.reviewer, reason=a.reason, acknowledge_mappings=a.ack_mappings, acknowledge_changes=a.ack_changes))
+            _out(review.approve(store, a.job_id, reviewer=a.reviewer, reason=a.reason, acknowledge_mappings=a.ack_mappings, acknowledge_changes=a.ack_changes, acknowledge_assertions=a.ack_assertions))
         elif a.cmd == "reject":
             _out(review.reject(store, a.job_id, reviewer=a.reviewer, reason=a.reason))
         elif a.cmd == "jobs":
@@ -81,6 +84,21 @@ def main(argv=None) -> int:
 
             out = dservice.run(store, a.query, window_days=a.window, limit=a.limit, stage=not a.no_stage, operator="cli", as_of=_date.fromisoformat(a.as_of) if a.as_of else None)
             _out(out)
+        elif a.cmd == "report":
+            from . import report as dreport
+
+            _out(dreport.quality_report(store, a.job_id) or {"error": "NOT_FOUND"})
+        elif a.cmd == "relationships":
+            from . import impact, overlay
+
+            edges, release = overlay.load(store)
+            cur = store.current("reference_entities", "")
+            refs = store.read_release(cur["release_id"])["rows"] if cur else []
+            _out({"release": release, "edges": edges, "adoption_effect": impact.adoption_effect(edges, refs) if edges else None})
+        elif a.cmd == "source-add":
+            from . import relationships
+
+            _out(relationships.add_source(store, Path(a.file).read_bytes(), url=a.url, published_date=a.published_date, title=a.title))
         elif a.cmd == "providers":
             from ..discovery import agent as dagent, net as dnet, providers as dprov
 
@@ -92,7 +110,7 @@ def main(argv=None) -> int:
             _out(store.load_run(a.run_id) or {"error": "NOT_FOUND"})
         elif a.cmd == "verify-ledger":
             _out(store.verify_chain())
-    except (review.ReviewError, pipeline.BadRequest, config.UnsafeWorkspace, acquire.IngestRejected) as exc:
+    except (review.ReviewError, pipeline.BadRequest, config.UnsafeWorkspace, acquire.IngestRejected, ValueError) as exc:
         print(json.dumps({"error": getattr(exc, "code", type(exc).__name__), "message": str(exc)}), file=sys.stderr)
         return 2
     return 0

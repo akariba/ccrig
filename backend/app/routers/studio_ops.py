@@ -61,6 +61,7 @@ class Decision(BaseModel):
     reason: str = Field(min_length=1, max_length=1000)
     acknowledge_mappings: bool = False
     acknowledge_changes: bool = False
+    acknowledge_assertions: bool = False
 
 
 class Restore(BaseModel):
@@ -119,7 +120,7 @@ def get_staging(job_id: str, store: StudioStore = Depends(get_store)):
 
 @router.post("/jobs/{job_id}/approve")
 def approve(job_id: str, body: Decision, store: StudioStore = Depends(get_store)):
-    return _call(review.approve, store, job_id, reviewer=body.reviewer, reason=body.reason, acknowledge_mappings=body.acknowledge_mappings, acknowledge_changes=body.acknowledge_changes)
+    return _call(review.approve, store, job_id, reviewer=body.reviewer, reason=body.reason, acknowledge_mappings=body.acknowledge_mappings, acknowledge_changes=body.acknowledge_changes, acknowledge_assertions=body.acknowledge_assertions)
 
 
 @router.post("/jobs/{job_id}/reject")
@@ -194,3 +195,38 @@ def discovery_run_detail(run_id: str, store: StudioStore = Depends(get_store)):
     if not run:
         raise _err(404, "NOT_FOUND", f"no discovery run {run_id}")
     return run
+
+
+# ------------------------------------------------------------------ relationships, data-quality reports and adoption effect (operator only)
+@router.get("/jobs/{job_id}/report")
+def job_report(job_id: str, store: StudioStore = Depends(get_store)):
+    from ..studio import report
+
+    out = report.quality_report(store, job_id)
+    if out is None:
+        raise _err(404, "NOT_FOUND", f"no job {job_id}")
+    return out
+
+
+@router.get("/relationships")
+def approved_relationships(store: StudioStore = Depends(get_store)):
+    """The approved relationship evidence as graph edges with provenance, and what adopting it would change (nothing is adopted)."""
+    from ..studio import impact, overlay
+
+    edges, release = overlay.load(store)
+    cur = store.current("reference_entities", "")
+    refs = store.read_release(cur["release_id"])["rows"] if cur else []
+    return {"release": release, "edges": edges, "adoption_effect": impact.adoption_effect(edges, refs) if edges else None}
+
+
+@router.post("/sources")
+async def add_source(request: Request, url: str = Query(min_length=10, max_length=2000), published_date: str = Query(pattern=r"^\d{4}-\d{2}-\d{2}$"),
+                     title: str = Query(min_length=3, max_length=500), store: StudioStore = Depends(get_store)):
+    """Store an operator-supplied copy of an approved-source page as raw evidence for relationship rows. No network is used; the page must contain the title and date."""
+    from ..studio import relationships
+
+    data = await _body(request, config.limits().max_bytes)
+    try:
+        return relationships.add_source(store, data, url=url, published_date=published_date, title=title)
+    except ValueError as exc:
+        raise _err(422, "BAD_SOURCE", str(exc)) from None

@@ -31,7 +31,7 @@ def _pending(store: StudioStore, job_id: str) -> dict:
     return job
 
 
-def approve(store: StudioStore, job_id: str, *, reviewer: str, reason: str, acknowledge_mappings: bool = False, acknowledge_changes: bool = False) -> dict:
+def approve(store: StudioStore, job_id: str, *, reviewer: str, reason: str, acknowledge_mappings: bool = False, acknowledge_changes: bool = False, acknowledge_assertions: bool = False) -> dict:
     reviewer, reason = _who(reviewer, reason)
     job = _pending(store, job_id)
     if job["blocking"]:
@@ -45,6 +45,12 @@ def approve(store: StudioStore, job_id: str, *, reviewer: str, reason: str, ackn
     needs_ack = [m for m in staging["mappings"] if m["requires_acknowledgement"]]
     if needs_ack and not acknowledge_mappings:
         raise ReviewError("MAPPINGS_NOT_ACKNOWLEDGED", f"{len(needs_ack)} entity mapping(s) were applied by ticker, name or alias; acknowledge them to approve")
+    asserted = staging.get("assertions_to_confirm") or []
+    if asserted and not acknowledge_assertions:
+        raise ReviewError("ASSERTIONS_NOT_ACKNOWLEDGED", f"{len(asserted)} relationship(s) are asserted by the proposer from quoted text with no explicit wording; the reviewer must confirm them (acknowledge_assertions)")
+    reverse = [e for e in (staging.get("graph_effect") or {}).get("edges", []) if e.get("reverse_edge_in_canonical")]
+    if reverse and not acknowledge_changes:
+        raise ReviewError("CHANGES_NOT_ACKNOWLEDGED", f"{len(reverse)} proposed relationship(s) run opposite to an existing canonical edge; acknowledge to approve")
     changed_prev, changed_canon = staging["vs_previous_release"].get("changed", 0), staging["vs_canonical"].get("changed", 0) or 0
     if (changed_prev or changed_canon) and not acknowledge_changes:
         raise ReviewError("CHANGES_NOT_ACKNOWLEDGED", f"{changed_prev} row(s) differ from the previous approved release and {changed_canon} from the canonical dataset; acknowledge the changes to approve")
@@ -63,7 +69,8 @@ def approve(store: StudioStore, job_id: str, *, reviewer: str, reason: str, ackn
            "approved_by": reviewer, "approved_at": store.clock(), "lineage_of_this_job": sorted(lineage)}
     path = store.write_release_file(contract.name, scope, version, doc)         # file first; the database commit below makes it real
     detail = {"acknowledge_mappings": acknowledge_mappings, "acknowledge_changes": acknowledge_changes, "changed_vs_previous": changed_prev, "changed_vs_canonical": changed_canon,
-              "mappings": len(staging["mappings"]), "base_release_id": staging["base_release_id"]}
+              "mappings": len(staging["mappings"]), "base_release_id": staging["base_release_id"], "acknowledge_assertions": acknowledge_assertions,
+              "assertions_confirmed": asserted}
     rid = store.commit_release(dataset=contract.name, scope=scope, job_id=job_id, version=version, content_hash=chash, path=path, rows=len(merged), reviewer=reviewer, reason=reason, detail=detail)
     return {"release_id": rid, "dataset": contract.name, "scope": scope, "version": version, "rows": len(merged), "content_hash": chash,
             "note": "Published to the Studio workspace only. Canonical datasets and scoring inputs are unchanged."}

@@ -150,6 +150,12 @@ def ingest(store: StudioStore, data: bytes, *, source_id: str, filename: str, ta
             ticker = (canonical_index().entities.get(scope_id) or {}).get("ticker") if contract.scoped else None
             staging = build_staging(contract, job_id=job_id, scope=scope_id, proposed=proposed, excluded=excluded, mappings=mappings, previous_release=current,
                                     previous_rows=prev_rows, canonical=canonical_rows(contract, scope_id, ticker))
+            if contract.name == "relationship_evidence":
+                from . import impact
+
+                staging["graph_effect"] = impact.edge_effect(proposed)
+                staging["assertions_to_confirm"] = sorted({(r["source"], r["relation"], r["target"]) for r in proposed if (r.get("assertion") or {}).get("basis") == "PROPOSER_ASSERTED"})
+                staging["assertions_to_confirm"] = [list(x) for x in staging["assertions_to_confirm"]]
             store.save_staging(job_id, staging)
             st.counts = {"new_vs_previous": staging["vs_previous_release"]["new"], "changed_vs_previous": staging["vs_previous_release"]["changed"],
                          "changed_vs_canonical": staging["vs_canonical"].get("changed")}
