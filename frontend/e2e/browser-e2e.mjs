@@ -81,7 +81,7 @@ try {
   await shot(page, "01_relationships");
 
   // ------------------------------------------------------------------ 2. navigation over all views
-  const NAV = [["Events", "Event Studio"], ["Counterparties", "Counterparty 360"], ["Controls", "Control Exceptions"], ["Inbox", "Inbox"],
+  const NAV = [["Events", "Event Studio"], ["Event Impact Map", "Global Event Impact Map"], ["Counterparties", "Counterparty 360"], ["Controls", "Control Exceptions"], ["Inbox", "Inbox"],
     ["Entity Explorer", "Entity 360"], ["Exposure Movers", "Exposure Movers"], ["Graph Explorer", "Interactive Graph Explorer"],
     ["Distance Map", "Distance Map"], ["Theme Radar", "Dynamic Theme Radar"], ["Model Lab", "Model Lab"], ["Backtest Lab", "Backtest Lab"],
     ["Data Sources", "Data & Provenance Explorer"], ["Relationships", "Relationships"]];
@@ -94,6 +94,66 @@ try {
     check(`nav: ${label} -> "${heading}"`, got === heading && problems.filter((p) => !/Failed to load resource/.test(p)).length === before && httpErrors.slice(httpBefore).every((e) => EXPECTED_404_TWO_UNIVERSES.test(e)) && warn === 0,
       got !== heading ? `h1="${got}"` : !httpErrors.slice(httpBefore).every((e) => EXPECTED_404_TWO_UNIVERSES.test(e)) ? httpErrors.slice(httpBefore).join(" ; ") : warn ? "error shown" : "");
   }
+
+  // ------------------------------------------------------------------ 2b. Global Event Impact Map
+  await navAndWait(page, "Event Impact Map", "Global Event Impact Map");
+  const map = page.getByTestId("impact-map");
+  await map.waitFor({ timeout: SLOW });
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
+  const markers = await page.getByTestId("event-marker").count();
+  check("impact map: default NVIDIA search plots 1-5 event markers", markers >= 1 && markers <= 5, `${markers} markers`);
+  check("impact map: the list shows the same events as the map", (await page.getByTestId("event-item").count()) === markers);
+  const cables = Number(await map.getAttribute("data-cables"));
+  check("impact map: cables are drawn only because the API returned graph edges", cables > 0, `${cables} cables`);
+  check("impact map: no event is selected at first, and the empty panel says so", await page.getByTestId("no-selection").isVisible() && !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
+  await shot(page, "02b_impact_map");
+  await page.getByTestId("event-marker").first().click();
+  const panel = page.getByTestId("event-panel");
+  await panel.waitFor({ timeout: 5000 });
+  check("impact map: selecting a marker opens the panel with an https source link", /^https:\/\//.test((await panel.getByTestId("source-link").first().getAttribute("href")) ?? ""));
+  check("impact map: panel shows verbatim evidence, a published date and a location basis", (await panel.getByTestId("evidence-quote").count()) >= 1 && /\d{4}/.test(await panel.getByTestId("published-date").innerText()) && /Basis:/.test(await panel.getByTestId("event-location").innerText()));
+  check("impact map: impact is 'Not estimated' and kept apart from relationship evidence", /Not estimated/.test(await panel.getByTestId("impact-block").innerText()) && /Not available/.test(await panel.getByTestId("impact-block").innerText()));
+  check("impact map: panel lists analytical limitations", (await panel.getByTestId("limitations").locator("li").count()) >= 1);
+  check("impact map: the selection is in the URL", /[?&]event=/.test(page.url()));
+  const typed = await page.getByTestId("path").evaluateAll((els) => els.map((e) => e.dataset.relationshipType));
+  check("impact map: every drawn path is typed (direct mention / documented direct / indirect), none invented", typed.length >= 1 && typed.every((t) => /^(DIRECT_MENTION|DOCUMENTED_DIRECT|DOCUMENTED_INDIRECT)$/.test(t)), typed.join(","));
+  await shot(page, "02c_impact_map_selected");
+  await page.keyboard.press("Escape");
+  await page.getByTestId("event-marker").first().focus();
+  await page.keyboard.press("Escape");
+  await page.waitForFunction(() => !document.querySelector('[data-testid="event-panel"]'), null, { timeout: 5000 }).catch(() => {});
+  check("impact map: Escape on a focused marker deselects", !(await page.getByTestId("event-panel").isVisible().catch(() => false)));
+  await page.getByTestId("event-item").nth(1).focus(); await page.keyboard.press("Enter");
+  check("impact map: events are selectable from the keyboard", await page.getByTestId("event-panel").waitFor({ timeout: 5000 }).then(() => true).catch(() => false));
+  await page.getByTestId("event-marker").first().click(); // restore a neutral state
+
+  await page.getByTestId("impact-window").selectOption("30");
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: SLOW }).catch(() => {});
+  const n30 = await page.getByTestId("event-marker").count();
+  check("impact map: a 30-day window returns fewer events and explains the shortfall", n30 < markers && /fewer|window|not returned|older|only/i.test(await page.getByTestId("impact-explanation").innerText()), `${n30} markers`);
+  await page.getByTestId("impact-window").selectOption("180");
+
+  await page.getByTestId("impact-query").fill("TSMC");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase !== "loading", null, { timeout: SLOW }).catch(() => {});
+  check("impact map: a company with no register coverage shows no markers and says why", (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("impact-map").getAttribute("data-cables")) === "0" && /no|not/i.test(await page.getByTestId("impact-explanation").innerText().catch(() => "") + await page.getByTestId("impact-message").innerText().catch(() => "")));
+  await page.getByTestId("impact-query").fill("zzzz not a company");
+  await page.getByRole("button", { name: "Search", exact: true }).click();
+  await page.getByTestId("impact-message").waitFor({ timeout: SLOW });
+  check("impact map: an unknown query clears the previous results and explains", (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("event-item").count()) === 0);
+
+  if (MODE === "dev") {   // static mode has no network between page and API, so a network failure can only be induced in dev
+    await page.route(apiRe("impact-map"), (r) => r.abort());
+    await page.getByTestId("impact-query").fill("NVIDIA");
+    await page.getByRole("button", { name: "Search", exact: true }).click();
+    const errShown = await page.getByTestId("impact-error").waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
+    check("impact map: unreachable API shows an error with Retry and draws nothing", errShown && (await page.getByTestId("event-marker").count()) === 0 && (await page.getByTestId("impact-map").getAttribute("data-phase")) === "error");
+    await page.unroute(apiRe("impact-map"));
+    await page.getByTestId("impact-error").getByRole("button", { name: "Retry" }).click();
+    await page.waitForFunction(() => document.querySelector('[data-testid="impact-map"]')?.dataset.phase === "ready", null, { timeout: 15_000 }).catch(() => {});
+    check("impact map: Retry recovers", (await page.getByTestId("event-marker").count()) >= 1);
+  }
+  await navAndWait(page, "Relationships", "Relationships");
 
   // ------------------------------------------------------------------ 3. Model Lab: results, validation errors, recovery
   await navAndWait(page, "Model Lab", "Model Lab");
