@@ -1,0 +1,148 @@
+# CI for CCRIG. What must fail the build:
+#   * any change to a score, rank, priority or list order        (analytical baseline + determinism)
+#   * the server and the in-browser (static) backend disagreeing   (FastAPI/dispatcher parity)
+#   * the static build's pinned runtime drifting or not working    (real Pyodide verification)
+#   * type errors, new lint warnings, failing UI-logic tests, broken production builds
+#
+# Third-party actions are pinned to exact commits (tag in the trailing comment).
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly: re-run the real-Pyodide verification to catch drift in what the
+    # static build downloads at runtime (Pyodide CDN, PyPI) even when no code changed.
+    - cron: "17 5 * * 1"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.13"
+  NODE_VERSION: "22"
+
+jobs:
+  backend:
+    name: Backend - analytics baseline, parity, determinism, tests
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+
+      # Exactly the pinned versions the project documents (requirements.txt has no ranges).
+      - name: Install pinned requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Analytical baseline (any drift in scores, ranks, priorities or list order fails)
+        run: python -m validation.run --check
+
+      - name: Full backend suite (includes FastAPI/dispatcher parity and cross-process determinism)
+        run: python -m pytest -q -ra
+
+  frontend:
+    name: Frontend - types, lint, tests, standard and static builds
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install (exact lockfile)
+        run: npm ci
+
+      - name: TypeScript
+        run: npx tsc -p tsconfig.app.json --noEmit
+
+      # Ratchet: the repository has 11 pre-existing react-hooks warnings. Errors fail
+      # the build and no NEW warning may be added; lower this number as they are fixed.
+      - name: Lint
+        run: npx oxlint --max-warnings 11
+
+      - name: UI-logic tests
+        run: npm test
+
+      - name: Standard production build (Render)
+        run: npm run build
+
+      # The GitHub Pages artifact is built with these two variables (see README). Without
+      # VITE_STATIC_BACKEND the bundle would call a server and the in-browser backend would
+      # never be built, so the step also proves each variant contains what it should.
+      - name: Static production build (GitHub Pages, backend in the browser)
+        env:
+          GH_PAGES: "true"
+          VITE_STATIC_BACKEND: "true"
+        run: |
+          npm run build:static
+          grep -rq "cdn.jsdelivr.net/pyodide" dist/assets || { echo "static bundle lacks the Pyodide runtime"; exit 1; }
+          grep -q '"/ccrig/' dist/index.html || { echo "static bundle is not served from /ccrig/"; exit 1; }
+          test -f dist/404.html && test -f dist/.nojekyll && test -f dist/backend/manifest.json
+
+  static-runtime:
+    name: Static backend - real Pyodide verification of the pinned runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      # Keyed on the pins file: a Pyodide bump invalidates the cache by itself.
+      - name: Cache Pyodide packages
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ runner.temp }}/ccrig-pyodide-package-cache
+          key: pyodide-${{ runner.os }}-${{ hashFiles('frontend/src/api/pyodide-pins.json') }}
+
+      - name: Install frontend dependencies (exact lockfile)
+        working-directory: frontend
+        run: npm ci
+
+      # Offline consistency: exact pins, fastapi == requirements.txt, npm pyodide == pins,
+      # bundled versions == the installed Pyodide's own lockfile, no pandas.
+      - name: Pin consistency
+        run: |
+          python -m pip install pytest
+          python -m pytest -q backend/tests/test_static_build_pins.py
+
+      # Boots the pinned runtime, asserts every installed version equals its pin,
+      # and runs the analytical baseline and all request-validation cases through the
+      # in-browser dispatcher.
+      - name: Verify the static backend in real Pyodide
+        working-directory: frontend
+        env:
+          # the verifier caches downloaded Pyodide wheels under os.tmpdir()/ccrig-pyodide-package-cache
+          TMPDIR: ${{ runner.temp }}
+        run: npm run verify:static
