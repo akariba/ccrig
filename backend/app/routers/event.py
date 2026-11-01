@@ -1,20 +1,21 @@
 from fastapi import APIRouter
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from ..core import event_parser, materiality
 from ..core.data import STORE
 from ..ai.provider import PROVIDER
+from ..request_validation import NonBlankText, MAX_TOP_K, MAX_FILTER_CHARS
 
 router = APIRouter(prefix="/api/event", tags=["event"])
 
 
 class EventParseRequest(BaseModel):
-    text: str
-    max_hops: int = 2
-    min_score: float = 0.05
-    sector: Optional[str] = None
-    geography: Optional[str] = None
-    top_k: int = 15
+    text: NonBlankText
+    max_hops: int = Field(2, ge=1, le=3)
+    min_score: float = Field(0.05, ge=0.0, le=1.0, allow_inf_nan=False)
+    sector: Optional[str] = Field(None, max_length=MAX_FILTER_CHARS)
+    geography: Optional[str] = Field(None, max_length=MAX_FILTER_CHARS)
+    top_k: int = Field(15, ge=1, le=MAX_TOP_K)
 
 
 @router.post("/parse")

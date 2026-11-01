@@ -8,7 +8,7 @@ router = APIRouter(prefix="/api/themes", tags=["themes"])
 
 
 @router.get("")
-def list_themes(q: Optional[str] = None, kind: Optional[str] = None):
+def list_themes(q: Optional[str] = Query(None, max_length=100), kind: Optional[str] = Query(None, max_length=100)):
     results = theme_mod.all_themes(q)
     if kind:
         results = [t for t in results if t["kind"].lower() == kind.lower()]

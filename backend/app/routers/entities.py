@@ -5,6 +5,7 @@ from ..core import candidates, scoring, market, paths as path_mod, ownership as 
 from ..core.graph_store import fact_neighbors, counterparties_exposed_to
 from ..core.config import DEFAULT_WEIGHTS
 from ..ai.provider import PROVIDER
+from ..request_validation import MAX_TOP_K, MAX_FILTER_CHARS
 
 router = APIRouter(prefix="/api/entities", tags=["entities"])
 
@@ -19,9 +20,11 @@ def _entity_summary(e):
 
 
 @router.get("")
-def list_entities(sector: Optional[str] = None, country: Optional[str] = None,
-                   node_type: Optional[str] = "Company/Issuer", q: Optional[str] = None,
-                   limit: int = 200):
+def list_entities(sector: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS),
+                   country: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS),
+                   node_type: Optional[str] = Query("Company/Issuer", max_length=MAX_FILTER_CHARS),
+                   q: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS),
+                   limit: int = Query(200, ge=1, le=1000)):
     out = []
     for eid in STORE.issuer_ids:
         e = STORE.entity(eid)
@@ -38,7 +41,7 @@ def list_entities(sector: Optional[str] = None, country: Optional[str] = None,
 
 
 @router.get("/{entity_id}")
-def entity_360(entity_id: str, top_k: int = 10):
+def entity_360(entity_id: str, top_k: int = Query(10, ge=1, le=MAX_TOP_K)):
     entity_id = entity_id.upper()
     e = STORE.entity(entity_id)
     if not e or e["node_type"] != "Company/Issuer":

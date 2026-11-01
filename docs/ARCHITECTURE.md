@@ -63,6 +63,12 @@ The active mode is shown at all times via the sidebar badge ("Offline determinis
 
 React + TypeScript + Vite, one page-component per view under `frontend/src/pages/`, a typed fetch client under `frontend/src/api/`, and Cytoscape.js for the Graph Explorer's interactive ego-graph rendering (three visually distinct edge styles per layer — solid/directional for Layer A, dashed/symmetric for Layer B, dotted/directional for Layer C).
 
+## Request validation (server and in-browser)
+
+Request constraints live in the endpoints' own signatures and request models (`Query(ge=..., le=...)`, pydantic fields, and the shared validators in `app/request_validation.py`): finite weights in [0, 1] with a positive sum and known component names only, `top_k` within `MAX_TOP_K`, bounded `max_hops` / `min_score`, non-blank bounded text, known presets. Invalid input is a `422` with FastAPI's standard error body; it is never silently coerced or ignored. Valid requests are computed exactly as before.
+
+The GitHub Pages build has no server: `app/browser_dispatch.py` calls the endpoint functions in-process inside Pyodide. It validates parameters through pydantic from the same signatures (and resolves omitted `Query(...)` defaults), so the static build rejects and accepts exactly what the server does. `tests/test_dispatcher_parity.py` sends every case in `validation/request_cases.py` through both paths and requires identical statuses and error locations; the dispatcher refuses at import time any endpoint parameter kind it cannot reproduce (`Depends`, `Header`, `Request`, ...).
+
 ## API surface
 
 All endpoints are namespaced under `/api/*` and registered in `backend/app/main.py`:

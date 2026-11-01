@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api/client";
+import { api, apiErrorMessage } from "../api/client";
 import { DataBadge } from "../components/Badge";
 
 const WEIGHT_LABELS: Record<string, string> = {
@@ -14,6 +14,7 @@ export function ModelLab() {
   const [entityId, setEntityId] = useState("TSM");
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [calibration, setCalibration] = useState<any>(null);
   const [calibrating, setCalibrating] = useState(false);
   const [marketAgreement, setMarketAgreement] = useState<any>(null);
@@ -48,9 +49,12 @@ export function ModelLab() {
 
   async function run() {
     setLoading(true);
+    setError(null);
     try {
       const r = await api.modelLabScore({ entity_id: entityId, weights });
       setResult(r);
+    } catch (e) {
+      setError(apiErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -71,6 +75,8 @@ export function ModelLab() {
           heuristic starting weights for scenario exploration — not a calibrated production model.
         </div>
       </div>
+
+      {error && <div className="warning-box">{error}</div>}
 
       <div className="row">
         <div className="card" style={{ flex: 1 }}>

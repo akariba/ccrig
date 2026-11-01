@@ -2,7 +2,7 @@
 Scalability simulator, and health/AI-mode endpoints grouped together since
 each is a small, mostly read-only surface over its core module."""
 from dataclasses import asdict
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from ..core import backtest as backtest_mod
 from ..core import provenance as provenance_mod
 from ..core import scalability as scalability_mod
@@ -25,7 +25,7 @@ def backtest_scenarios():
 
 
 @router.get("/backtest/run")
-def backtest_run(scenario_id: str = "taiwan_earthquake_2026"):
+def backtest_run(scenario_id: str = Query("taiwan_earthquake_2026", min_length=1, max_length=64)):
     result = backtest_mod.run_backtest(scenario_id)
     if "error" in result:
         raise HTTPException(400, result["error"])

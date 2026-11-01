@@ -3,8 +3,9 @@ recomputation of the relationship vector/composite with user-editable
 weights. Explicitly NOT a production-calibrated model.
 """
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
-from typing import Optional, Dict
+from pydantic import BaseModel, Field
+from typing import Optional
+from ..request_validation import EntityId, Weights, Preset, MAX_TOP_K
 from ..core.data import STORE
 from ..core import candidates, scoring, calibration
 from ..core.config import WEIGHT_PRESETS, DEFAULT_WEIGHTS
@@ -25,10 +26,10 @@ def presets():
 
 
 class ScoreRequest(BaseModel):
-    entity_id: str
-    weights: Optional[Dict[str, float]] = None
-    preset: Optional[str] = None
-    top_k: int = 15
+    entity_id: EntityId
+    weights: Optional[Weights] = None
+    preset: Optional[Preset] = None
+    top_k: int = Field(15, ge=1, le=MAX_TOP_K)
 
 
 @router.post("/score")
@@ -56,10 +57,10 @@ def score(req: ScoreRequest):
 
 
 class PairRequest(BaseModel):
-    a: str
-    b: str
-    weights: Optional[Dict[str, float]] = None
-    preset: Optional[str] = None
+    a: EntityId
+    b: EntityId
+    weights: Optional[Weights] = None
+    preset: Optional[Preset] = None
 
 
 @router.post("/pair")
@@ -86,9 +87,9 @@ def calibration_anchors():
 
 
 class CalibrateRequest(BaseModel):
-    starting_weights: Optional[Dict[str, float]] = None
-    gamma: float = calibration.DEFAULT_GAMMA
-    lam: float = calibration.DEFAULT_LAMBDA
+    starting_weights: Optional[Weights] = None
+    gamma: float = Field(calibration.DEFAULT_GAMMA, gt=0, le=1000, allow_inf_nan=False)
+    lam: float = Field(calibration.DEFAULT_LAMBDA, ge=0, le=1000, allow_inf_nan=False)
 
 
 @router.post("/calibration/run")
@@ -97,8 +98,8 @@ def calibration_run(req: CalibrateRequest):
 
 
 class MarketAgreementRequest(BaseModel):
-    weights: Optional[Dict[str, float]] = None
-    top_k: int = 5
+    weights: Optional[Weights] = None
+    top_k: int = Field(5, ge=1, le=MAX_TOP_K)
 
 
 @router.post("/calibration/market-agreement")

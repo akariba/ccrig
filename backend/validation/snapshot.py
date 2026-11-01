@@ -146,6 +146,23 @@ def fastapi_request() -> Request:
     return request
 
 
+def dispatch_request() -> Request:
+    """Same contract as `fastapi_request`, but through the in-browser
+    (Pyodide) dispatcher: no HTTP, query values arrive as strings exactly as
+    the frontend's URLSearchParams would deliver them."""
+    from urllib.parse import parse_qsl, urlsplit
+
+    from app.browser_dispatch import dispatch
+
+    def request(method: str, path: str, body):
+        parts = urlsplit(path)
+        query = dict(parse_qsl(parts.query, keep_blank_values=True))
+        status, data = dispatch(method, parts.path, query, body)
+        return status, json.loads(json.dumps(data))
+
+    return request
+
+
 def normalise(data: Any) -> Any:
     """JSON round-trip, so tuples/dataclass output compare like HTTP bodies."""
     return json.loads(json.dumps(data))

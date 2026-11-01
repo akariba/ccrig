@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { api } from "../api/client";
+import { api, apiErrorMessage } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RiskPath, pathFromChain } from "../components/RiskPath";
 
@@ -39,6 +39,7 @@ export function EventStudio() {
   const [text, setText] = useState(params.get("text") || SAMPLES[0]);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [showAllMateriality, setShowAllMateriality] = useState(false);
   const nav = useNavigate();
   // Guards against out-of-order responses (e.g. the mount-time parse of the
@@ -49,10 +50,15 @@ export function EventStudio() {
   async function run() {
     const requestId = ++requestIdRef.current;
     setLoading(true);
+    setError(null);
     try {
       const r = await api.parseEvent({ text });
       if (requestId === requestIdRef.current) {
         setResult(r);
+      }
+    } catch (e) {
+      if (requestId === requestIdRef.current) {
+        setError(apiErrorMessage(e));
       }
     } finally {
       if (requestId === requestIdRef.current) {
@@ -83,6 +89,8 @@ export function EventStudio() {
           ))}
         </div>
       </div>
+
+      {error && <div className="warning-box">{error}</div>}
 
       {loading && <div className="loading">Parsing…</div>}
 

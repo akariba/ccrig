@@ -9,6 +9,7 @@ from fastapi import APIRouter, Query
 from ..core.data import STORE
 from ..core import themes as theme_mod, event_parser
 from ..ai.provider import PROVIDER
+from ..request_validation import MAX_TEXT_CHARS
 
 router = APIRouter(prefix="/api/search", tags=["search"])
 
@@ -60,7 +61,9 @@ def _match_theme(q):
 
 
 @router.get("")
-def universal_search(q: str = Query(..., min_length=1), max_hops: int = 2, min_score: float = 0.05):
+def universal_search(q: str = Query(..., min_length=1, max_length=MAX_TEXT_CHARS),
+                     max_hops: int = Query(2, ge=1, le=3),
+                     min_score: float = Query(0.05, ge=0.0, le=1.0)):
     intent = PROVIDER.classify_query_intent(q)
     entity_matches = _match_entity(q)
     theme_match = _match_theme(q)

@@ -5,7 +5,7 @@ Priority is a deterministic rule cascade (core/ccr_priority.py), never a
 naked 0-1 ML/AI score.
 """
 from dataclasses import asdict
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from typing import Optional
 from ..core import ccr_priority
 from ..core.config import CCR_PRIORITY_THRESHOLDS
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/api", tags=["priority"])
 
 
 @router.get("/priority-queue")
-def priority_queue(priority: Optional[str] = None, driver: Optional[str] = None):
+def priority_queue(priority: Optional[str] = Query(None, max_length=50), driver: Optional[str] = Query(None, max_length=50)):
     rows = ccr_priority.build_priority_queue()
     if priority:
         rows = [r for r in rows if r["priority"] == priority.upper()]
@@ -63,7 +63,7 @@ def counterparty_risk_clusters(counterparty_id: str):
 
 
 @router.get("/breaches")
-def breaches(status: Optional[str] = None):
+def breaches(status: Optional[str] = Query(None, max_length=50)):
     rows = [r for r in ccr_priority.build_priority_queue() if r["is_breach"]]
     if status == "overdue":
         rows = [r for r in rows if r["is_overdue"]]

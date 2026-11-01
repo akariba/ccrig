@@ -10,6 +10,7 @@ from ..core.data import STORE
 from ..core.graph_store import FACT_GRAPH, exposure_of_counterparty, counterparties_exposed_to
 from ..core import candidates, scoring
 from ..core.config import DEFAULT_WEIGHTS
+from ..request_validation import MAX_TOP_K, MAX_FILTER_CHARS
 
 router = APIRouter(prefix="/api/graph", tags=["graph"])
 
@@ -24,9 +25,11 @@ def _node_obj(eid):
 
 
 @router.get("/ego/{entity_id}")
-def ego_graph(entity_id: str, hops: int = 1, top_k: int = 8, min_score: float = 0.1,
-              layers: str = "fact,derived,exposure",
-              node_types: Optional[str] = None):
+def ego_graph(entity_id: str, hops: int = 1,
+              top_k: int = Query(8, ge=1, le=MAX_TOP_K),
+              min_score: float = Query(0.1, ge=0.0, le=1.0),
+              layers: str = Query("fact,derived,exposure", max_length=MAX_FILTER_CHARS),
+              node_types: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS)):
     entity_id = entity_id.upper()
     if entity_id not in STORE.entities_by_id:
         raise HTTPException(404, f"Entity '{entity_id}' not found")
