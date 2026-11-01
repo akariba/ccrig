@@ -208,3 +208,14 @@ test("with bounds, spread markers stay inside the stage and still keep apart whe
   for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) assert.ok(Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1]) >= 29);
   assert.deepEqual(m.spreadOverlaps(items, 30, b), m.spreadOverlaps([...items].reverse(), 30, b));
 });
+
+test("event colour comes only from the explicit category; unknown categories are neutral, never guessed", () => {
+  assert.equal(m.categoryStyle("REGULATORY_ACTION").label, "Regulatory action");
+  const colours = Object.values(m.CATEGORY_STYLE).map((c) => c.color);
+  assert.equal(new Set(colours).size, colours.length);                                     // every known category is distinguishable
+  assert.equal(m.categoryStyle("SOMETHING_NEW").color, m.categoryStyle(undefined).color);
+  assert.equal(m.categoryStyle("SOMETHING_NEW").label, "something new");
+  const s = m.buildScene({ ...response, events: [{ id: "e1", category: "EARNINGS_RELEASE" }, { id: "e2", category: "PRODUCT_ANNOUNCEMENT" }] });
+  assert.equal(s.markers.find((x) => x.id === "event:e1").category, "EARNINGS_RELEASE");
+  assert.equal(s.markers.find((x) => x.id === "entity:NVDA").category, undefined);
+});

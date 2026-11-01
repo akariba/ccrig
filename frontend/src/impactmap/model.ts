@@ -104,12 +104,13 @@ export function spreadOverlaps(items: { id: string; pt: Pt }[], minDist = 20, bo
 
 // ------------------------------------------------------------------ scene
 export type MarkerKind = "event" | "entity" | "region";
-export interface Marker { id: string; kind: MarkerKind; label: string; lat: number; lon: number; precision: string; role?: string; rank?: number; place?: string; eventId?: string; entityId?: string; ticker?: string }
+export interface Marker { id: string; kind: MarkerKind; label: string; lat: number; lon: number; precision: string; role?: string; rank?: number; place?: string; category?: string; eventId?: string; entityId?: string; ticker?: string }
 export interface Cable { id: string; type: GraphEdge["type"]; from: string; to: string; eventIds: string[]; relation?: string }
 export interface Scene { markers: Marker[]; cables: Cable[]; unmapped: { id: string; label: string; reason: string }[] }
 
 export function buildScene(data: ImpactResponse): Scene {
   const rank = new Map(data.events.map((e, i) => [e.id, i + 1]));
+  const categoryOf = new Map(data.events.map((e) => [e.id, e.category]));
   const markers: Marker[] = [], unmapped: Scene["unmapped"] = [];
   const have = new Set<string>();
   for (const n of data.graph.nodes) {
@@ -117,7 +118,7 @@ export function buildScene(data: ImpactResponse): Scene {
     have.add(n.id);
     markers.push({
       id: n.id, kind: n.type.toLowerCase() as MarkerKind, label: n.label, lat: n.position.lat, lon: n.position.lon, precision: n.position.precision,
-      role: n.role, rank: n.event_id ? rank.get(n.event_id) : undefined, place: n.type === "EVENT" ? n.position.label : undefined, eventId: n.event_id, entityId: n.entity_id, ticker: n.ticker,
+      role: n.role, rank: n.event_id ? rank.get(n.event_id) : undefined, place: n.type === "EVENT" ? n.position.label : undefined, category: n.event_id ? categoryOf.get(n.event_id) : undefined, eventId: n.event_id, entityId: n.entity_id, ticker: n.ticker,
     });
   }
   const cables: Cable[] = data.graph.edges
@@ -199,6 +200,18 @@ export function placeCallout(anchor: Pt, size: { w: number; h: number }, obstacl
   }
   return best;
 }
+
+// ------------------------------------------------------------------ event categories
+// Colour encodes the event's EXPLICIT category from the register (what kind of publication it is) and nothing else: not impact, not
+// confidence, not importance. Unknown categories get a neutral colour rather than a guessed one.
+export const CATEGORY_STYLE: Record<string, { color: string; label: string }> = {
+  CORPORATE_ANNOUNCEMENT: { color: "#f2a93b", label: "Corporate announcement" },
+  EARNINGS_RELEASE: { color: "#a8d86b", label: "Earnings release" },
+  PARTNERSHIP_ANNOUNCEMENT: { color: "#b58cf0", label: "Partnership announcement" },
+  PRODUCT_ANNOUNCEMENT: { color: "#f08bb4", label: "Product announcement" },
+  REGULATORY_ACTION: { color: "#ff7b6b", label: "Regulatory action" },
+};
+export const categoryStyle = (category?: string) => (category && CATEGORY_STYLE[category]) || { color: "#cfd6de", label: category ? category.replace(/_/g, " ").toLowerCase() : "event" };
 
 // ------------------------------------------------------------------ reading a path
 export interface Chip { kind: "event" | "entity" | "relation"; text: string; detail?: string }
