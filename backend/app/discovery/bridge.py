@@ -49,7 +49,7 @@ def _store():
     return StudioStore(root), None
 
 
-def discovered_response(entity_id: str, *, limit: int = 5, recency_days: int = 180, as_of: date | None = None) -> dict:
+def discovered_response(entity_id: str, *, limit: int = 5, recency_days: int = 180, as_of: date | None = None, graph=None) -> dict:
     store, why = _store()
     if store is None:
         return unavailable(entity_id, why[0], limit=limit, recency_days=recency_days, as_of=as_of, code=why[1])
@@ -74,7 +74,7 @@ def discovered_response(entity_id: str, *, limit: int = 5, recency_days: int = 1
             "approved_sources": [{"id": s["id"], "domains": s["domains"], "tier": s["tier"], "limits": s["limits"]} for s in __import__("app.core.event_register", fromlist=["x"]).approved_sources()["sources"]]}
     out = event_discovery.discover_from_events(entity_id, [shape.register_event(r) for r in run["events"]], meta, limit=limit, recency_days=recency_days, as_of=as_of or run_date,
                                                as_of_basis="the date of the discovery run" if as_of is None else "supplied by the caller", admissible=shape.admissible,
-                                               explainer=lambda *a: run["explanation"], limitations=shape.LIMITATIONS)
+                                               explainer=lambda *a: run["explanation"], limitations=shape.LIMITATIONS, graph=graph)
     run_exclusions = [{"id": None, "title": n["title"], "published_date": n.get("published_date") or "", "reason": f"{n['stage'].lower()}: {n['reason']}", "url": n.get("url")} for n in run["not_returned"] if n["stage"] != "SELECT"]
     for e in out["events"]:                                          # the events keep what the extractor recorded: which provider, which rule chose the category
         row = next(r for r in run["events"] if r["id"] == e["id"])

@@ -71,17 +71,17 @@ def _days_before(as_of: date, published: str) -> int:
     return (as_of - date.fromisoformat(published)).days
 
 
-def discover(entity_id: str, *, limit: int = MAX_LIMIT, recency_days: int = DEFAULT_RECENCY_DAYS, as_of: date | None = None) -> dict:
+def discover(entity_id: str, *, limit: int = MAX_LIMIT, recency_days: int = DEFAULT_RECENCY_DAYS, as_of: date | None = None, graph=None) -> dict:
     """Events concerning `entity_id`, with sources, locations, entities, typed paths and limitations. See module docstring."""
     register = reg.load_register()
     meta = {"built_at": register["register"]["built_at"], "coverage": register["register"]["coverage"], "events_total": len(register["events"]),
             "approved_sources": [{"id": s["id"], "domains": s["domains"], "tier": s["tier"], "limits": s["limits"]} for s in reg.approved_sources()["sources"]]}
     return discover_from_events(entity_id, register["events"], meta, limit=limit, recency_days=recency_days, as_of=as_of or as_of_default(),
-                                as_of_basis="the register's build date" if as_of in (None, as_of_default()) else "supplied by the caller")
+                                as_of_basis="the register's build date" if as_of in (None, as_of_default()) else "supplied by the caller", graph=graph)
 
 
 def discover_from_events(entity_id: str, events: list, meta: dict, *, limit: int = MAX_LIMIT, recency_days: int = DEFAULT_RECENCY_DAYS, as_of: date,
-                         as_of_basis: str = "supplied by the caller", admissible=None, explainer=None, limitations=None) -> dict:
+                         as_of_basis: str = "supplied by the caller", admissible=None, explainer=None, limitations=None, graph=None) -> dict:
     """The selection and presentation shared by the curated register and by dynamic discovery: same rules, same output shape.
     `events` are register-shaped records; `admissible(event) -> (ok, problems)` and `explainer(...)` let a caller adapt wording, never the rules."""
     limit = max(1, min(limit, MAX_LIMIT))
@@ -121,7 +121,7 @@ def discover_from_events(entity_id: str, events: list, meta: dict, *, limit: int
         not_returned.append({"id": event["id"], "title": event["title"], "published_date": event["published_date"],
                              "reason": f"qualifies, but ranks below the limit of {limit} (newest first)"})
 
-    presented = [_present(event, resolved, entity_id) for event, resolved in returned]
+    presented = [_present(event, resolved, entity_id, graph) for event, resolved in returned]
     return {
         "entity": {"entity_id": entity_id, "name": entity["name"], "ticker": entity.get("ticker"), "country": entity.get("country")},
         "query": {"limit": limit, "recency_days": recency_days, "as_of": as_of.isoformat(),
@@ -136,10 +136,10 @@ def discover_from_events(entity_id: str, events: list, meta: dict, *, limit: int
     }
 
 
-def _present(event: dict, resolved: list, target: str) -> dict:
+def _present(event: dict, resolved: list, target: str, graph=None) -> dict:
     location = event_geo.event_location(event)
     regions = event_geo.regions_mentioned(event)
-    relationships = event_graph.build_event_relationships(event["id"], resolved, target)
+    relationships = event_graph.build_event_relationships(event["id"], resolved, target, graph)
     primary = event["sources"][0]
     return {
         "id": event["id"], "title": event["title"], "category": event["category"],

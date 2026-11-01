@@ -11,6 +11,7 @@ from ..core.graph_store import FACT_GRAPH, exposure_of_counterparty, counterpart
 from ..core import candidates, scoring
 from ..core.config import DEFAULT_WEIGHTS
 from ..request_validation import MAX_TOP_K, MAX_FILTER_CHARS
+from ..studio import overlay as studio_overlay
 
 router = APIRouter(prefix="/api/graph", tags=["graph"])
 
@@ -29,7 +30,8 @@ def ego_graph(entity_id: str, hops: int = 1,
               top_k: int = Query(8, ge=1, le=MAX_TOP_K),
               min_score: float = Query(0.1, ge=0.0, le=1.0),
               layers: str = Query("fact,derived,exposure", max_length=MAX_FILTER_CHARS),
-              node_types: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS)):
+              node_types: Optional[str] = Query(None, max_length=MAX_FILTER_CHARS),
+              include_studio: bool = False):
     entity_id = entity_id.upper()
     if entity_id not in STORE.entities_by_id:
         raise HTTPException(404, f"Entity '{entity_id}' not found")
@@ -108,7 +110,27 @@ def ego_graph(entity_id: str, hops: int = 1,
         if not frontier:
             break
 
-    return {
+    studio = None
+    if include_studio:
+        ov = studio_overlay.approved(True)
+        added = attached = 0
+        for e in ov["edges"]:
+            ev = [{"source_url": x["source_url"], "source_publisher": x["source_publisher"], "source_tier": x["source_tier"], "source_published_date": x["source_published_date"],
+                   "relationship_as_of": x["relationship_as_of"], "quotes": x["quotes"], "assertion": x["assertion"], "source_sha256": x["source_sha256"]} for x in e["evidence"]]
+            existing = [ed for ed in edges if ed["layer"] == "FACT" and ed["source"] == e["source"] and ed["target"] == e["target"] and ed["relation"] == e["relation"]]
+            if existing:
+                for ed in existing:
+                    ed["evidence"] = {**(ed["evidence"] or {}), "studio_evidence": ev}
+                attached += len(existing)
+            elif e["source"] in nodes or e["target"] in nodes:
+                for end in (e["source"], e["target"]):
+                    nodes.setdefault(end, _node_obj(end))
+                edges.append({"source": e["source"], "target": e["target"], "relation": e["relation"], "layer": "FACT", "weight": None, "directed": True,
+                              "evidence": {"evidence_status": "STUDIO_APPROVED", "evidence_url": ev[0]["source_url"], "note": "Approved in the Data Studio; not part of the canonical dataset. No criticality is assigned.",
+                                           "studio": True, "studio_evidence": ev, "first_documented": e["first_documented"]}})
+                added += 1
+        studio = {"requested": True, "available": ov["available"], "reason": ov["reason"], "release": ov["release"], "edges_added": added, "canonical_edges_with_evidence": attached}
+    out = {
         "center": entity_id,
         "hops": hops,
         "active_layers": sorted(active_layers),
@@ -123,3 +145,6 @@ def ego_graph(entity_id: str, hops: int = 1,
         },
         "bounded_by_default": True,
     }
+    if studio is not None:                    # only when asked for: the default response is exactly what it always was
+        out["studio_overlay"] = studio
+    return out

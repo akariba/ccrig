@@ -32,11 +32,12 @@ EXPOSURE_NOT_AVAILABLE = {
 }
 
 
-def _documented_neighbours(node: str):
-    for _, target, data in FACT_GRAPH.out_edges(node, data=True):
+def _documented_neighbours(node: str, graph=None):
+    graph = FACT_GRAPH if graph is None else graph
+    for _, target, data in graph.out_edges(node, data=True):
         if data["relation"] in DOCUMENTED_RELATIONS:
             yield target, data, "FORWARD"
-    for source, _, data in FACT_GRAPH.in_edges(node, data=True):
+    for source, _, data in graph.in_edges(node, data=True):
         if data["relation"] in DOCUMENTED_RELATIONS:
             yield source, data, "REVERSE"
 
@@ -51,10 +52,11 @@ def _hop(current: str, nxt: str, data: dict, direction: str) -> dict:
     }
 
 
-def documented_paths(source: str, target: str, max_hops: int = MAX_HOPS) -> list:
+def documented_paths(source: str, target: str, max_hops: int = MAX_HOPS, graph=None) -> list:
     """The shortest documented paths from `source` to `target` (all of the minimum length, at most
     MAX_PATHS_PER_ENTITY, in a fixed order). Each is a list of hops; [] if none within `max_hops`."""
-    if source == target or source not in FACT_GRAPH or target not in FACT_GRAPH:
+    graph = FACT_GRAPH if graph is None else graph
+    if source == target or source not in graph or target not in graph:
         return []
     found = []
     stack = [(source, [], {source})]
@@ -62,7 +64,7 @@ def documented_paths(source: str, target: str, max_hops: int = MAX_HOPS) -> list
         node, hops, seen = stack.pop()
         if len(hops) >= max_hops:
             continue
-        for nxt, data, direction in _documented_neighbours(node):
+        for nxt, data, direction in _documented_neighbours(node, graph):
             if nxt in seen:
                 continue
             path = hops + [_hop(node, nxt, data, direction)]
@@ -98,13 +100,13 @@ def _explain(entity: str, target: str, cls: str, paths: list) -> str:
     return f"{entity} is connected to {target} {kind} ({chain})."
 
 
-def build_event_relationships(event_id: str, resolved: list, target: str) -> dict:
+def build_event_relationships(event_id: str, resolved: list, target: str, graph=None) -> dict:
     """For one event: each resolved entity's documented connection to `target`, and the flat list of
     typed paths event -> entity [-> entity] -> target."""
     entities, flat = [], []
     for rec in resolved:
         eid = rec["entity_id"]
-        paths = documented_paths(eid, target)
+        paths = documented_paths(eid, target, graph=graph)
         cls = classify(eid, target, paths)
         entities.append({"entity_id": eid, "name": rec["name"], "country": rec["country"], "mentions": rec["mentions"],
                          "role": "TARGET" if eid == target else "MENTIONED", "relationship_to_target": cls,

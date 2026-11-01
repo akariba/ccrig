@@ -69,12 +69,24 @@ def events(entity_id: str,
            limit: int = Query(5, ge=1, le=event_discovery.MAX_LIMIT),
            recency_days: int = Query(event_discovery.DEFAULT_RECENCY_DAYS, ge=1, le=730),
            as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$"),
-           mode: Literal["curated", "discovered"] = Query("curated")):
+           mode: Literal["curated", "discovered"] = Query("curated"),
+           include_studio: bool = False):
     """mode=curated (default): the approved-source register. mode=discovered: the latest dynamic discovery run, if this deployment can run one."""
     entity_id = _issuer_or_404(entity_id)
     when = _when(as_of)
+    graph, studio = None, None
+    if include_studio:
+        from ..studio import overlay
+
+        ov = overlay.approved(True)
+        graph = overlay.merged_graph(ov["edges"]) if ov["edges"] else None
+        studio = {"requested": True, "available": ov["available"], "reason": ov["reason"], "release": ov["release"],
+                  "edges_added": sum(1 for e in ov["edges"] if not e["in_canonical"]),
+                  "note": "Paths may use approved relationships that are not in the canonical dataset; they are marked with evidence status STUDIO_APPROVED and carry no criticality."}
     if mode == "discovered":
         from ..discovery import bridge
 
-        return bridge.discovered_response(entity_id, limit=limit, recency_days=recency_days, as_of=when)
-    return event_discovery.discover(entity_id, limit=limit, recency_days=recency_days, as_of=when)
+        out = bridge.discovered_response(entity_id, limit=limit, recency_days=recency_days, as_of=when, graph=graph)
+    else:
+        out = event_discovery.discover(entity_id, limit=limit, recency_days=recency_days, as_of=when, graph=graph)
+    return {**out, "studio_overlay": studio} if studio else out
