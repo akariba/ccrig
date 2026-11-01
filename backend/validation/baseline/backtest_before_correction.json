@@ -1,0 +1,104 @@
+{
+ "description": "The backtest exactly as published in Phase 1 (methodology v1), recorded BEFORE the evaluation was corrected. The live API still computes this procedure verbatim under 'legacy'; tests/test_backtest_methodology.py requires the two to match. Known weaknesses of v1: it ranked and counted the entities named in the event text, shifted SKHY's window by four days, labelled with raw returns and used 8 'positives' out of 12-14 entities. See app/core/backtest.py.",
+ "metrics": {
+  "ndcg_at_5": 0.6183,
+  "ndcg_at_8": 0.6375,
+  "precision_at_5": 0.6,
+  "precision_at_8": 0.5,
+  "recall_at_5": 0.375,
+  "recall_at_8": 0.5
+ },
+ "model_ranking_top_k": [
+  {
+   "entity_id": "AAPL",
+   "model_score": 1.0
+  },
+  {
+   "entity_id": "AMD",
+   "model_score": 1.0
+  },
+  {
+   "entity_id": "NVDA",
+   "model_score": 1.0
+  },
+  {
+   "entity_id": "TSM",
+   "model_score": 1.0
+  },
+  {
+   "entity_id": "ASML",
+   "model_score": 0.85
+  },
+  {
+   "entity_id": "SKHY",
+   "model_score": 0.78
+  },
+  {
+   "entity_id": "ARM",
+   "model_score": 0.75
+  },
+  {
+   "entity_id": "QCOM",
+   "model_score": 0.7
+  }
+ ],
+ "observed_subsequent_movers_top_k": [
+  {
+   "abs_return": 0.15614,
+   "entity_id": "INTC",
+   "from_date": "2026-07-06",
+   "return": -0.15614,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.08321,
+   "entity_id": "SKHY",
+   "from_date": "2026-07-10",
+   "return": -0.08321,
+   "to_date": "2026-07-17"
+  },
+  {
+   "abs_return": 0.08114,
+   "entity_id": "BA",
+   "from_date": "2026-07-06",
+   "return": -0.08114,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.07474,
+   "entity_id": "SHEL",
+   "from_date": "2026-07-06",
+   "return": 0.07474,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.06687,
+   "entity_id": "TSM",
+   "from_date": "2026-07-06",
+   "return": -0.06687,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.05915,
+   "entity_id": "XOM",
+   "from_date": "2026-07-06",
+   "return": 0.05915,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.04081,
+   "entity_id": "NVDA",
+   "from_date": "2026-07-06",
+   "return": 0.04081,
+   "to_date": "2026-07-13"
+  },
+  {
+   "abs_return": 0.03219,
+   "entity_id": "LMT",
+   "from_date": "2026-07-06",
+   "return": -0.03219,
+   "to_date": "2026-07-13"
+  }
+ ],
+ "scenario": "taiwan_earthquake_2026"
+}

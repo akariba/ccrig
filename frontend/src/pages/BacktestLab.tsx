@@ -65,14 +65,45 @@ export function BacktestLab() {
           </div>
 
           <div className="grid-3">
-            <div className="card kpi"><div className="value">{result.metrics.precision_at_5}</div><div className="label">Precision@5</div></div>
-            <div className="card kpi"><div className="value">{result.metrics.recall_at_5}</div><div className="label">Recall@5</div></div>
-            <div className="card kpi"><div className="value">{result.metrics.ndcg_at_5}</div><div className="label">NDCG@5</div></div>
+            <div className="card kpi"><div className="value">{result.metrics.precision_at_3}</div><div className="label">Precision@3</div></div>
+            <div className="card kpi"><div className="value">{result.metrics.recall_at_3}</div><div className="label">Recall@3</div></div>
+            <div className="card kpi"><div className="value">{result.metrics.ndcg_at_3}</div><div className="label">NDCG@3</div></div>
+          </div>
+          <p style={{ fontSize: 11.5, color: "var(--text-muted)", margin: 0 }}>
+            Corrected evaluation (methodology v{result.methodology_version}) over {result.metrics.universe_size} issuers with {result.metrics.n_positive} label
+            positives. A random ranking would score precision@3 = {result.metrics.random_precision_at_3} and precision@5 = {result.metrics.random_precision_at_5};
+            the probability of doing at least this well by chance is {result.metrics.p_value_at_3} (@3) and {result.metrics.p_value_at_5} (@5).
+            One event is not enough to tell skill from luck.
+          </p>
+
+          <div className="card">
+            <div className="section-title">Before and after the methodology correction (@5)</div>
+            <table className="table">
+              <thead><tr><th>Step</th><th>Change</th><th>Evaluated</th><th>Positives</th><th>Precision@5</th><th>Recall@5</th><th>NDCG@5</th><th>Random P@5</th></tr></thead>
+              <tbody>
+                {result.correction_steps.map((st: any) => (
+                  <tr key={st.step}>
+                    <td>{st.step}</td><td>{st.change}</td><td className="mono">{st.universe_size}</td><td className="mono">{st.n_positive}</td>
+                    <td className="mono">{st.precision_at_5}</td><td className="mono">{st.recall_at_5}</td><td className="mono">{st.ndcg_at_5}</td>
+                    <td className="mono">{st.random_precision_at_5 ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <p style={{ fontSize: 11.5, color: "var(--text-faint)" }}>
+              Step 0 is exactly what was published before: it ranked the entities named in the event text ({result.seed_entities.entities.join(", ")}),
+              measured SKHY over a window starting four days late, used raw returns, and called 8 of 12 entities "positives".
+            </p>
+            {result.evaluation.excluded.length > 0 && (
+              <p style={{ fontSize: 11.5, color: "var(--text-faint)" }}>
+                Not evaluated: {result.evaluation.excluded.map((x: any) => `${x.entity_id} (${x.reason ?? x.status})`).join(", ")}.
+              </p>
+            )}
           </div>
 
           <div className="row">
             <div className="card" style={{ flex: 1 }}>
-              <div className="section-title">Model-predicted top movers (as-of event date, no look-ahead)</div>
+              <div className="section-title">Model-predicted movers among non-named entities (as-of event date, no look-ahead)</div>
               <table className="table">
                 <thead><tr><th>Entity</th><th>Model score</th></tr></thead>
                 <tbody>
@@ -83,12 +114,17 @@ export function BacktestLab() {
               </table>
             </div>
             <div className="card" style={{ flex: 1 }}>
-              <div className="section-title">Observed forward movers (realized-return proxy, not causal ground truth)</div>
+              <div className="section-title">Observed movers by abnormal return (realized-return proxy, not causal ground truth)</div>
               <table className="table">
-                <thead><tr><th>Entity</th><th>Return ({'->'} +5d)</th></tr></thead>
+                <thead><tr><th>Entity</th><th>Return ({'->'} +5d)</th><th>Abnormal</th><th>Label</th></tr></thead>
                 <tbody>
                   {result.observed_subsequent_movers_top_k.map((r: any) => (
-                    <tr key={r.entity_id}><td>{r.entity_id}</td><td className="mono">{(r.return * 100).toFixed(1)}%</td></tr>
+                    <tr key={r.entity_id}>
+                      <td>{r.entity_id}</td>
+                      <td className="mono">{(r.return * 100).toFixed(1)}%</td>
+                      <td className="mono">{(r.abnormal_return * 100).toFixed(1)}%</td>
+                      <td>{r.is_label_positive ? "positive" : ""}</td>
+                    </tr>
                   ))}
                 </tbody>
               </table>

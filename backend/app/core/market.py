@@ -157,6 +157,45 @@ def forward_move(entity_id, from_date, horizon_days=5):
             "return": round(ret, 5), "abs_return": round(abs(ret), 5)}
 
 
+def window_return(entity_id, t0, horizon_days=5, max_gap_days=3):
+    """Strict event window for the corrected backtest: close-to-close return
+    from the T0 close to the close `horizon_days` trading days later.
+
+    Unlike forward_move() (kept as-is for the legacy procedure) this never
+    silently shifts the window: the series must have a close ON the last
+    trading day at or before T0 (no more than `max_gap_days` earlier) and a
+    close `horizon_days` trading days after it. Otherwise the entity is
+    reported as ineligible with the reason, so every compared entity is
+    measured over the SAME window.
+
+    Returns {"status": "OK", ...} or {"status": <reason>}.
+    """
+    e = STORE.entity(entity_id)
+    if not e or not e.get("has_market_data"):
+        return {"status": "NO_PRICE_HISTORY"}
+    rows = STORE.prices.get(e["ticker"])
+    if not rows:
+        return {"status": "NO_PRICE_HISTORY"}
+    idx_start = None
+    for i, (d, _c) in enumerate(rows):
+        if d <= t0:
+            idx_start = i
+        else:
+            break
+    if idx_start is None:
+        return {"status": "HISTORY_STARTS_AFTER_T0", "first_date": rows[0][0].isoformat()}
+    if (t0 - rows[idx_start][0]).days > max_gap_days:
+        return {"status": "NO_CLOSE_AT_T0", "last_date_before_t0": rows[idx_start][0].isoformat()}
+    if idx_start + horizon_days >= len(rows):
+        return {"status": "INSUFFICIENT_FORWARD_DATA"}
+    p0, p1 = rows[idx_start][1], rows[idx_start + horizon_days][1]
+    if not p0:
+        return {"status": "NO_PRICE_HISTORY"}
+    ret = (p1 / p0) - 1.0
+    return {"status": "OK", "entity_id": entity_id, "from_date": rows[idx_start][0].isoformat(),
+            "to_date": rows[idx_start + horizon_days][0].isoformat(), "return": ret}
+
+
 def price_series(entity_id):
     e = STORE.entity(entity_id)
     if not e or not e.get("ticker") or not e.get("has_market_data"):

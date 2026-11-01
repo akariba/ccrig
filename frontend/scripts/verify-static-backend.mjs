@@ -10,7 +10,7 @@
 //   npm run verify:static          (needs network: Pyodide CDN + PyPI)
 //
 // Exit code 0 = the static build's backend is functional and as pinned.
-import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";

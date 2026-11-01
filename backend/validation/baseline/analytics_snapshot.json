@@ -1,6 +1,53 @@
 {
  "backtest:taiwan": {
   "body": {
+   "correction_steps": [
+    {
+     "change": "As originally published (v1)",
+     "n_positive": 8,
+     "ndcg_at_5": 0.6183,
+     "precision_at_5": 0.6,
+     "recall_at_5": 0.375,
+     "step": 0,
+     "universe_size": 12
+    },
+    {
+     "change": "Exclude entities named in the event text; positives = top third of the universe",
+     "hits_at_5": 2,
+     "n_positive": 3,
+     "ndcg_at_5": 0.8772,
+     "p_value_at_5": 0.7143,
+     "precision_at_5": 0.4,
+     "random_precision_at_5": 0.375,
+     "recall_at_5": 0.6667,
+     "step": 1,
+     "universe_size": 8
+    },
+    {
+     "change": "+ Require a close at T0 and a full forward window for every entity (drops SKHY)",
+     "hits_at_5": 2,
+     "n_positive": 3,
+     "ndcg_at_5": 0.5438,
+     "p_value_at_5": 0.5952,
+     "precision_at_5": 0.4,
+     "random_precision_at_5": 0.3333,
+     "recall_at_5": 0.6667,
+     "step": 2,
+     "universe_size": 9
+    },
+    {
+     "change": "+ Label = absolute abnormal return (market-adjusted)",
+     "hits_at_5": 1,
+     "n_positive": 3,
+     "ndcg_at_5": 0.3869,
+     "p_value_at_5": 0.9524,
+     "precision_at_5": 0.2,
+     "random_precision_at_5": 0.3333,
+     "recall_at_5": 0.3333,
+     "step": 3,
+     "universe_size": 9
+    }
+   ],
    "data_cutoff": "2026-07-06",
    "detected_entities": [
     "AAPL",
@@ -14,47 +61,197 @@
     "TAIWAN",
     "EARTHQUAKE"
    ],
+   "evaluation": {
+    "excluded": [
+     {
+      "entity_id": "AAPL",
+      "reason": "NAMED_IN_EVENT_TEXT"
+     },
+     {
+      "entity_id": "AMD",
+      "reason": "NAMED_IN_EVENT_TEXT"
+     },
+     {
+      "entity_id": "NVDA",
+      "reason": "NAMED_IN_EVENT_TEXT"
+     },
+     {
+      "entity_id": "TSM",
+      "reason": "NAMED_IN_EVENT_TEXT"
+     },
+     {
+      "entity_id": "SKHY",
+      "first_date": "2026-07-10",
+      "status": "HISTORY_STARTS_AFTER_T0"
+     }
+    ],
+    "label": "absolute abnormal return over the T0 -> T0+5 trading-day window (return minus the leave-one-out equal-weighted mean of the evaluated entities)",
+    "n_positive_rule": "top third of the evaluated universe (at least 2)",
+    "universe": [
+     "MSFT",
+     "C",
+     "BA",
+     "JPM",
+     "INTC",
+     "IBM",
+     "SHEL",
+     "LMT",
+     "XOM"
+    ]
+   },
    "event_narrative_at_t0": "A magnitude 7.2 earthquake struck near Hsinchu, Taiwan, disrupting semiconductor fabrication at several TSMC plants and raising concerns for NVIDIA, AMD and Apple chip supply.",
+   "legacy": {
+    "description": "The ORIGINAL v1 procedure, kept verbatim for before/after comparison. Do not use it to judge the model: it ranks the entities named in the event text, shifts SKHY's window and labels with raw returns.",
+    "metrics": {
+     "ndcg_at_5": 0.6183,
+     "ndcg_at_8": 0.6375,
+     "precision_at_5": 0.6,
+     "precision_at_8": 0.5,
+     "recall_at_5": 0.375,
+     "recall_at_8": 0.5
+    },
+    "model_ranking_top_k": [
+     {
+      "entity_id": "AAPL",
+      "model_score": 1.0
+     },
+     {
+      "entity_id": "AMD",
+      "model_score": 1.0
+     },
+     {
+      "entity_id": "NVDA",
+      "model_score": 1.0
+     },
+     {
+      "entity_id": "TSM",
+      "model_score": 1.0
+     },
+     {
+      "entity_id": "ASML",
+      "model_score": 0.85
+     },
+     {
+      "entity_id": "SKHY",
+      "model_score": 0.78
+     },
+     {
+      "entity_id": "ARM",
+      "model_score": 0.75
+     },
+     {
+      "entity_id": "QCOM",
+      "model_score": 0.7
+     }
+    ],
+    "observed_subsequent_movers_top_k": [
+     {
+      "abs_return": 0.15614,
+      "entity_id": "INTC",
+      "from_date": "2026-07-06",
+      "return": -0.15614,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.08321,
+      "entity_id": "SKHY",
+      "from_date": "2026-07-10",
+      "return": -0.08321,
+      "to_date": "2026-07-17"
+     },
+     {
+      "abs_return": 0.08114,
+      "entity_id": "BA",
+      "from_date": "2026-07-06",
+      "return": -0.08114,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.07474,
+      "entity_id": "SHEL",
+      "from_date": "2026-07-06",
+      "return": 0.07474,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.06687,
+      "entity_id": "TSM",
+      "from_date": "2026-07-06",
+      "return": -0.06687,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.05915,
+      "entity_id": "XOM",
+      "from_date": "2026-07-06",
+      "return": 0.05915,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.04081,
+      "entity_id": "NVDA",
+      "from_date": "2026-07-06",
+      "return": 0.04081,
+      "to_date": "2026-07-13"
+     },
+     {
+      "abs_return": 0.03219,
+      "entity_id": "LMT",
+      "from_date": "2026-07-06",
+      "return": -0.03219,
+      "to_date": "2026-07-13"
+     }
+    ]
+   },
+   "methodology_version": 2,
    "metrics": {
-    "ndcg_at_5": 0.6183,
-    "ndcg_at_8": 0.6375,
-    "precision_at_5": 0.6,
-    "precision_at_8": 0.5,
-    "recall_at_5": 0.375,
-    "recall_at_8": 0.5
+    "hits_at_3": 0,
+    "hits_at_5": 1,
+    "n_positive": 3,
+    "ndcg_at_3": 0.0,
+    "ndcg_at_5": 0.3869,
+    "p_value_at_3": 1.0,
+    "p_value_at_5": 0.9524,
+    "precision_at_3": 0.0,
+    "precision_at_5": 0.2,
+    "random_precision_at_3": 0.3333,
+    "random_precision_at_5": 0.3333,
+    "recall_at_3": 0.0,
+    "recall_at_5": 0.3333,
+    "universe_size": 9
    },
    "model_ranking_top_k": [
     {
-     "entity_id": "AAPL",
-     "model_score": 1.0
+     "entity_id": "MSFT",
+     "model_score": 0.55
     },
     {
-     "entity_id": "AMD",
-     "model_score": 1.0
+     "entity_id": "C",
+     "model_score": 0.2944
     },
     {
-     "entity_id": "NVDA",
-     "model_score": 1.0
+     "entity_id": "BA",
+     "model_score": 0.265
     },
     {
-     "entity_id": "TSM",
-     "model_score": 1.0
+     "entity_id": "JPM",
+     "model_score": 0.2349
     },
     {
-     "entity_id": "ASML",
-     "model_score": 0.85
+     "entity_id": "INTC",
+     "model_score": 0.2
     },
     {
-     "entity_id": "SKHY",
-     "model_score": 0.78
+     "entity_id": "IBM",
+     "model_score": 0.1844
     },
     {
-     "entity_id": "ARM",
-     "model_score": 0.75
+     "entity_id": "SHEL",
+     "model_score": 0.1628
     },
     {
-     "entity_id": "QCOM",
-     "model_score": 0.7
+     "entity_id": "LMT",
+     "model_score": 0.0
     }
    ],
    "news_source": {
@@ -64,59 +261,75 @@
    },
    "observed_subsequent_movers_top_k": [
     {
-     "abs_return": 0.15614,
+     "abnormal_return": -0.15229,
+     "abs_abnormal_return": 0.15229,
      "entity_id": "INTC",
      "from_date": "2026-07-06",
+     "is_label_positive": true,
      "return": -0.15614,
      "to_date": "2026-07-13"
     },
     {
-     "abs_return": 0.08321,
-     "entity_id": "SKHY",
-     "from_date": "2026-07-10",
-     "return": -0.08321,
-     "to_date": "2026-07-17"
-    },
-    {
-     "abs_return": 0.08114,
-     "entity_id": "BA",
-     "from_date": "2026-07-06",
-     "return": -0.08114,
-     "to_date": "2026-07-13"
-    },
-    {
-     "abs_return": 0.07474,
+     "abnormal_return": 0.10745,
+     "abs_abnormal_return": 0.10745,
      "entity_id": "SHEL",
      "from_date": "2026-07-06",
+     "is_label_positive": true,
      "return": 0.07474,
      "to_date": "2026-07-13"
     },
     {
-     "abs_return": 0.06687,
-     "entity_id": "TSM",
-     "from_date": "2026-07-06",
-     "return": -0.06687,
-     "to_date": "2026-07-13"
-    },
-    {
-     "abs_return": 0.05915,
+     "abnormal_return": 0.08991,
+     "abs_abnormal_return": 0.08991,
      "entity_id": "XOM",
      "from_date": "2026-07-06",
+     "is_label_positive": true,
      "return": 0.05915,
      "to_date": "2026-07-13"
     },
     {
-     "abs_return": 0.04081,
-     "entity_id": "NVDA",
+     "abnormal_return": -0.06791,
+     "abs_abnormal_return": 0.06791,
+     "entity_id": "BA",
      "from_date": "2026-07-06",
-     "return": 0.04081,
+     "is_label_positive": false,
+     "return": -0.08114,
      "to_date": "2026-07-13"
     },
     {
-     "abs_return": 0.03219,
+     "abnormal_return": 0.03573,
+     "abs_abnormal_return": 0.03573,
+     "entity_id": "MSFT",
+     "from_date": "2026-07-06",
+     "is_label_positive": false,
+     "return": 0.01099,
+     "to_date": "2026-07-13"
+    },
+    {
+     "abnormal_return": -0.01285,
+     "abs_abnormal_return": 0.01285,
      "entity_id": "LMT",
      "from_date": "2026-07-06",
+     "is_label_positive": false,
      "return": -0.03219,
+     "to_date": "2026-07-13"
+    },
+    {
+     "abnormal_return": 0.01274,
+     "abs_abnormal_return": 0.01274,
+     "entity_id": "JPM",
+     "from_date": "2026-07-06",
+     "is_label_positive": false,
+     "return": -0.00945,
+     "to_date": "2026-07-13"
+    },
+    {
+     "abnormal_return": -0.01152,
+     "abs_abnormal_return": 0.01152,
+     "entity_id": "IBM",
+     "from_date": "2026-07-06",
+     "is_label_positive": false,
+     "return": -0.03102,
      "to_date": "2026-07-13"
     }
    ],
@@ -133,12 +346,22 @@
     "t0": "2026-07-06",
     "top_k": 8
    },
+   "seed_entities": {
+    "entities": [
+     "AAPL",
+     "AMD",
+     "NVDA",
+     "TSM"
+    ],
+    "note": "Named in the event text: they are the INPUT to the model, not predictions, so they are not ranked or scored here (v1 scored them 1.0 and counted them)."
+   },
    "t0": "2026-07-06",
    "warnings": [
     "SCENARIO REPLAY / BACKTEST PROTOTYPE, NOT A HISTORICAL BACKTEST: the event narrative (news doc n11) is a SYNTHETIC construction; only the subsequent market prices used for scoring are real. Do not present this as a validated historical-event backtest.",
-    "POC-SCALE WARNING: this is a single illustrative worked example, not a validated backtest. Sample size (one event) is far too small for statistical significance.",
-    "'Observed subsequent affected entities' is a REALIZED-RETURN PROXY (largest absolute price move in the 5 trading days after T0), not verified causal ground truth - many things move markets simultaneously and this label cannot isolate the earthquake's specific causal effect.",
-    "Model score intentionally excludes any post-T0 data (asof-truncated correlation + timeless fact graph only) to avoid look-ahead bias."
+    "POC-SCALE WARNING: one event and 9 evaluated issuers. Read the random-ranking baseline and the chance probability next to every metric: at this size most outcomes are not distinguishable from luck.",
+    "'Observed subsequent affected entities' is a REALIZED-RETURN PROXY (largest absolute abnormal price move in the 5 trading days after T0), not verified causal ground truth - many things move markets simultaneously and this label cannot isolate the earthquake's specific causal effect.",
+    "Model score intentionally excludes any post-T0 data (asof-truncated correlation + timeless fact graph only) to avoid look-ahead bias.",
+    "The window starts at the T0 close, so any reaction already priced into T0 itself is not measured."
    ]
   },
   "status": 200
