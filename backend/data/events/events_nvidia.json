@@ -1,0 +1,408 @@
+{
+ "schema_version": 1,
+ "register": {
+  "description": "Real, retrieved publications about NVIDIA from approved primary sources, each verified by retrieval. Built by scripts/event_register.py; edit by re-running it, not by hand.",
+  "coverage": "NVIDIA (NVDA) pilot",
+  "built_at": "2026-11-01",
+  "specs_total": 8,
+  "specs_rejected": []
+ },
+ "events": [
+  {
+   "id": "nvda-20261021-supply-chain-capacity",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA and Supply Chain Partners Expand Capacity to Accelerate AI Infrastructure Buildout",
+   "category": "CORPORATE_ANNOUNCEMENT",
+   "published_date": "2026-10-21",
+   "event_date": "2026-10-21",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "berlin-de",
+    "basis": "Dateline of the press release: 'GTC Berlin'. The release places the announcement at that conference; the facilities it names are elsewhere (see regions mentioned).",
+    "basis_text": "GTC Berlin"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Newsroom",
+     "url": "https://nvidianews.nvidia.com/news/nvidia-and-supply-chain-partners-expand-capacity-to-accelerate-ai-infrastructure-buildout",
+     "title": "NVIDIA and Supply Chain Partners Expand Capacity to Accelerate AI Infrastructure Buildout",
+     "published_date": "2026-10-21",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:17Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "GTC Berlin— NVIDIA today announced plans with a group of supply chain partners to expand global manufacturing capacity to meet growing demand for its accelerated computing and full-stack AI factory platform."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Samsung Electro-Mechanics is joining NVIDIA’s substrate supply chain, bringing immediate capacity from its existing operations in South Korea."
+    },
+    {
+     "source_id": "s1",
+     "quote": "NVIDIA is supporting Unimicron’s KF substrate manufacturing expansion in Taiwan with a capacity reservation agreement."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Under an agreement signed and announced earlier this year by IBIDEN, NVIDIA is providing a multibillion-dollar capacity reservation advance to support IBIDEN’s Ono Plant in Japan."
+    },
+    {
+     "source_id": "s1",
+     "quote": "NVIDIA’s $1.1 billion capacity reservation advance to KYEC will support new U.S. testing facilities and equipment, with high-volume production targeted for April 2027."
+    },
+    {
+     "source_id": "s1",
+     "quote": "In Singapore, expanded testing operations are expected to begin high-volume production in February 2027."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:17Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 6,
+    "quotes_found": 6
+   }
+  },
+  {
+   "id": "nvda-20261014-semicon-west-ai-fabs",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA and Semiconductor Leaders Advance AI Across Chip Design and Manufacturing for AI-Defined Fabs",
+   "category": "CORPORATE_ANNOUNCEMENT",
+   "published_date": "2026-10-14",
+   "event_date": "2026-10-14",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "san-francisco-us",
+    "basis": "Dateline of the source: 'SAN FRANCISCO, Oct. 14, 2026'.",
+    "basis_text": "SAN FRANCISCO, Oct. 14, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Investor Relations",
+     "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Semiconductor-Leaders-Advance-AI-Across-Chip-Design-and-Manufacturing-for-AI-Defined-Fabs/default.aspx",
+     "title": "NVIDIA and Semiconductor Leaders Advance AI Across Chip Design and Manufacturing for AI-Defined Fabs",
+     "published_date": "2026-10-14",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:17Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "SAN FRANCISCO, Oct. 14, 2026 (GLOBE NEWSWIRE) -- SEMICON West -- NVIDIA today announced semiconductor leaders are adopting NVIDIA CUDA-X ™ libraries — including the new NVIDIA cuPotential library, which developers can use to build AI agents that simulate how atoms and molecules interact — to advance AI-defined fabs."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Applied Materials, Cadence, KLA, Lam Research, Siemens, Synopsys and other semiconductor leaders are using NVIDIA’s accelerated computing and AI stack across chip design, manufacturing and testing, helping drive faster development, better yield and greater production capacity."
+    },
+    {
+     "source_id": "s1",
+     "quote": "FANUC and Foxconn are connecting their robot models to the Mega NVIDIA Omniverse Blueprint, enabling manufacturers to simulate and validate robotic operations in factory digital twins before physical deployment."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:17Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 3,
+    "quotes_found": 3
+   }
+  },
+  {
+   "id": "nvda-20261008-us-science-commitment",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA Commits $1 Billion to Advance US Science Over the Next Five Years",
+   "category": "CORPORATE_ANNOUNCEMENT",
+   "published_date": "2026-10-08",
+   "event_date": "2026-10-08",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "santa-clara-us",
+    "basis": "Dateline of the source: 'SANTA CLARA, Calif., Oct. 08, 2026'.",
+    "basis_text": "SANTA CLARA, Calif., Oct. 08, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Investor Relations",
+     "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Commits-1-Billion-to-Advance-US-Science-Over-the-Next-Five-Years/default.aspx",
+     "title": "NVIDIA Commits $1 Billion to Advance US Science Over the Next Five Years",
+     "published_date": "2026-10-08",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:17Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "SANTA CLARA, Calif., Oct. 08, 2026 (GLOBE NEWSWIRE) -- NVIDIA today announced commitments valued at $1 billion to build out the United States’ capacity for super intelligence research and development in fields critical for U.S. leadership, including quantum computing, healthcare and energy security."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:17Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 1,
+    "quotes_found": 1
+   }
+  },
+  {
+   "id": "nvda-20260826-q2-fy2027-results",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027",
+   "category": "EARNINGS_RELEASE",
+   "published_date": "2026-08-26",
+   "event_date": "2026-08-26",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "santa-clara-us",
+    "basis": "Dateline of the source: 'SANTA CLARA, Calif., Aug. 26, 2026'.",
+    "basis_text": "SANTA CLARA, Calif., Aug. 26, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Investor Relations",
+     "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Announces-Financial-Results-for-Second-Quarter-Fiscal-2027/default.aspx",
+     "title": "NVIDIA Announces Financial Results for Second Quarter Fiscal 2027",
+     "published_date": "2026-08-26",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:18Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "NVIDIA Corporation - NVIDIA Announces Financial Results for Second Quarter Fiscal 2027 Skip to main content Skip to main content News Events & Presentations Events & Presentations Presentations Stock Info Stock Quote & Chart Historical Price Lookup Investment Calculator Fundamentals Analyst Coverage Financial Info Financial Reports SEC Filings Quarterly Results Annual Reports and Proxies Annual Meeting Governance Management Team Board of Directors Governance Documents Committee Composition Contact the Board Investor Resources Download Library Contact Investor Relations Request Information FAQs Email Alerts RSS Application Catalog News Events & Presentations Events & Presentations Presentations Stock Info Stock Quote & Chart Historical Price Lookup Investment Calculator Fundamentals Analyst Coverage Financial Info Financial Reports SEC Filings Quarterly Results Annual Reports and Proxies Annual Meeting Governance Management Team Board of Directors Governance Documents Committee Composition Contact the Board Investor Resources Download Library Contact Investor Relations Request Information FAQs Email Alerts RSS Application Catalog Press Release Details News Events & Presentations Events & Presentations Presentations Stock Info Stock Quote & Chart Historical Price Lookup Investment Calculator Fundamentals Analyst Coverage Financial Info Financial Reports SEC Filings Quarterly Results Annual Reports and Proxies Annual Meeting Governance Management Team Board of Directors Governance Documents Committee Composition Contact the Board Investor Resources Download Library Contact Investor Relations Request Information FAQs Email Alerts RSS Application Catalog View all news NVIDIA Announces Financial Results for Second Quarter Fiscal 2027 August 26, 2026 Download this Press Release PDF Format (opens in new window) Revenue of $96.2 billion, up 106% from a year ago Data Center revenue of $89.0 billion, up 117% from a year ago SANTA CLARA, Calif., Aug. 26, 2026 (GLOBE NEWSWIRE) -- NVIDIA (NASDAQ: NVDA) today reported revenue for the second quarter ended July 26, 2026, of $96.2 billion, up 18% from the previous quarter and up 106% from a year ago."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Announced the NVIDIA Vera Rubin platform is ramping into full production with racks running at partners including CoreWeave, Google Cloud, Microsoft Azure, Oracle Cloud Infrastructure and Nebius."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Announced a multiyear technology partnership with SK hynix to advance next-generation memory for the global AI factory buildout."
+    },
+    {
+     "source_id": "s1",
+     "quote": "NVIDIA is not assuming any Data Center compute revenue from China in its outlook."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:18Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 4,
+    "quotes_found": 4
+   }
+  },
+  {
+   "id": "nvda-20260725-sk-group-partnership",
+   "kind": "REAL_EVENT",
+   "title": "SK Group and NVIDIA Expand Strategic Partnership Across AI Factories and Next-Generation Memory",
+   "category": "PARTNERSHIP_ANNOUNCEMENT",
+   "published_date": "2026-07-25",
+   "event_date": "2026-07-25",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "seoul-kr",
+    "basis": "Dateline of the source: 'Seoul, July 25, 2026'.",
+    "basis_text": "Seoul, July 25, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "SK hynix Newsroom",
+     "url": "https://news.skhynix.com/en/skhynix-nvidia-partnership-2026/",
+     "title": "SK Group and NVIDIA Expand Strategic Partnership Across AI Factories and Next-Generation Memory",
+     "published_date": "2026-07-25",
+     "tier": "PRIMARY_RELATED_PARTY",
+     "approved_source_id": "sk_hynix_newsroom",
+     "retrieved_at": "2026-11-01T09:36:19Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "Seoul, July 25, 2026 – SK Group and NVIDIA today announced plans for a $500 billion plus comprehensive partnership to establish AI infrastructure serving the surging demand for global compute."
+    },
+    {
+     "source_id": "s1",
+     "quote": "SK hynix is also entering into a long-term AI memory partnership with NVIDIA."
+    },
+    {
+     "source_id": "s1",
+     "quote": "As a follow-up measure to solidify their previous long-term technical partnership, this agreement allows NVIDIA to secure a stable supply of next-generation AI memory, while enabling SK hynix to expand the foundation for growth."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Today’s announcement builds on the decades-long technology partnership between SK Group and NVIDIA, including the recently announced plans for SK Telecom to build a 2 gigawatt-scale AI Cloud in Korea."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:19Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 4,
+    "quotes_found": 4
+   }
+  },
+  {
+   "id": "nvda-20260601-gtc-taipei-rtx-spark",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA and Microsoft Reinvent Windows PCs for the Age of Personal AI",
+   "category": "PRODUCT_ANNOUNCEMENT",
+   "published_date": "2026-06-01",
+   "event_date": "2026-06-01",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "taipei-tw",
+    "basis": "Dateline of the source: 'TAIPEI, Taiwan, June 01, 2026'.",
+    "basis_text": "TAIPEI, Taiwan, June 01, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Investor Relations",
+     "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-and-Microsoft-Reinvent-Windows-PCs-for-the-Age-of-Personal-AI/default.aspx",
+     "title": "NVIDIA and Microsoft Reinvent Windows PCs for the Age of Personal AI",
+     "published_date": "2026-06-01",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:19Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "TAIPEI, Taiwan, June 01, 2026 (GLOBE NEWSWIRE) -- NVIDIA GTC Taipei -- NVIDIA today unveiled NVIDIA RTX Spark™, a new superchip that reinvents Windows PCs for the era of personal AI agents — offering a new class of computer that moves from tool to teammate."
+    },
+    {
+     "source_id": "s1",
+     "quote": "NVIDIA and Microsoft collaborate to deliver a native Windows experience for personal agents, including new security primitives and NVIDIA OpenShell to run agents securely on primary devices."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:19Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 2,
+    "quotes_found": 2
+   }
+  },
+  {
+   "id": "nvda-20260115-bis-h200-china-license-policy",
+   "kind": "REAL_EVENT",
+   "title": "Revision to License Review Policy for Advanced Computing Commodities",
+   "category": "REGULATORY_ACTION",
+   "published_date": "2026-01-15",
+   "event_date": "2026-01-15",
+   "event_date_basis": "Federal Register publication date; the rule's own effective date is not asserted here",
+   "location": {
+    "gazetteer_key": "country-us",
+    "basis": "Issued by a United States federal agency (Commerce Department, Bureau of Industry and Security, per the Federal Register's agency metadata). The document states no city, so the location is country-level.",
+    "basis_text": "Bureau of Industry and Security"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "Federal Register (Commerce Department, Bureau of Industry and Security)",
+     "url": "https://www.federalregister.gov/documents/2026/01/15/2026-00789/revision-to-license-review-policy-for-advanced-computing-commodities",
+     "title": "Revision to License Review Policy for Advanced Computing Commodities",
+     "published_date": "2026-01-15",
+     "tier": "PRIMARY_REGULATOR",
+     "approved_source_id": "us_federal_register",
+     "retrieved_at": "2026-11-01T09:36:19Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "The Bureau of Industry and Security (BIS) is revising its license review policy for exports of certain semiconductors to China and Macau--changing it from a presumption of denial to a case-by-case review."
+    },
+    {
+     "source_id": "s1",
+     "quote": "The semiconductors covered by this rule are the Nvidia H200 and its equivalents, as well as less advanced chips--provided that (1) the semiconductors are commercially available in the United States at the time of publication of this rule and (2) the exporter certifies that: there is sufficient supply of this product in the United States; production of this product for exports to China will not divert global foundry capacity for similar or more advanced products for end users in the United States; the recipient has demonstrated sufficient security procedures; and the item undergoes independent, third-party testing in the United States to verify its performance specifications."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:19Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 2,
+    "quotes_found": 2
+   }
+  },
+  {
+   "id": "nvda-20260105-ces-rubin-platform",
+   "kind": "REAL_EVENT",
+   "title": "NVIDIA Kicks Off the Next Generation of AI With Rubin — Six New Chips, One Incredible AI Supercomputer",
+   "category": "PRODUCT_ANNOUNCEMENT",
+   "published_date": "2026-01-05",
+   "event_date": "2026-01-05",
+   "event_date_basis": "press release date; the release says 'today announced'",
+   "location": {
+    "gazetteer_key": "las-vegas-us",
+    "basis": "Dateline of the source: 'LAS VEGAS, Jan. 05, 2026'.",
+    "basis_text": "LAS VEGAS, Jan. 05, 2026"
+   },
+   "sources": [
+    {
+     "id": "s1",
+     "publisher": "NVIDIA Investor Relations",
+     "url": "https://investor.nvidia.com/news/press-release-details/2026/NVIDIA-Kicks-Off-the-Next-Generation-of-AI-With-Rubin--Six-New-Chips-One-Incredible-AI-Supercomputer/default.aspx",
+     "title": "NVIDIA Kicks Off the Next Generation of AI With Rubin — Six New Chips, One Incredible AI Supercomputer",
+     "published_date": "2026-01-05",
+     "tier": "PRIMARY_ISSUER",
+     "approved_source_id": "nvidia_newsroom",
+     "retrieved_at": "2026-11-01T09:36:19Z"
+    }
+   ],
+   "evidence": [
+    {
+     "source_id": "s1",
+     "quote": "LAS VEGAS, Jan. 05, 2026 (GLOBE NEWSWIRE) -- CES -- NVIDIA today kickstarted the next generation of AI with the launch of the NVIDIA Rubin platform , comprising six new chips designed to deliver one incredible AI supercomputer."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Microsoft’s next-generation Fairwater AI superfactories — featuring NVIDIA Vera Rubin NVL72 rack-scale systems — will scale to hundreds of thousands of NVIDIA Vera Rubin Superchips."
+    },
+    {
+     "source_id": "s1",
+     "quote": "Broad Ecosystem Support Among the world’s leading AI labs, cloud service providers, computer makers and startups expected to adopt Rubin are Amazon Web Services (AWS), Anthropic, Black Forest Labs, Cisco, Cohere, CoreWeave, Cursor, Dell Technologies , Google, Harvey, HPE, Lambda, Lenovo, Meta, Microsoft, Mistral AI, Nebius, Nscale, OpenAI, OpenEvidence, Oracle Cloud Infrastructure (OCI), Perplexity, Runway, Supermicro , Thinking Machines Lab and xAI."
+    }
+   ],
+   "verification": {
+    "status": "VERIFIED_BY_RETRIEVAL",
+    "method": "scripts/event_register.py (retrieved the source, matched the date, title, location basis and every quote verbatim)",
+    "checked_at": "2026-11-01T09:36:19Z",
+    "http_status": 200,
+    "date_confirmed": true,
+    "quotes_total": 3,
+    "quotes_found": 3
+   }
+  }
+ ]
+}

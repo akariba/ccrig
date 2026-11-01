@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "description": "Approximate display coordinates for places that appear in the event register. NOT event epicentres, not facility locations, not exposure locations: a marker is a labelled place or a country centroid, and the precision is always shown. Coordinates are rounded, widely published values used only to place a marker on the map.",
+  "places": {
+    "berlin-de":       {"label": "Berlin, Germany",              "kind": "city",    "lat": 52.52,  "lon": 13.405,   "country": "Germany"},
+    "san-francisco-us":{"label": "San Francisco, United States", "kind": "city",    "lat": 37.7749,"lon": -122.4194,"country": "United States"},
+    "santa-clara-us":  {"label": "Santa Clara, United States",   "kind": "city",    "lat": 37.3541,"lon": -121.9552,"country": "United States"},
+    "seoul-kr":        {"label": "Seoul, South Korea",           "kind": "city",    "lat": 37.5665,"lon": 126.978,  "country": "South Korea"},
+    "taipei-tw":       {"label": "Taipei, Taiwan",               "kind": "city",    "lat": 25.033, "lon": 121.5654, "country": "Taiwan"},
+    "las-vegas-us":    {"label": "Las Vegas, United States",     "kind": "city",    "lat": 36.1699,"lon": -115.1398,"country": "United States"},
+    "country-us": {"label": "United States",  "kind": "country", "lat": 39.83, "lon": -98.58, "country": "United States",  "aliases": ["United States", "U.S."]},
+    "country-kr": {"label": "South Korea",    "kind": "country", "lat": 36.5,  "lon": 127.9,  "country": "South Korea",    "aliases": ["South Korea", "Korea"]},
+    "country-tw": {"label": "Taiwan",         "kind": "country", "lat": 23.7,  "lon": 121.0,  "country": "Taiwan",         "aliases": ["Taiwan"]},
+    "country-jp": {"label": "Japan",          "kind": "country", "lat": 36.2,  "lon": 138.25, "country": "Japan",          "aliases": ["Japan"]},
+    "country-sg": {"label": "Singapore",      "kind": "country", "lat": 1.35,  "lon": 103.82, "country": "Singapore",      "aliases": ["Singapore"]},
+    "country-cn": {"label": "China",          "kind": "country", "lat": 35.86, "lon": 104.2,  "country": "China",          "aliases": ["China"]},
+    "country-mo": {"label": "Macau",          "kind": "country", "lat": 22.2,  "lon": 113.54, "country": "Macau",          "aliases": ["Macau"]},
+    "country-de": {"label": "Germany",        "kind": "country", "lat": 51.17, "lon": 10.45,  "country": "Germany",        "aliases": ["Germany"]},
+    "country-dk": {"label": "Denmark",        "kind": "country", "lat": 56.0,  "lon": 9.5,    "country": "Denmark",        "aliases": ["Denmark"]},
+    "country-fr": {"label": "France",         "kind": "country", "lat": 46.6,  "lon": 2.2,    "country": "France",         "aliases": ["France"]},
+    "country-nl": {"label": "Netherlands",    "kind": "country", "lat": 52.1,  "lon": 5.3,    "country": "Netherlands",    "aliases": ["Netherlands"]},
+    "country-ch": {"label": "Switzerland",    "kind": "country", "lat": 46.8,  "lon": 8.2,    "country": "Switzerland",    "aliases": ["Switzerland"]},
+    "country-gb": {"label": "United Kingdom", "kind": "country", "lat": 54.0,  "lon": -2.0,   "country": "United Kingdom", "aliases": ["United Kingdom", "U.K."]}
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "policy": "An event is admitted to the register only if EVERY source it cites is on an approved domain below, the tier recorded on the source matches the tier configured here, and the source was retrieved and its date and every quoted evidence passage found (see scripts/event_register.py verify). Press, analyst and social-media sources are not approved in this MVP: they are not machine-verifiable here and secondary reporting is not needed to establish that an issuer or a regulator published something.",
+  "sources": [
+    {
+      "id": "nvidia_newsroom",
+      "domains": ["nvidianews.nvidia.com", "investor.nvidia.com"],
+      "tier": "PRIMARY_ISSUER",
+      "description": "NVIDIA's own press releases.",
+      "limits": "Issuer statements are promotional and forward-looking; figures and claims are the issuer's own and are not independently verified."
+    },
+    {
+      "id": "us_federal_register",
+      "domains": ["federalregister.gov"],
+      "tier": "PRIMARY_REGULATOR",
+      "description": "The United States Federal Register (official publication of federal rules), read through its public API.",
+      "limits": "Establishes that a rule was published and what it says; it does not establish economic effect."
+    },
+    {
+      "id": "sk_hynix_newsroom",
+      "domains": ["news.skhynix.com"],
+      "tier": "PRIMARY_RELATED_PARTY",
+      "description": "SK hynix's own newsroom (SK hynix is a documented NVIDIA supplier in the platform's relationship data).",
+      "limits": "A counterparty's own statement; promotional, and not independently verified."
+    },
+    {
+      "id": "sec_edgar",
+      "domains": ["sec.gov"],
+      "tier": "PRIMARY_REGULATOR",
+      "description": "SEC EDGAR filings.",
+      "limits": "Approved but not used in the MVP: automated retrieval requires a registered contact identity, which this project has not configured."
+    }
+  ]
+}
