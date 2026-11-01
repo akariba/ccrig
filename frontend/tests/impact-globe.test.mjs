@@ -80,3 +80,12 @@ test("camera easing moves toward the target by the shortest way round, settles e
   while (!settled && steps++ < 400) ({ cam: c, settled } = g.stepCam(c, target, 1 / 60));
   assert.ok(settled && steps < 400); assert.deepEqual(c, target);
 });
+
+test("auto projection: globe when everything fits one hemisphere, flat otherwise", () => {
+  assert.equal(g.chooseProjection([]), "globe"); assert.equal(g.chooseProjection([berlin]), "globe");
+  assert.equal(g.chooseProjection([[-98.6, 39.8], seoul]), "globe");                      // the Seoul event and its US counterpart: a readable globe
+  assert.equal(g.chooseProjection([santaClara, [-122.4, 37.77], [-121.9, 37.4]]), "globe");
+  assert.equal(g.chooseProjection([berlin, santaClara, seoul, taipei, [-98.6, 39.8]]), "flat");   // the whole register: dispersed
+  assert.equal(g.chooseProjection([[0, 0], [180, 0]]), "flat");                          // opposite points have no centre: never a globe
+  assert.deepEqual([g.chooseProjection([berlin, seoul]), g.chooseProjection([seoul, berlin])].length, 2);
+});

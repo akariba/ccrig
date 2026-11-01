@@ -96,3 +96,17 @@ export function stepCam(cur: GlobeCam, target: GlobeCam, dtSeconds: number, rate
   const settled = Math.abs(lonDelta(cam.lon, target.lon)) < 0.03 && Math.abs(target.lat - cam.lat) < 0.03 && Math.abs(target.k - cam.k) < 0.15;
   return settled ? { cam: { ...target }, settled: true } : { cam, settled: false };
 }
+
+/**
+ * Which projection reads best for a set of positions: the globe while everything lies within one comfortable hemisphere of their mean
+ * direction, otherwise the flat map, where nothing hides behind the horizon and a pole-centred view never appears. Pure.
+ */
+export const GLOBE_MAX_SPREAD = (58 * Math.PI) / 180, GLOBE_MAX_CENTRE_LAT = 66;
+export function chooseProjection(points: LonLat[]): "globe" | "flat" {
+  if (points.length < 2) return "globe";
+  const sum = points.map(unit).reduce((s, v) => [s[0] + v[0], s[1] + v[1], s[2] + v[2]] as [number, number, number], [0, 0, 0]);
+  if (Math.hypot(...sum) < 1e-6) return "flat";
+  const centre = fromUnit(sum);
+  const spread = Math.max(...points.map((p) => angularDistance(centre, p)));
+  return spread <= GLOBE_MAX_SPREAD && Math.abs(centre[1]) <= GLOBE_MAX_CENTRE_LAT ? "globe" : "flat";   // wide, or centred near a pole, reads better flat
+}
