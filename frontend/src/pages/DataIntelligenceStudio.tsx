@@ -98,7 +98,7 @@ export function DataIntelligenceStudio() {
   const status = destinationStatus(events, cursor);
   const canAct = source === "operator" && access.kind === "ready" && atEnd && !playing && !liveRun;
   const last = events[cursor - 1];
-  const lastStaged = events.slice(0, cursor).reverse().find((e) => e.stage_id);
+  const lastStaged = events.slice(0, cursor).reverse().find((e) => e.stage_id && e.state !== "SKIPPED");
 
   // ---------------------------------------------------------------- playback of recorded events
   useEffect(() => {
