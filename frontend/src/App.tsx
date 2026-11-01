@@ -16,6 +16,7 @@ import { BacktestLab } from "./pages/BacktestLab";
 import { Provenance } from "./pages/Provenance";
 import { BreachesActions } from "./pages/BreachesActions";
 import { ExposureMovers } from "./pages/ExposureMovers";
+import { DataIntelligenceStudio } from "./pages/DataIntelligenceStudio";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
           <Route path="/model-lab" element={<ModelLab />} />
           <Route path="/backtest-lab" element={<BacktestLab />} />
           <Route path="/provenance" element={<Provenance />} />
+          <Route path="/data-studio" element={<DataIntelligenceStudio />} />
         </Route>
       </Routes>
       </InvestigationProvider>

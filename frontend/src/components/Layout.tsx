@@ -25,6 +25,7 @@ const NAV = [
   { to: "/model-lab", label: "Model Lab" },
   { to: "/backtest-lab", label: "Backtest Lab" },
   { section: "System" },
+  { to: "/data-studio", label: "Data Intelligence Studio" },
   { to: "/provenance", label: "Data Sources" },
 ];
 
