@@ -8,7 +8,7 @@ All of it is pure and offline (no network at request time), so it runs unchanged
 in-browser (Pyodide) build. See docs/EVENT_IMPACT_MAP.md.
 """
 from datetime import date
-from typing import Optional
+from typing import Literal, Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
@@ -44,16 +44,37 @@ def register():
     return event_discovery.register_overview()
 
 
+def _when(as_of):
+    if as_of is None:
+        return None
+    try:
+        return date.fromisoformat(as_of)
+    except ValueError:
+        raise HTTPException(422, f"as_of '{as_of}' is not a real calendar date (use YYYY-MM-DD)")
+
+
+@router.get("/{entity_id}/compare")
+def compare(entity_id: str,
+            limit: int = Query(5, ge=1, le=event_discovery.MAX_LIMIT),
+            recency_days: int = Query(event_discovery.DEFAULT_RECENCY_DAYS, ge=1, le=730),
+            as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$")):
+    """Curated register vs the latest dynamic discovery, side by side."""
+    from ..discovery import bridge
+
+    return bridge.compare(_issuer_or_404(entity_id), limit=limit, recency_days=recency_days, as_of=_when(as_of))
+
+
 @router.get("/{entity_id}/events")
 def events(entity_id: str,
            limit: int = Query(5, ge=1, le=event_discovery.MAX_LIMIT),
            recency_days: int = Query(event_discovery.DEFAULT_RECENCY_DAYS, ge=1, le=730),
-           as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$")):
+           as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$"),
+           mode: Literal["curated", "discovered"] = Query("curated")):
+    """mode=curated (default): the approved-source register. mode=discovered: the latest dynamic discovery run, if this deployment can run one."""
     entity_id = _issuer_or_404(entity_id)
-    when = None
-    if as_of is not None:
-        try:
-            when = date.fromisoformat(as_of)
-        except ValueError:
-            raise HTTPException(422, f"as_of '{as_of}' is not a real calendar date (use YYYY-MM-DD)")
+    when = _when(as_of)
+    if mode == "discovered":
+        from ..discovery import bridge
+
+        return bridge.discovered_response(entity_id, limit=limit, recency_days=recency_days, as_of=when)
     return event_discovery.discover(entity_id, limit=limit, recency_days=recency_days, as_of=when)

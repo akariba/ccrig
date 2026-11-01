@@ -73,16 +73,27 @@ def _days_before(as_of: date, published: str) -> int:
 
 def discover(entity_id: str, *, limit: int = MAX_LIMIT, recency_days: int = DEFAULT_RECENCY_DAYS, as_of: date | None = None) -> dict:
     """Events concerning `entity_id`, with sources, locations, entities, typed paths and limitations. See module docstring."""
-    limit = max(1, min(limit, MAX_LIMIT))
-    as_of = as_of or as_of_default()
-    entity = STORE.entity(entity_id)
     register = reg.load_register()
+    meta = {"built_at": register["register"]["built_at"], "coverage": register["register"]["coverage"], "events_total": len(register["events"]),
+            "approved_sources": [{"id": s["id"], "domains": s["domains"], "tier": s["tier"], "limits": s["limits"]} for s in reg.approved_sources()["sources"]]}
+    return discover_from_events(entity_id, register["events"], meta, limit=limit, recency_days=recency_days, as_of=as_of or as_of_default(),
+                                as_of_basis="the register's build date" if as_of in (None, as_of_default()) else "supplied by the caller")
+
+
+def discover_from_events(entity_id: str, events: list, meta: dict, *, limit: int = MAX_LIMIT, recency_days: int = DEFAULT_RECENCY_DAYS, as_of: date,
+                         as_of_basis: str = "supplied by the caller", admissible=None, explainer=None, limitations=None) -> dict:
+    """The selection and presentation shared by the curated register and by dynamic discovery: same rules, same output shape.
+    `events` are register-shaped records; `admissible(event) -> (ok, problems)` and `explainer(...)` let a caller adapt wording, never the rules."""
+    limit = max(1, min(limit, MAX_LIMIT))
+    admissible = admissible or _passes_policy
+    explainer = explainer or _explain
+    entity = STORE.entity(entity_id)
     window_start = as_of - timedelta(days=recency_days)
 
     eligible, not_returned = [], []
-    for event in register["events"]:
+    for event in events:
         stub = {"id": event["id"], "title": event["title"], "published_date": event["published_date"]}
-        ok, problems = _passes_policy(event)
+        ok, problems = admissible(event)
         if not ok:
             not_returned.append({**stub, "reason": "inadmissible: " + "; ".join(problems)})
             continue
@@ -110,20 +121,18 @@ def discover(entity_id: str, *, limit: int = MAX_LIMIT, recency_days: int = DEFA
         not_returned.append({"id": event["id"], "title": event["title"], "published_date": event["published_date"],
                              "reason": f"qualifies, but ranks below the limit of {limit} (newest first)"})
 
-    events = [_present(event, resolved, entity_id) for event, resolved in returned]
+    presented = [_present(event, resolved, entity_id) for event, resolved in returned]
     return {
         "entity": {"entity_id": entity_id, "name": entity["name"], "ticker": entity.get("ticker"), "country": entity.get("country")},
         "query": {"limit": limit, "recency_days": recency_days, "as_of": as_of.isoformat(),
                   "window": [window_start.isoformat(), as_of.isoformat()]},
-        "as_of_basis": "the register's build date" if as_of == as_of_default() else "supplied by the caller",
-        "register": {"built_at": register["register"]["built_at"], "coverage": register["register"]["coverage"],
-                     "events_total": len(register["events"]), "approved_sources": [
-                         {"id": s["id"], "domains": s["domains"], "tier": s["tier"], "limits": s["limits"]} for s in reg.approved_sources()["sources"]]},
-        "events": events,
+        "as_of_basis": as_of_basis,
+        "register": meta,
+        "events": presented,
         "not_returned": sorted(not_returned, key=lambda r: (r["published_date"], r["id"]), reverse=True),
-        "explanation": _explain(entity, len(events), limit, recency_days, as_of, not_returned, len(register["events"])),
-        "graph": build_graph(events, entity_id),
-        "limitations": GLOBAL_LIMITATIONS,
+        "explanation": explainer(entity, len(presented), limit, recency_days, as_of, not_returned, meta["events_total"]),
+        "graph": build_graph(presented, entity_id),
+        "limitations": limitations or GLOBAL_LIMITATIONS,
     }
 
 
