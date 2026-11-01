@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "description": "Explicit, reviewable adjustments to how names in event evidence are resolved to dataset entities. They resolve a NAME to an entity; they do not assert any relationship between entities.",
+  "brand_aliases": {
+    "GOOGL": [
+      {"alias": "Google Cloud", "reason": "Cloud business of Google LLC, a wholly owned subsidiary of Alphabet Inc."},
+      {"alias": "Google", "reason": "Google LLC is a wholly owned subsidiary of Alphabet Inc."}
+    ],
+    "AMZN": [
+      {"alias": "Amazon Web Services", "reason": "Cloud business of Amazon.com, Inc."},
+      {"alias": "AWS", "reason": "Abbreviation of Amazon Web Services, part of Amazon.com, Inc."},
+      {"alias": "Amazon", "reason": "Short name of Amazon.com, Inc."}
+    ],
+    "META": [
+      {"alias": "Meta", "reason": "Short name of Meta Platforms, Inc."}
+    ]
+  },
+  "require_following": {
+    "rtx": {"pattern": "^\\s+(?:Corporation|Corp\\b)", "reason": "RTX is also NVIDIA's product brand (GeForce RTX, RTX Spark). The defence company RTX Corporation is resolved only when its legal form follows."}
+  },
+  "denied_aliases": {
+    "samsung": "Not an alias: 'Samsung' is a group of distinct listed companies (Samsung Electronics, Samsung Electro-Mechanics, ...). Only 'Samsung Electronics' resolves to Samsung Electronics."
+  }
+}
