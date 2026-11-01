@@ -277,23 +277,34 @@ try {
     (await page.getByTestId("mode-badge").innerText()) === "RECORDED REPLAY" && (await page.getByTestId("access-note").count()) === 1 && /recording/i.test(await page.getByTestId("recording-note").innerText()));
   check("studio: no run controls, no approve or rollback controls, no token field are offered on a read-only deployment",
     (await page.locator('[data-testid^="run-claim-"]').count()) === 0 && (await page.getByTestId("review-approve").count()) === 0 && (await page.getByTestId("rollback-btn").count()) === 0);
-  check("studio: the recorded run ends in its recorded final state, with the supported/partial/unsupported matrix and unavailable metrics stated",
-    (await page.getByTestId("studio-page").getAttribute("data-state")) === "ROLLED_BACK" && (await page.locator('[data-testid="support-matrix"] [data-level="SUPPORTED"]').count()) === 1
-    && (await page.locator('[data-testid="support-matrix"] [data-level="PARTIAL"]').count()) >= 4 && /unavailable/.test(await page.getByTestId("spec-throughput").innerText()));
+  check("studio: the recorded run ends in its recorded final state; the details drawer is closed until asked for",
+    (await page.getByTestId("studio-page").getAttribute("data-state")) === "ROLLED_BACK" && (await page.getByTestId("studio-page").getAttribute("data-drawer")) === "false" && (await page.getByTestId("source-inspector").count()) === 0);
+  await page.getByTestId("drawer-toggle").click();
+  await page.getByTestId("drawer-tab-about").click();
+  check("studio: the supported / partial / unsupported matrix is stated", (await page.locator('[data-testid="support-matrix"] [data-level="SUPPORTED"]').count()) === 1 && (await page.locator('[data-testid="support-matrix"] [data-level="PARTIAL"]').count()) >= 4);
+  await page.getByTestId("drawer-tab-events").click();
+  check("studio: unavailable metrics are declared unavailable, not estimated", /unavailable/.test(await page.getByTestId("spec-throughput").innerText()));
+  await page.getByTestId("drawer-close").click();
+  check("studio: the language-model module is drawn as skipped (no model call was recorded), never as running", (await page.getByTestId("flow-node-LLM").getAttribute("data-state")) === "SKIPPED" && /not invoked/.test(await page.getByTestId("flow-node-LLM").innerText()));
   await page.getByTestId("replay-btn").click();
   await page.getByRole("button", { name: "4×" }).click();
-  const seenStates = new Set();
+  const seenStates = new Set(), seenLlm = new Set();
   const tr = Date.now();
   while (Date.now() - tr < 45000) {
     seenStates.add(await page.getByTestId("flow-node-REVIEW").getAttribute("data-state"));
+    seenLlm.add(await page.getByTestId("flow-node-LLM").getAttribute("data-state"));
     if ((await page.getByTestId("studio-page").getAttribute("data-playing")) === "false" && seenStates.size > 2) break;
     await page.waitForTimeout(50);
   }
-  check("studio: the replay passes through the recorded gate states and is labelled as a recorded replay", ["QUEUED", "AWAITING_REVIEW", "APPROVED"].every((x) => seenStates.has(x)) && (await page.getByTestId("mode-badge").innerText()) === "RECORDED REPLAY", [...seenStates].join(","));
-  await page.getByTestId("flow-node-EVIDENCE").click();
-  check("studio: selecting a stage shows its recorded findings and history", (await page.getByTestId("selection-dock").getAttribute("data-stage")) === "EVIDENCE" && /stage completed/.test(await page.getByTestId("selection-dock").innerText()));
+  check("studio: the replay passes through the recorded gate states and is labelled as a recorded replay; the model module never runs", ["QUEUED", "AWAITING_REVIEW", "APPROVED"].every((x) => seenStates.has(x)) && (await page.getByTestId("mode-badge").innerText()) === "RECORDED REPLAY" && ![...seenLlm].some((x) => ["RUNNING", "COMPLETED"].includes(x)), [...seenStates].join(",") + " | llm " + [...seenLlm].join(","));
+  await page.getByTestId("flow-node-VERIFY").click({ position: { x: 20, y: 20 } });
+  check("studio: selecting a module opens the drawer with its recorded findings and history", (await page.getByTestId("selection-dock").first().getAttribute("data-stage")) === "EVIDENCE" && /stage completed/.test(await page.getByTestId("selection-dock").first().innerText()));
+  await page.getByTestId("drawer-close").click();
   await page.getByTestId("rec-claim-cooccurrence").click();
-  check("studio: the recorded co-occurrence claim is shown rejected as insufficient evidence", (await page.getByTestId("studio-page").getAttribute("data-state")) === "BLOCKED" && (await page.getByTestId("assessment-verdict").first().innerText()).toLowerCase() === "rejected");
+  await page.getByTestId("drawer-toggle").click();
+  await page.getByTestId("drawer-tab-quality").click();
+  check("studio: the recorded co-occurrence claim is shown refused as insufficient evidence", (await page.getByTestId("studio-page").getAttribute("data-state")) === "BLOCKED" && (await page.getByTestId("assessment-verdict").first().innerText()).toLowerCase() === "rejected");
+  await page.getByTestId("drawer-close").click();
   await shot(page, "studio_recorded");
   page.off("request", onReq);
   check("studio: no operator or server-side ingestion request was made", studioReqs.length === 0, studioReqs.join(" "));

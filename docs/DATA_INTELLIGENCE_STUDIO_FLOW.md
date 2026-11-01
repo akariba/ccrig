@@ -1,12 +1,19 @@
 # Data Intelligence Studio: watching a real source move through the pipeline
 
+## The instrument (visual design, v2)
+The page is a computational instrument, not a report. The network fills the window (about 75% of a 1440x900 window, 86% at 1920x1080): **SOURCE -> PARSE -> VALIDATE -> RESOLVE -> LLM -> VERIFY -> REVIEW -> OUTPUT**. Large modules carry one hero fact each (bytes, rows, identifiers, quotes verdict, review decision, release version). Kinds of processing are grouped and labelled: source ingestion, deterministic processing, evidence verification, human review, output, and a separate violet **LLM execution layer** above the deterministic lane. Cables are multi-strand, glowing Bezier curves; pulses travel along them only for a moment after a recorded event, or while a module is recorded as running.
+
+The graph follows the recorded dependencies. The language-model module is an optional branch: when no model call is recorded (always, for the relationship pipeline, which is deterministic) it is drawn as **skipped / "not invoked"**, its two cables are dashed and dim, and the evidence stage is fed by the direct cable from Resolve. If the ledger ever records a model call (stage `LLM`, with provider, model, calls, latency and token counts), the module lights, shows exactly those fields ("not recorded" for any that are missing, never an estimate), the direct cable goes idle and the branch carries the data. A failed call is a failed module. No model is configured in this deployment, so no real model execution has been captured; the display of recorded calls is covered by tests using clearly labelled synthetic ledger rows.
+
+Selecting a module focuses it (neighbouring cables brighten, the rest dim) and opens a **contextual drawer**, closed by default: Stage, Source, Quality, Review, Output, Events, About. Review (acknowledgement, approve, reject) and Output (overlay, Graph Explorer / Impact Map links, rollback) live there; the review module shows a "Decide" control when a decision is awaited. A compact timeline strip under the network shows one tick per recorded event (click to move a replay there). The earlier report-style panels are now drawer content.
+
 Page: **Data Intelligence Studio** (`/data-studio`, under System). Design: the "Ingest Bench" sheet (title block, status bar, three instrument panels, specification table, event log) with "Neural Cable Graph" cables and node cards. No simulated network, loss curves, token counts or model names.
 
 ## What it is built on (nothing rebuilt)
 The branch lineage is linear (`phase2/event-impact-map` -> `data-studio` -> `event-discovery` -> `relationship-ccr-integration` -> this branch), so no merge was needed. The page reuses the existing pipeline (acquire, parse, profile, validate, resolve, check, stage), the hash-chained event ledger, review (approve/reject with explicit acknowledgements), release/rollback, the relationship overlay and the Graph Explorer / Impact Map integration. New code: `backend/app/studio/flow.py` (a view over recorded data) and the page under `frontend/src/studio/`.
 
-## Eight stages and the structured event contract
-SOURCE -> PARSE -> PROFILE -> VALIDATE -> RESOLVE -> EVIDENCE -> REVIEW -> PROMOTE. Pipeline stages map as ACQUIRE=SOURCE, CHECK+STAGE=EVIDENCE; REVIEW and PROMOTE come from the review/release mechanism.
+## Recorded stages and the structured event contract
+SOURCE -> PARSE -> PROFILE -> VALIDATE -> RESOLVE -> LLM -> EVIDENCE -> REVIEW -> PROMOTE (nine recorded stages; the page shows Parse+Profile as one module, Evidence as VERIFY and Promote as OUTPUT). LLM is `SKIPPED` unless a model call was recorded. Pipeline stages map as ACQUIRE=SOURCE, CHECK+STAGE=EVIDENCE; REVIEW and PROMOTE come from the review/release mechanism.
 
 Each structured event is derived from exactly one persisted ledger row (`id` = ledger sequence, `hash` = ledger hash, `ts` = recorded time). A few rows expand into several events (an approval is a REVIEW and a PROMOTE event: ids `41`, `41.1`). Fields: job id, source id and sha-256 fingerprint, stage id, type, state, `records {processed, accepted, rejected}`, error, `resolution` counts, `evidence` references (stored document hashes), `review_state`, `destination` (dataset, release, kind `STUDIO_OVERLAY`, `canonical_data_modified: false`), `validation` (errors, warnings, codes).
 
