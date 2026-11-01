@@ -8,6 +8,7 @@ export const STAGE_DEFS: { id: StageId; label: string; hint: string }[] = [
   { id: "PROFILE", label: "Profile", hint: "types, completeness, duplicates" },
   { id: "VALIDATE", label: "Validate", hint: "contract: types, required fields" },
   { id: "RESOLVE", label: "Resolve", hint: "match identifiers, exact first" },
+  { id: "LLM", label: "Language model", hint: "only if a model call was recorded" },
   { id: "EVIDENCE", label: "Evidence", hint: "quotes, direction, staged comparison" },
   { id: "REVIEW", label: "Review", hint: "a named person decides" },
   { id: "PROMOTE", label: "Promote", hint: "versioned release and overlay" },
@@ -17,10 +18,10 @@ export const STAGE_ORDER = STAGE_DEFS.map((s) => s.id);
 export interface StageView {
   id: StageId; label: string; state: string; records: Records | null; durationMs: number | null; startedTs: string | null; lastTs: string | null; message: string | null;
   validation: { errors: number; warnings: number; codes: Record<string, number> } | null; resolution: FlowEvent["resolution"]; error: FlowEvent["error"];
-  destination: FlowEvent["destination"]; eventIds: string[];
+  destination: FlowEvent["destination"]; llm: FlowEvent["llm"] | null; eventIds: string[];
 }
 
-export const emptyStage = (id: StageId, label: string): StageView => ({ id, label, state: "QUEUED", records: null, durationMs: null, startedTs: null, lastTs: null, message: null, validation: null, resolution: null, error: null, destination: null, eventIds: [] });
+export const emptyStage = (id: StageId, label: string): StageView => ({ id, label, state: "QUEUED", records: null, durationMs: null, startedTs: null, lastTs: null, message: null, validation: null, resolution: null, error: null, destination: null, llm: null, eventIds: [] });
 
 /** Stage views after applying the first `upto` events (all of them when omitted). */
 export function reduceStages(events: FlowEvent[], upto: number = events.length): StageView[] {
@@ -38,25 +39,10 @@ export function reduceStages(events: FlowEvent[], upto: number = events.length):
     if (e.resolution) v.resolution = e.resolution;
     if (e.error) v.error = e.error;
     if (e.destination) v.destination = e.destination;
+    if (e.llm) v.llm = e.llm;
     if (e.message && ["STAGE_SKIPPED", "REVIEW_BLOCKED", "REVIEW_AWAITING"].includes(e.type)) v.message = e.message;
   }
   return STAGE_ORDER.map((id) => views[id]);
-}
-
-export interface ConnView { from: StageId; to: StageId; state: "FLOWED" | "HELD" | "AWAITING" | "IDLE" }
-
-export function reduceConnections(stages: StageView[]): ConnView[] {
-  const done = ["COMPLETED", "COMPLETED_WITH_WARNINGS", "FAILED_CHECKS", "APPROVED", "ROLLED_BACK"];
-  const out: ConnView[] = [];
-  for (let i = 0; i < stages.length - 1; i++) {
-    const a = stages[i], b = stages[i + 1];
-    let state: ConnView["state"];
-    if (b.id === "REVIEW") state = b.state === "AWAITING_REVIEW" ? "AWAITING" : b.state === "BLOCKED" ? "HELD" : ["APPROVED", "REJECTED"].includes(b.state) ? "FLOWED" : "IDLE";
-    else if (a.id === "REVIEW") state = ["COMPLETED", "ROLLED_BACK"].includes(b.state) ? "FLOWED" : b.state === "SKIPPED" && ["BLOCKED", "REJECTED"].includes(a.state) ? "HELD" : "IDLE";
-    else state = done.includes(a.state) && !["QUEUED", "SKIPPED"].includes(b.state) ? "FLOWED" : done.includes(a.state) && b.state === "SKIPPED" ? "HELD" : "IDLE";
-    out.push({ from: a.id, to: b.id, state });
-  }
-  return out;
 }
 
 /** The job's overall state from its stage views. */

@@ -2,8 +2,9 @@
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { STAGE_DEFS, clock, fmtMs, shortHash, type StageView } from "./reduce";
-import type { Selection } from "./FlowCanvas";
+import type { EdgeVM, NodeVM } from "./graph";
 import { STATE_COLOR, STATE_LABEL } from "./states";
+type Selection = { kind: "node"; id: import("./types").StageId } | { kind: "conn"; from: import("./types").StageId; to: import("./types").StageId } | null;
 import type { Assessment, FlowEvent, GraphProof, MentionItem, Preview, Projection, QuoteAssessment, SupportMatrix } from "./types";
 
 const reached = (stages: StageView[], id: string) => stages.find((s) => s.id === id)?.state !== "QUEUED";
@@ -272,6 +273,51 @@ export function SupportTable({ support }: { support: SupportMatrix | null }) {
         <tbody>{support.domains.map((d) => <tr key={d.dataset} data-level={d.level}><td>{d.label}<br /><code>{d.dataset}</code></td><td><span className={"ds-level " + d.level.toLowerCase()}>{d.level.replace("_", " ").toLowerCase()}</span></td><td>{d.supported}</td><td>{d.limits}</td></tr>)}</tbody></table>
       <table className="ds-table" style={{ marginTop: 10 }}><thead><tr><th>Source type</th><th>Support</th><th>Note</th></tr></thead>
         <tbody>{support.formats.map((f) => <tr key={f.format}><td>{f.format}</td><td><span className={"ds-level " + f.level.toLowerCase()}>{f.level.toLowerCase()}</span></td><td>{f.note}</td></tr>)}</tbody></table>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- the language-model module and cables
+export function LlmDetail({ node, proj }: { node: NodeVM; proj: Projection | null }) {
+  const v = node.stages[0], l = v.llm, nr = (x: unknown, unit = "") => (x == null ? "not recorded" : `${x}${unit}`);
+  return (
+    <div data-testid="llm-detail" data-state={node.state}>
+      <span className="ds-lab">Language-model layer</span>
+      {node.state === "SKIPPED" || node.state === "QUEUED" ? (
+        <>
+          <h3>{node.state === "SKIPPED" ? "Not invoked" : "Not reached"} <Badge state={node.state}>{node.state === "SKIPPED" ? "skipped" : "queued"}</Badge></h3>
+          <p>{v.message ?? "No model call has been recorded for this job."}</p>
+          <p className="ds-muted">Nothing is simulated here. A model call appears in this module only when the event ledger records one, with the provider, model, latency and token counts exactly as recorded. This job's parsing, validation, entity resolution and evidence checks are deterministic code; the evidence stage was fed directly by the resolve stage.</p>
+        </>
+      ) : (
+        <>
+          <h3>{l?.model ?? "model call"} <Badge state={node.state} /></h3>
+          <KV rows={[["provider", nr(l?.provider)], ["model", nr(l?.model)], ["calls", nr(l?.calls)], ["latency", nr(l?.latency_ms, " ms")], ["input tokens", nr(l?.input_tokens)], ["output tokens", nr(l?.output_tokens)], ["error", v.error ? `${v.error.type}: ${v.error.message}` : "none"]]} />
+          <p className="ds-muted">Values marked "not recorded" were not written to the ledger; they are never estimated. A model may only suggest: everything it returns is re-verified deterministically before it can reach a proposal.</p>
+        </>
+      )}
+      {proj && <p className="ds-muted">Job {proj.job.job_id}</p>}
+    </div>
+  );
+}
+
+export function EdgeDetail({ edge, nodes, proj }: { edge: EdgeVM; nodes: NodeVM[]; proj: Projection | null }) {
+  const n = (id: string) => nodes.find((x) => x.id === id)!;
+  const a = n(edge.from), b = n(edge.to), rec = (id: string) => a.stages.concat(b.stages).find((s) => s.id === id)?.records;
+  const what: Record<string, string> = {
+    "SOURCE-PARSE": `the stored raw file (${a.hero}, content-hashed)`, "PARSE-VALIDATE": `${a.hero} with their profile`, "VALIDATE-RESOLVE": `${b.stages[0].records?.processed ?? "—"} identifiers drawn from ${a.hero} that passed type checks`,
+    "RESOLVE-VERIFY": `rows with canonical identifiers (${a.hero}); no model call was recorded, so this lane fed the evidence stage directly`,
+    "VERIFY-REVIEW": `${rec("EVIDENCE")?.accepted ?? "—"} proposed and ${rec("EVIDENCE")?.rejected ?? "—"} excluded rows with the staged comparison`, "REVIEW-OUTPUT": "the approved proposal, published as a versioned release",
+    "RESOLVE-LLM": "nothing: no model call was recorded", "LLM-VERIFY": "nothing: no model call was recorded",
+  };
+  const ranModel = ["RUNNING", "COMPLETED", "FAILED"].includes(n("LLM").state);
+  return (
+    <div data-testid="edge-detail" data-state={edge.state}>
+      <span className="ds-lab">Connection</span>
+      <h3>{a.label} → {b.label}</h3>
+      <KV rows={[["upstream", STATE_LABEL[a.state]], ["downstream", STATE_LABEL[b.state]], ["cable", edge.state === "FLOWED" ? "data passed" : edge.state === "AWAITING" ? "paused at the approval gate" : edge.state === "HELD" ? "held: the next module refused it" : edge.state === "SKIPPED" ? "skipped: optional branch not used" : "nothing has passed yet"],
+                 ["what passed", edge.state === "FLOWED" || edge.state === "AWAITING" || edge.state === "HELD" ? (edge.id === "RESOLVE-VERIFY" && ranModel ? "not used: the model layer fed the evidence stage" : what[edge.id] ?? "—") : edge.state === "SKIPPED" ? what[edge.id] : "—"]]} />
+      {proj && edge.state === "HELD" && <p className="ds-muted">See the Quality tab for the findings that stopped it.</p>}
     </div>
   );
 }

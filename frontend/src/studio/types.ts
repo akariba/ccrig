@@ -1,8 +1,9 @@
 // Shapes returned by the Studio's flow endpoints (backend/app/studio/flow.py) and by a saved recording of them. Fields not needed by the page are left out.
 
-export type StageId = "SOURCE" | "PARSE" | "PROFILE" | "VALIDATE" | "RESOLVE" | "EVIDENCE" | "REVIEW" | "PROMOTE";
+export type StageId = "SOURCE" | "PARSE" | "PROFILE" | "VALIDATE" | "RESOLVE" | "LLM" | "EVIDENCE" | "REVIEW" | "PROMOTE";
 
 export interface Records { unit: string; processed: number | null; accepted: number | null; rejected: number | null; columns?: number | null; duplicate_rows?: number | null }
+export interface LlmCall { provider: string | null; model: string | null; calls: number | null; latency_ms: number | null; input_tokens: number | null; output_tokens: number | null }
 export interface Destination { dataset: string; scope: string; version: number; release_id: number; rows: number; kind: string; canonical_data_modified: boolean }
 
 export interface FlowEvent {
@@ -11,13 +12,13 @@ export interface FlowEvent {
   stage_id: StageId | null; state: string | null; records: Records | null;
   resolution: { distinct_identifiers: number; resolved: number; mapped: number; ambiguous: number; unresolved: number } | null;
   evidence: { references: { source_sha256: string; source_url?: string; source_publisher?: string; source_tier?: string; source_published_date?: string }[] } | null;
-  review_state: string | null; destination: Destination | null; validation: { errors: number; warnings: number; codes: Record<string, number> } | null;
+  review_state: string | null; destination: Destination | null; llm?: LlmCall | null; validation: { errors: number; warnings: number; codes: Record<string, number> } | null;
 }
 
 export interface Finding { severity: string; code: string; message: string; row?: number | null; field?: string | null }
 export interface StageInfo {
   id: StageId; label: string; state: string; started_at: string | null; finished_at: string | null; duration_ms: number | null; records: Records | null; events: string[];
-  findings: Finding[]; resolution: FlowEvent["resolution"]; message: string | null; inputs?: Record<string, unknown>; outputs?: Record<string, unknown>;
+  findings: Finding[]; resolution: FlowEvent["resolution"]; llm?: LlmCall | null; message: string | null; inputs?: Record<string, unknown>; outputs?: Record<string, unknown>;
 }
 export interface Connection { from: StageId; to: StageId; state: string; what: string | null }
 
