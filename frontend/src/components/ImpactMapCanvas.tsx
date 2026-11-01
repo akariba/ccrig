@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
 import {
-  arcControl, cableStyle, makeView, quadPoint, spreadOverlaps,
+  arcControl, cableStyle, fitView, makeView, quadPoint, spreadOverlaps,
   type Marker, type Phase, type Pt, type Scene,
 } from "../impactmap/model";
 
@@ -14,7 +14,7 @@ import {
 // The cable technique (gradient bezier strokes, travelling pulses, glow on the selected routes) is adapted from the supplied
 // "Neural Cable Graph", with its random colours, jitter and invented readouts removed.
 
-const OCEAN = "#0d0e11", LAND = "#191c21", BORDER = "#2a2e34", GRID = "#1a1d22", PULSE_SPEED = 0.16; // cycles per second
+const OCEAN = "#060d12", LAND = "#112029", BORDER = "#1f3b49", GRID = "#0e1a22", PULSE_SPEED = 0.16; // cycles per second
 
 type Feature = { geometry: { type: string; coordinates: any } };
 
@@ -31,10 +31,10 @@ function usePrefersReducedMotion() {
 }
 
 export function ImpactMapCanvas(props: {
-  scene: Scene; phase: Phase; selectedEventId: string | null; selectedEntityId: string | null;
-  onSelectEvent: (id: string | null) => void; onSelectEntity: (id: string) => void;
+  scene: Scene; phase: Phase; selectedEventId: string | null; selectedEntityId: string | null; hoverEventId: string | null;
+  onSelectEvent: (id: string | null) => void; onSelectEntity: (id: string) => void; onHoverEvent: (id: string | null) => void;
 }) {
-  const { scene, phase, selectedEventId, selectedEntityId, onSelectEvent, onSelectEntity } = props;
+  const { scene, phase, selectedEventId, selectedEntityId, hoverEventId, onSelectEvent, onSelectEntity, onHoverEvent } = props;
   const wrap = useRef<HTMLDivElement>(null), landRef = useRef<HTMLCanvasElement>(null), cableRef = useRef<HTMLCanvasElement>(null);
   const [width, setWidth] = useState(900);
   const [land, setLand] = useState<Feature[] | null>(null);
@@ -60,9 +60,27 @@ export function ImpactMapCanvas(props: {
 
   const view = useMemo(() => makeView(width), [width]);
   const positions = useMemo(
-    () => spreadOverlaps(scene.markers.map((m) => ({ id: m.id, pt: view.project(m.lon, m.lat) as Pt })), 24),
+    () => spreadOverlaps(scene.markers.map((m) => ({ id: m.id, pt: view.project(m.lon, m.lat) as Pt })), 30),
     [scene, view],
   );
+
+  // Everything connected to the selected event: its own marker plus the far end of each of its cables.
+  const relatedIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (!selectedEventId) return ids;
+    for (const m of scene.markers) if (m.kind === "event" && m.eventId === selectedEventId) ids.add(m.id);
+    for (const cb of scene.cables) if (cb.eventIds.includes(selectedEventId)) { ids.add(cb.from); ids.add(cb.to); }
+    return ids;
+  }, [scene, selectedEventId]);
+
+  // Camera: frame the selected event's markers (never below "whole world"); the user can step back out.
+  const [wholeMap, setWholeMap] = useState(false);
+  useEffect(() => setWholeMap(false), [selectedEventId]);
+  const camera = useMemo(() => {
+    if (wholeMap || !selectedEventId) return { zoom: 1, tx: 0, ty: 0 };
+    const pts = [...relatedIds].map((id) => positions[id]).filter(Boolean);
+    return fitView(pts, view.width, view.height, Math.max(40, view.width * 0.09));
+  }, [wholeMap, selectedEventId, relatedIds, positions, view]);
 
   function sizeCanvas(c: HTMLCanvasElement) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -99,7 +117,7 @@ export function ImpactMapCanvas(props: {
   useEffect(() => {
     const c = cableRef.current; if (!c) return;
     const ctx = sizeCanvas(c);
-    const styled = scene.cables.map((cable) => ({ cable, s: cableStyle(cable, { phase, selectedEventId, reducedMotion: reduced }) })).filter((x) => x.s.draw);
+    const styled = scene.cables.map((cable) => ({ cable, s: cableStyle(cable, { phase, selectedEventId, reducedMotion: reduced, hoverEventId }) })).filter((x) => x.s.draw);
     const animated = styled.some((x) => x.s.pulses > 0);
     let raf = 0;
     const geometry = (cable: { from: string; to: string }) => {
@@ -108,6 +126,15 @@ export function ImpactMapCanvas(props: {
     };
     const paint = (time: number) => {
       ctx.clearRect(0, 0, view.width, view.height);
+      // a marker nudged apart from its neighbours stays tied to its true position by a hairline
+      ctx.lineWidth = 0.8; ctx.strokeStyle = "rgba(200,210,225,0.35)"; ctx.fillStyle = "rgba(200,210,225,0.55)";
+      for (const m of scene.markers) {
+        const at = positions[m.id]; if (!at) continue;
+        const [tx, ty] = view.project(m.lon, m.lat);
+        if (Math.hypot(at[0] - tx, at[1] - ty) < 6) continue;
+        ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(at[0], at[1]); ctx.stroke();
+        ctx.beginPath(); ctx.arc(tx, ty, 1.6, 0, Math.PI * 2); ctx.fill();
+      }
       // dim cables first, active ones on top
       for (const { cable, s } of [...styled].sort((x, y) => Number(x.s.glow) - Number(y.s.glow))) {
         const g = geometry(cable); if (!g) continue;
@@ -115,8 +142,15 @@ export function ImpactMapCanvas(props: {
         grad.addColorStop(0, `hsla(${s.hueFrom},85%,62%,${s.alpha})`); grad.addColorStop(1, `hsla(${s.hueTo},85%,66%,${s.alpha})`);
         ctx.setLineDash(s.dash ?? []); ctx.strokeStyle = grad; ctx.lineWidth = s.width;
         ctx.beginPath(); ctx.moveTo(g.a[0], g.a[1]); ctx.quadraticCurveTo(g.c[0], g.c[1], g.b[0], g.b[1]); ctx.stroke();
-        if (s.glow) { ctx.globalAlpha = 0.14; ctx.lineWidth = s.width + 5; ctx.stroke(); ctx.globalAlpha = 1; }
+        if (s.glow) { ctx.globalAlpha = 0.14; ctx.lineWidth = s.width + 6; ctx.stroke(); ctx.globalAlpha = 0.07; ctx.lineWidth = s.width + 12; ctx.stroke(); ctx.globalAlpha = 1; }
         ctx.setLineDash([]);
+        if (s.kind === "documented" && s.alpha >= 0.25) {   // arrowhead: the stored direction of the relationship (source -> target)
+          const [hx, hy] = quadPoint(g.a, g.c, g.b, 0.9), [ex, ey] = quadPoint(g.a, g.c, g.b, 0.93);
+          const ang = Math.atan2(ey - hy, ex - hx);
+          ctx.fillStyle = `hsla(${s.hueTo},90%,70%,${s.alpha})`;
+          ctx.beginPath(); ctx.moveTo(ex + Math.cos(ang) * 5, ey + Math.sin(ang) * 5);
+          ctx.lineTo(ex + Math.cos(ang + 2.5) * 5, ey + Math.sin(ang + 2.5) * 5); ctx.lineTo(ex + Math.cos(ang - 2.5) * 5, ey + Math.sin(ang - 2.5) * 5); ctx.fill();
+        }
         for (let k = 0; k < s.pulses; k++) {           // a pulse = the direction of a documented relationship (source -> target)
           const t = (((time / 1000) * PULSE_SPEED) + k / s.pulses) % 1;
           const [px, py] = quadPoint(g.a, g.c, g.b, t);
@@ -133,49 +167,58 @@ export function ImpactMapCanvas(props: {
     }
     return () => cancelAnimationFrame(raf);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scene, positions, phase, selectedEventId, reduced, view]);
+  }, [scene, positions, phase, selectedEventId, hoverEventId, reduced, view]);
 
   const eventsOnMap = scene.markers.filter((m) => m.kind === "event");
-  const related = (m: Marker) => selectedEventId === null || (m.kind === "event" ? m.eventId === selectedEventId
-    : scene.cables.some((cb) => cb.eventIds.includes(selectedEventId) && (cb.from === m.id || cb.to === m.id)));
+  const related = (m: Marker) => selectedEventId === null || relatedIds.has(m.id);
+  const world: React.CSSProperties = { width: view.width, height: view.height, transform: `translate(${camera.tx}px, ${camera.ty}px) scale(${camera.zoom})`, ["--z" as string]: camera.zoom };
 
   return (
     <div
-      ref={wrap} className="impact-stage" style={{ height: view.height }} data-testid="impact-map" data-phase={phase}
+      ref={wrap} className="impact-stage" style={{ height: view.height }} data-testid="impact-map" data-phase={phase} data-zoom={camera.zoom.toFixed(2)}
       data-cables={scene.cables.length} data-animated={String(!reduced && phase === "ready")} role="group" aria-busy={phase === "loading"}
       aria-label={`World map: ${eventsOnMap.length} event${eventsOnMap.length === 1 ? "" : "s"}, ${scene.cables.length} connections`}
     >
-      <canvas ref={landRef} className="layer-land" aria-hidden="true" />
-      <canvas ref={cableRef} className="layer-cables" aria-hidden="true" />
-      {phase === "ready" && scene.markers.map((m) => {
-        const [x, y] = positions[m.id] ?? view.project(m.lon, m.lat);
-        const common = { style: { left: x, top: y } as React.CSSProperties, "data-marker-id": m.id };
-        if (m.kind === "event") {
-          const selected = m.eventId === selectedEventId;
-          return (
-            <button
-              key={m.id} {...common} type="button" className={`impact-marker event${selected ? " selected" : ""}${related(m) ? "" : " dim"}`}
-              data-testid="event-marker" data-event-id={m.eventId} aria-pressed={selected}
-              aria-label={`Event ${m.rank}: ${m.label}. Location: ${m.precision}. Press to ${selected ? "deselect" : "select"}.`}
-              title={`${m.rank}. ${m.label}`} onClick={() => onSelectEvent(selected ? null : (m.eventId as string))}
-              onKeyDown={(e) => { if (e.key === "Escape") onSelectEvent(null); }}
-            >{m.rank}</button>
-          );
-        }
-        if (m.kind === "entity") {
-          const target = m.role === "TARGET", selected = m.entityId === selectedEntityId;
-          return (
-            <button
-              key={m.id} {...common} type="button" className={`impact-marker entity${target ? " target" : ""}${selected ? " selected" : ""}${related(m) ? "" : " dim"}`}
-              data-testid="entity-marker" data-entity-id={m.entityId} aria-pressed={selected}
-              aria-label={`${m.label}${target ? " (searched company)" : ""}, positioned at its headquarters country (${m.precision})`}
-              title={`${m.label} - headquarters country, approximate`} onClick={() => onSelectEntity(m.entityId as string)}
-            >{m.ticker ?? m.entityId}</button>
-          );
-        }
-        return <span key={m.id} {...common} className="impact-marker region" data-testid="region-marker" role="img" aria-label={`Country named in the evidence: ${m.label}`} title={`${m.label} (named in the evidence; country centroid)`} />;
-      })}
+      <div className="impact-world" style={world}>
+        <canvas ref={landRef} className="layer-land" aria-hidden="true" />
+        <canvas ref={cableRef} className="layer-cables" aria-hidden="true" />
+        {phase === "ready" && scene.markers.map((m) => {
+          const [x, y] = positions[m.id] ?? view.project(m.lon, m.lat);
+          const common = { style: { left: x, top: y } as React.CSSProperties, "data-marker-id": m.id };
+          if (m.kind === "event") {
+            const selected = m.eventId === selectedEventId, hovered = m.eventId === hoverEventId;
+            return (
+              <button
+                key={m.id} {...common} type="button" className={`impact-marker event${selected ? " selected" : ""}${hovered ? " hover" : ""}${related(m) ? "" : " dim"}`}
+                data-testid="event-marker" data-event-id={m.eventId} aria-pressed={selected}
+                aria-label={`Event ${m.rank}: ${m.label}. Event location: ${m.precision}. Press to ${selected ? "deselect" : "select"}.`}
+                title={`${m.rank}. ${m.label}`} onClick={() => onSelectEvent(selected ? null : (m.eventId as string))}
+                onMouseEnter={() => onHoverEvent(m.eventId as string)} onMouseLeave={() => onHoverEvent(null)}
+                onFocus={() => onHoverEvent(m.eventId as string)} onBlur={() => onHoverEvent(null)}
+                onKeyDown={(e) => { if (e.key === "Escape") onSelectEvent(null); }}
+              >{m.rank}
+                {selected && <span className={`callout${y * camera.zoom + camera.ty < 130 ? " below" : ""}`} aria-hidden="true"><b>{m.place}</b><span>{m.label}</span></span>}
+                {hovered && !selected && <span className="tag" aria-hidden="true">{m.place ?? ""}</span>}</button>
+            );
+          }
+          if (m.kind === "entity") {
+            const target = m.role === "TARGET", selected = m.entityId === selectedEntityId, dim = !related(m);
+            return (
+              <button
+                key={m.id} {...common} type="button" className={`impact-marker entity${target ? " target" : ""}${selected ? " selected" : ""}${dim ? " dim" : ""}`}
+                data-testid="entity-marker" data-entity-id={m.entityId} aria-pressed={selected}
+                aria-label={`${m.label}${target ? " (searched company)" : ""}, positioned at its headquarters country (${m.precision})`}
+                title={`${m.label} - headquarters country, approximate`} onClick={() => onSelectEntity(m.entityId as string)}
+              ><span className="txt">{m.ticker ?? m.entityId}</span></button>
+            );
+          }
+          return <span key={m.id} {...common} className={`impact-marker region${related(m) ? "" : " dim"}`} data-testid="region-marker" role="img" aria-label={`Country named in the evidence: ${m.label}`} title={`${m.label} (named in the evidence; country centroid)`} />;
+        })}
+      </div>
+      {phase === "loading" && <div className="impact-overlay" data-testid="impact-loading" role="status"><span className="spinner" />Loading verified events…</div>}
+      {(phase === "empty" || phase === "error") && <div className="impact-overlay quiet" role="status">{phase === "error" ? "Events could not be loaded." : "No verified events to show for this search."}</div>}
+      {camera.zoom > 1.01 && <button type="button" className="impact-reset" onClick={() => setWholeMap(true)}>Show whole map</button>}
+      {wholeMap && selectedEventId && <button type="button" className="impact-reset" onClick={() => setWholeMap(false)}>Frame selection</button>}
     </div>
   );
 }
-
