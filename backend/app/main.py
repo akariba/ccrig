@@ -30,7 +30,9 @@ app.include_router(impact_map.router)
 app.include_router(studio.router)           # read-only: what the Studio is and whether this deployment can run it
 if studio_enabled():                       # operator-only routes exist only when explicitly enabled (never in the static build or on a default deployment)
     from .routers import studio_ops
+    from . import ingest_events
     app.include_router(studio_ops.router)
+    app.include_router(ingest_events._build_router())      # Ingest Bench progress stream (operator only, like the Studio)
 
 
 @app.get("/")
