@@ -202,6 +202,18 @@ class StudioStore:
             r["error"] = json.loads(r["error"]) if r["error"] else None
         return rows
 
+    def events_since(self, seq: int = 0, job_id=None, limit=500) -> list:
+        """Ledger rows after `seq`, oldest first (what a polling or streaming client has not seen yet)."""
+        sql, args = (("SELECT * FROM events WHERE seq>? AND job_id=? ORDER BY seq LIMIT ?", (seq, job_id, limit)) if job_id else ("SELECT * FROM events WHERE seq>? ORDER BY seq LIMIT ?", (seq, limit)))
+        rows = self._all(sql, args)
+        for r in rows:
+            r["counts"] = json.loads(r["counts"]) if r["counts"] else None
+            r["error"] = json.loads(r["error"]) if r["error"] else None
+        return rows
+
+    def last_seq(self) -> int:
+        return (self._one("SELECT COALESCE(MAX(seq),0) AS s FROM events") or {"s": 0})["s"]
+
     def verify_chain(self) -> dict:
         prev, n = "0" * 64, 0
         for r in self._all("SELECT * FROM events ORDER BY seq"):

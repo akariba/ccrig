@@ -8,7 +8,12 @@ from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
-from ..studio import config, pipeline, review
+import asyncio
+import json
+
+from starlette.responses import StreamingResponse
+
+from ..studio import config, flow, pipeline, review
 from ..discovery import agent as discovery_agent, net as discovery_net, providers as discovery_providers, service as discovery_service
 from ..discovery.entity import resolve_entity
 from ..studio.store import IntegrityError, StudioStore
@@ -230,3 +235,88 @@ async def add_source(request: Request, url: str = Query(min_length=10, max_lengt
         return relationships.add_source(store, data, url=url, published_date=published_date, title=title)
     except ValueError as exc:
         raise _err(422, "BAD_SOURCE", str(exc)) from None
+
+
+# ------------------------------------------------------------------ processing flow: structured events, projections, live stream (operator only)
+class RunScenario(BaseModel):
+    scenario: str = Field(min_length=1, max_length=60)
+    claim: str = Field(min_length=1, max_length=40)
+    operator: str = Field(default="operator", min_length=1, max_length=80)
+    force_new: bool = False
+
+
+@router.get("/flow/support")
+def flow_support():
+    return flow.support_matrix()
+
+
+@router.get("/flow/scenarios")
+def flow_scenarios(store: StudioStore = Depends(get_store)):
+    """Scenarios, and the ledger position a live client should stream from (`last_seq`)."""
+    return {"scenarios": flow.scenarios_status(), "last_seq": store.last_seq(), "jobs": [j for j in store.list_jobs(50) if j["target"] == "relationship_evidence"]}
+
+
+@router.get("/flow/scenarios/{scenario_id}")
+def flow_scenario(scenario_id: str):
+    try:
+        return flow.scenario_preview(scenario_id)
+    except flow.FlowError as exc:
+        raise _err(404, "NO_SCENARIO", str(exc)) from None
+
+
+@router.post("/flow/run")
+async def flow_run(body: RunScenario, store: StudioStore = Depends(get_store)):
+    """Submit one claim about the stored excerpt through the ordinary pipeline. Idempotent: an identical resubmission returns the existing job and records the resubmission."""
+    try:
+        return await run_in_threadpool(lambda: _call(flow.run_scenario, store, body.scenario, body.claim, operator=body.operator, force_new=body.force_new))
+    except flow.FlowError as exc:
+        raise _err(422, "BAD_SCENARIO", str(exc)) from None
+
+
+@router.get("/flow/jobs/{job_id}")
+def flow_job(job_id: str, store: StudioStore = Depends(get_store)):
+    out = flow.project(store, job_id)
+    if out is None:
+        raise _err(404, "NOT_FOUND", f"no job {job_id}")
+    return out
+
+
+@router.get("/flow/events")
+def flow_events(since: int = Query(default=0, ge=0), job_id: str | None = Query(default=None, max_length=80), limit: int = Query(default=500, ge=1, le=1000), store: StudioStore = Depends(get_store)):
+    """Polling: structured events recorded after `since` (a ledger sequence number). Use `last_seq` as the next `since`."""
+    raw = store.events_since(since, job_id, limit)
+    return {"events": flow.structure(store, _with_context(store, raw)), "last_seq": raw[-1]["seq"] if raw else since}
+
+
+def _with_context(store: StudioStore, raw: list) -> list:
+    """Record counts carry forward from earlier stages of the same job, so a slice of the ledger is completed with the job's earlier rows before shaping."""
+    needed = {r["job_id"] for r in raw if r["job_id"]}
+    first = min((r["seq"] for r in raw), default=0)
+    earlier = [e for jid in sorted(needed) for e in store.events(jid) if e["seq"] < first]
+    return sorted(earlier, key=lambda e: e["seq"]) + raw
+
+
+@router.get("/flow/stream")
+async def flow_stream(request: Request, since: int = Query(default=0, ge=0), timeout: float = Query(default=25.0, ge=0.2, le=120.0), job_id: str | None = Query(default=None, max_length=80),
+                      store: StudioStore = Depends(get_store)):
+    """Server-Sent Events: each new ledger row, as soon as it is persisted, as structured events. Ends after `timeout` seconds so connections never pile up (the client reconnects with the
+    last id it saw). Send the operator token in X-Studio-Token (use fetch, not EventSource)."""
+    async def gen():
+        cursor, waited = since, 0.0
+        yield "retry: 1000\n\n"
+        while waited < timeout:
+            if await request.is_disconnected():
+                return
+            raw = await run_in_threadpool(store.events_since, cursor, job_id, 200)
+            if raw:
+                prev, cursor = cursor, raw[-1]["seq"]
+                shaped = await run_in_threadpool(lambda: flow.structure(store, _with_context(store, raw)))
+                for ev in shaped:
+                    if ev["seq"] > prev:
+                        yield f"id: {ev['id']}\nevent: flow\ndata: {json.dumps(ev, separators=(',', ':'))}\n\n"
+            else:
+                yield ": heartbeat\n\n"
+            await asyncio.sleep(0.25)
+            waited += 0.25
+        yield f"event: end\ndata: {json.dumps({'last_seq': cursor})}\n\n"
+    return StreamingResponse(gen(), media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
