@@ -1,0 +1,21 @@
+/* Ingest Bench design tokens. Gold is the single attention accent (active stage, live paths); blue / teal / rose are only for the three data domains. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,300..700&family=IBM+Plex+Mono:wght@400;500&display=swap");
+.ib-root {
+  --paper: #e7e5df; --sheet: #f3f1ec; --ink: #1b2430; --ink-2: #4a5563; --ink-3: #7f8995;
+  --rule: #aeb4ba; --hair: #d6d7d6; --hl: #e3ebf2;
+  --blue: #2e6a9e; --teal: #2c8a70; --rose: #b9465d; --gold: #c38a14;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif; --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  .ib-root:not([data-theme="light"]) {
+    --paper: #0b1117; --sheet: #111a22; --ink: #e2e7ec; --ink-2: #a3aeba; --ink-3: #6c7886;
+    --rule: #3b4957; --hair: #22303c; --hl: #152637;
+    --blue: #6ea5d8; --teal: #58be9c; --rose: #e07a90; --gold: #e2ae45; color-scheme: dark;
+  }
+}
+.ib-root[data-theme="dark"], :root[data-theme="dark"] .ib-root:not([data-theme="light"]) {
+  --paper: #0b1117; --sheet: #111a22; --ink: #e2e7ec; --ink-2: #a3aeba; --ink-3: #6c7886;
+  --rule: #3b4957; --hair: #22303c; --hl: #152637;
+  --blue: #6ea5d8; --teal: #58be9c; --rose: #e07a90; --gold: #e2ae45; color-scheme: dark;
+}
