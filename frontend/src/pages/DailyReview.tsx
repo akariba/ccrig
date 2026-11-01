@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { ErrorState } from "../ui/primitives";
 
 const PRIORITY_COLOR: Record<string, string> = {
   CRITICAL: "var(--error)",
@@ -41,6 +42,7 @@ export function DailyReview() {
   const [rows, setRows] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null), [attempt, setAttempt] = useState(0);
   const [priorityFilter, setPriorityFilter] = useState<string | null>(null);
   const [specialFilter, setSpecialFilter] = useState<"overdue" | "model_data" | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -48,13 +50,13 @@ export function DailyReview() {
   const nav = useNavigate();
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true); setError(null);
     api.priorityQueue(priorityFilter ? { priority: priorityFilter } : {}).then((d) => {
       setRows(d.results);
       setSummary(d.summary);
       setLoading(false);
-    });
-  }, [priorityFilter]);
+    }).catch((e) => { setError(String(e?.message ?? e)); setLoading(false); });
+  }, [priorityFilter, attempt]);
 
   const displayed = rows.filter((r) => {
     if (specialFilter === "overdue") return r.is_overdue;
@@ -66,7 +68,7 @@ export function DailyReview() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Inbox</h1>
+        <h2>Inbox</h2>
         <div className="subtitle">
           The 5 things worth a look today, ranked by the same priority logic as everywhere else in CCRIG — not a
           separate model. Full relationship-to-decision detail lives on each counterparty's own page.
@@ -97,9 +99,10 @@ export function DailyReview() {
         </div>
       )}
 
+      {error && <ErrorState message={error} onRetry={() => setAttempt((n) => n + 1)} />}
       {loading && <div className="loading">Loading Inbox…</div>}
 
-      {!loading && (
+      {!loading && !error && (
         <div className="card">
           <table className="table">
             <thead>
@@ -162,7 +165,7 @@ export function DailyReview() {
                               <div className="section-title" style={{ marginTop: 12 }}>Decision</div>
                               <div style={{ fontSize: 12.5 }}>
                                 {r.decision.decision} · owner: {r.decision.recommended_owner || "unassigned"}
-                                {" "}· <a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>open full Counterparty 360 →</a>
+                                {" "}· <a onClick={() => nav(`/cp/${r.id}`)} style={{ cursor: "pointer" }}>open full Counterparty 360 →</a>
                               </div>
                             </div>
                           </div>

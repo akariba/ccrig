@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RiskPath, pathFromChain } from "../components/RiskPath";
@@ -133,10 +133,9 @@ function TabBar({ active, onChange }: { active: TabKey; onChange: (k: TabKey) =>
 }
 
 export function Counterparty360() {
-  const [params, setParams] = useSearchParams();
   const [portfolioList, setPortfolioList] = useState<any[]>([]);
   const [ccrList, setCcrList] = useState<any[]>([]);
-  const id = params.get("id");
+  const id = useParams().id ?? null;        // /cp/:id
   const [portfolioData, setPortfolioData] = useState<any>(null);
   const [ccrData, setCcrData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -149,7 +148,7 @@ export function Counterparty360() {
     Promise.all([api.listCounterparties(), api.priorityQueue()]).then(([portfolio, ccr]) => {
       setPortfolioList(portfolio.results);
       setCcrList(ccr.results);
-      if (!id) setParams({ id: ccr.results[0]?.id || portfolio.results[0]?.id });
+      if (!id) nav(`/cp/${encodeURIComponent(ccr.results[0]?.id || portfolio.results[0]?.id)}`, { replace: true });
     });
   }, []);
 
@@ -174,7 +173,7 @@ export function Counterparty360() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Counterparty 360</h1>
+        <h2>Counterparty 360</h2>
         <div className="subtitle">
           Synthetic, fictional POC data — no real fund, bank, or institution is represented. Three questions, in
           order: what is this counterparty connected to, how is that exposed and controlled, and what should I do
@@ -186,7 +185,7 @@ export function Counterparty360() {
         <div className="section-title">CCR counterparties</div>
         <div className="pill-list">
           {ccrList.map((c) => (
-            <span key={c.id} className="pill" style={id === c.id ? { borderColor: "var(--primary)", color: "var(--text)" } : {}} onClick={() => setParams({ id: c.id })}>
+            <span key={c.id} className="pill" style={id === c.id ? { borderColor: "var(--primary)", color: "var(--text)" } : {}} onClick={() => nav(`/cp/${encodeURIComponent(c.id)}`)}>
               {c.name} <span style={{ opacity: 0.6 }}>· {c.priority}</span>
             </span>
           ))}
@@ -194,7 +193,7 @@ export function Counterparty360() {
         <div className="section-title" style={{ marginTop: 12 }}>Portfolio-holdings counterparties</div>
         <div className="pill-list">
           {portfolioList.map((c) => (
-            <span key={c.id} className="pill" style={id === c.id ? { borderColor: "var(--primary)", color: "var(--text)" } : {}} onClick={() => setParams({ id: c.id })}>
+            <span key={c.id} className="pill" style={id === c.id ? { borderColor: "var(--primary)", color: "var(--text)" } : {}} onClick={() => nav(`/cp/${encodeURIComponent(c.id)}`)}>
               {c.name}
             </span>
           ))}
@@ -264,7 +263,7 @@ export function Counterparty360() {
                 )}
                 {r.reference_entity_id && (
                   <div style={{ fontSize: 12.5, marginTop: 4 }}>
-                    <strong>Reference issuer:</strong> <a onClick={() => nav(`/entity?id=${r.reference_entity_id}`)} style={{ cursor: "pointer" }}>{r.reference_entity_id}</a> (public relationship-discovery data, not a real position)
+                    <strong>Reference issuer:</strong> <a onClick={() => nav(`/issuer/${r.reference_entity_id}`)} style={{ cursor: "pointer" }}>{r.reference_entity_id}</a> (public relationship-discovery data, not a real position)
                   </div>
                 )}
                 {r.event.id !== "NONE" && (
@@ -282,7 +281,7 @@ export function Counterparty360() {
                       <tbody>
                         {portfolioData.direct_holdings.map((h: any, i: number) => (
                           <tr key={i}>
-                            <td><a onClick={() => nav(`/entity?id=${h.issuer}`)} style={{ cursor: "pointer" }}>{h.issuer}</a></td>
+                            <td><a onClick={() => nav(`/issuer/${h.issuer}`)} style={{ cursor: "pointer" }}>{h.issuer}</a></td>
                             <td>{h.relation}</td>
                             <td className="mono">{(h.exposure_pct * 100).toFixed(0)}%</td>
                           </tr>
@@ -311,7 +310,7 @@ export function Counterparty360() {
                               {portfolioData.indirect_relationships.slice(0, 10).map((rel: any, i: number) => (
                                 <tr key={i}>
                                   <td style={{ fontSize: 11 }}>{rel.via_direct_holding}</td>
-                                  <td><a onClick={() => nav(`/entity?id=${rel.indirect_entity}`)} style={{ cursor: "pointer" }}>{rel.indirect_entity}</a></td>
+                                  <td><a onClick={() => nav(`/issuer/${rel.indirect_entity}`)} style={{ cursor: "pointer" }}>{rel.indirect_entity}</a></td>
                                   <td className="mono">{rel.relatedness_score.toFixed(3)}</td>
                                 </tr>
                               ))}
@@ -435,7 +434,7 @@ export function Counterparty360() {
                 <tbody>
                   {portfolioData.direct_holdings.map((h: any, i: number) => (
                     <tr key={i}>
-                      <td><a onClick={() => nav(`/entity?id=${h.issuer}`)} style={{ cursor: "pointer" }}>{h.issuer}</a></td>
+                      <td><a onClick={() => nav(`/issuer/${h.issuer}`)} style={{ cursor: "pointer" }}>{h.issuer}</a></td>
                       <td>{h.relation}</td>
                       <td className="mono">{(h.exposure_pct * 100).toFixed(0)}%</td>
                     </tr>

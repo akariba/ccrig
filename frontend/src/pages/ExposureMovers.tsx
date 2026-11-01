@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { ErrorState } from "../ui/primitives";
 import { DataBadge } from "../components/Badge";
 
 type Tab = "pfe" | "stress" | "rc" | "sensitivity";
@@ -29,12 +30,14 @@ function moveValue(r: any, tab: Tab): number | null {
 export function ExposureMovers() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null), [attempt, setAttempt] = useState(0);
   const [tab, setTab] = useState<Tab>("pfe");
   const nav = useNavigate();
 
   useEffect(() => {
-    api.priorityQueue().then((d) => { setRows(d.results); setLoading(false); });
-  }, []);
+    setLoading(true); setError(null);
+    api.priorityQueue().then((d) => { setRows(d.results); setLoading(false); }).catch((e) => { setError(String(e?.message ?? e)); setLoading(false); });
+  }, [attempt]);
 
   const withMove = rows
     .map((r) => ({ r, move: moveValue(r, tab) }))
@@ -44,7 +47,7 @@ export function ExposureMovers() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Exposure Movers</h1>
+        <h2>Exposure Movers</h2>
         <div className="subtitle">
           What moved and why — not what is most risky. A large mover here may be a genuine market move, a new
           trade, a model recalibration, a data issue, or a maturing/matured trade. Always check the driver column
@@ -60,9 +63,10 @@ export function ExposureMovers() {
         </div>
       </div>
 
+      {error && <ErrorState message={error} onRetry={() => setAttempt((n) => n + 1)} />}
       {loading && <div className="loading">Loading exposure movers…</div>}
 
-      {!loading && (
+      {!loading && !error && (
         <div className="card">
           <table className="table">
             <thead>
@@ -73,7 +77,7 @@ export function ExposureMovers() {
             <tbody>
               {withMove.map(({ r, move }) => (
                 <tr key={r.id}>
-                  <td><a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                  <td><a onClick={() => nav(`/cp/${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
                   <td className="mono" style={{ color: (move as number) > 0 ? "var(--warning)" : "var(--text)" }}>{(move as number) > 0 ? "+" : ""}{move}</td>
                   <td style={{ fontSize: 11, fontWeight: 600 }}>{r.driver}</td>
                   <td style={{ fontSize: 11 }}>{r.product}</td>

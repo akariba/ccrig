@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { api } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { RelatednessWaterfall } from "../components/Waterfall";
@@ -29,7 +29,8 @@ function Field({ label, value }: { label: string; value: number | null | undefin
 // priority, breach counts) only appear beneath that, and only once a
 // relationship has already been shown - never before it.
 export function RelationshipWorkbench() {
-  const [q, setQ] = useState("");
+  const [params] = useSearchParams();
+  const [q, setQ] = useState(params.get("q") ?? "");
   const [result, setResult] = useState<any>(null);
   const [entityData, setEntityData] = useState<any>(null);
   const [inspecting, setInspecting] = useState<string | null>(null);
@@ -57,7 +58,7 @@ export function RelationshipWorkbench() {
           nodeId: d.header.id,
           nodeType: r.resolved_as === "counterparty" ? "COUNTERPARTY" : "ENTITY",
           label: d.header.name,
-          route: `/?q=${encodeURIComponent(query)}`,
+          route: `/network?tab=search&q=${encodeURIComponent(query)}`,
         });
       }
     }
@@ -97,12 +98,15 @@ export function RelationshipWorkbench() {
     const singleHop = hops?.length === 1 ? hops[0] : null;
     pushStep({
       nodeId: otherId, nodeType: "ENTITY", label: otherName,
-      route: `/?q=${encodeURIComponent(entityData.header.id)}`,
+      route: `/network?tab=search&q=${encodeURIComponent(entityData.header.id)}`,
       edgeType: singleHop ? singleHop.relation : RANKED_ONLY,
       traversedReverse: singleHop?.direction === "REVERSE",
       evidenceRef: e,
     });
   }
+
+  const ran = useRef(false);
+  useEffect(() => { const initial = params.get("q"); if (initial && !ran.current) { ran.current = true; runSearch(initial); } }, []);   // eslint-disable-line react-hooks/exhaustive-deps
 
   const productChannelCount = new Set(pairMateriality.map((r: any) => r.product).filter(Boolean)).size;
   const collateralLinkageCount = pairMateriality.filter((r: any) => r.collateral).length;
@@ -110,7 +114,7 @@ export function RelationshipWorkbench() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Relationships</h1>
+        <h2>Relationships</h2>
         <div className="subtitle">
           Search any entity, counterparty, country, theme, or risk factor. The graph nominates what's connected —
           exposure is a separate question, asked after.
@@ -146,7 +150,7 @@ export function RelationshipWorkbench() {
             <div className="link-list">
               {result.entity_matches.map((m: any) =>
                 m.node_type === "Counterparty" ? (
-                  <Link key={m.id} to={`/counterparty?id=${m.id}`}>
+                  <Link key={m.id} to={`/cp/${m.id}`}>
                     {m.name} <span style={{ color: "var(--text-faint)", fontSize: 11 }}>({m.node_type})</span>
                   </Link>
                 ) : (
@@ -165,14 +169,14 @@ export function RelationshipWorkbench() {
       {result && result.resolved_as === "theme" && (
         <div className="card">
           <div className="section-title">Theme match</div>
-          <Link to={`/theme-radar?theme=${result.theme_match.theme_id}`}>{result.theme_match.label} — open Theme Radar →</Link>
+          <Link to={`/events?tab=themes&theme=${result.theme_match.theme_id}`}>{result.theme_match.label} — open Theme Radar →</Link>
         </div>
       )}
 
       {result && result.resolved_as === "event" && (
         <div className="card">
           <div className="section-title">Reads as an event / narrative query</div>
-          <Link to={`/event-studio?text=${encodeURIComponent(q)}`}>Open in Event Studio →</Link>
+          <Link to={`/events?tab=analyse&text=${encodeURIComponent(q)}`}>Open in Event Studio →</Link>
         </div>
       )}
 
@@ -209,7 +213,7 @@ export function RelationshipWorkbench() {
               </tbody>
             </table>
             <div style={{ marginTop: 8, fontSize: 12 }}>
-              <Link to={`/entity?id=${entityData.header.id}`}>Open full Entity 360 (all relationships, diagnostics, price history) →</Link>
+              <Link to={`/issuer/${entityData.header.id}`}>Open full Entity 360 (all relationships, diagnostics, price history) →</Link>
             </div>
           </div>
 
@@ -294,10 +298,10 @@ export function RelationshipWorkbench() {
                     <tr key={r.id}>
                       <td>
                         <Link
-                          to={`/counterparty?id=${r.id}`}
+                          to={`/cp/${r.id}`}
                           onClick={() => pushStep({
                             nodeId: r.id, nodeType: "COUNTERPARTY", label: r.name,
-                            route: `/counterparty?id=${r.id}`,
+                            route: `/cp/${r.id}`,
                             edgeType: r.product ?? "HAS_EXPOSURE", traversedReverse: false,
                           })}
                         >

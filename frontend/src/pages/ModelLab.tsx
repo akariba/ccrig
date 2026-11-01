@@ -70,7 +70,7 @@ export function ModelLab() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Model Lab</h1>
+        <h2>Model Lab</h2>
         <div className="subtitle">
           Exploratory weight tuning over the same feature vector used everywhere else in the platform. These are
           heuristic starting weights for scenario exploration — not a calibrated production model.
@@ -118,7 +118,7 @@ export function ModelLab() {
                 {result.results.map((r: any, i: number) => (
                   <tr key={r.entity_id}>
                     <td>{i + 1}</td>
-                    <td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                    <td><a onClick={() => nav(`/issuer/${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
                     <td className="mono">{r.score.toFixed(3)}</td>
                   </tr>
                 ))}

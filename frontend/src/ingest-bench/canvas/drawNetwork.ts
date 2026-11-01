@@ -32,7 +32,7 @@ export function drawNetwork(x: CanvasRenderingContext2D, v: View, C: Colors, tim
     for (let l = 0; l < 4; l++) { const a = COL[l], b = COL[l + 1]; if (l > 0) x.lineTo(a.x + 11, a.ys[ch[l]]); bz(x, a.x + 11, a.ys[ch[l]], b.x - 11, b.ys[ch[l + 1]]); }
     x.stroke();
     if (live) {
-      const ph = (time * 0.00045 + ci * 0.17) % 1, seg = Math.floor(ph * 4), tt = ph * 4 - seg, a = COL[seg], b = COL[seg + 1];
+      const ph = ((((time || 0) * 0.00045 + ci * 0.17) % 1) + 1) % 1, seg = Math.floor(ph * 4), tt = ph * 4 - seg, a = COL[seg], b = COL[seg + 1];
       const p = bzPt(a.x + 11, a.ys[ch[seg]], b.x - 11, b.ys[ch[seg + 1]], tt);
       x.fillStyle = C.gold; x.beginPath(); x.arc(p[0], p[1], 2.6, 0, Math.PI * 2); x.fill();
     }

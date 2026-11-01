@@ -78,7 +78,7 @@ export function GraphExplorer() {
 
     cy.on("tap", "node", (evt: any) => {
       const id = evt.target.data("id");
-      setParams({ id });
+      setParams((prev) => { const n = new URLSearchParams(prev); n.set("id", id); return n; });
     });
     cy.on("tap", "edge", (evt: any) => {
       setSelected({ type: "edge", data: evt.target.data() });
@@ -91,7 +91,7 @@ export function GraphExplorer() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Interactive Graph Explorer</h1>
+        <h2>Interactive Graph Explorer</h2>
         <div className="subtitle">
           Bounded ego-graph only — never renders the full universe. Fact (solid, directional), Derived (dashed,
           symmetric), Exposure (dotted, counterparty → issuer) layers are toggleable and visually distinct.
@@ -102,8 +102,8 @@ export function GraphExplorer() {
         <div className="hstack" style={{ flexWrap: "wrap", gap: 16 }}>
           <div className="searchbar" style={{ maxWidth: 260 }}>
             <input className="input" value={inputId} onChange={(e) => setInputId(e.target.value.toUpperCase())}
-              onKeyDown={(e) => e.key === "Enter" && setParams({ id: inputId })} placeholder="Center entity ID" />
-            <button className="btn secondary" onClick={() => setParams({ id: inputId })}>Go</button>
+              onKeyDown={(e) => e.key === "Enter" && setParams((prev) => { const n = new URLSearchParams(prev); n.set("id", inputId); return n; })} placeholder="Center entity ID" />
+            <button className="btn secondary" onClick={() => setParams((prev) => { const n = new URLSearchParams(prev); n.set("id", inputId); return n; })}>Go</button>
           </div>
           <div className="hstack">
             <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Hops</span>

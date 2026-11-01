@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { ErrorState } from "../ui/primitives";
 
 function exposureForLimitType(r: any) {
   // Utilisation/excess is ONLY ever computed against the metric matching
@@ -16,22 +17,23 @@ function exposureForLimitType(r: any) {
 export function BreachesActions() {
   const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null), [attempt, setAttempt] = useState(0);
   const [statusFilter, setStatusFilter] = useState<"" | "overdue" | "within_sla">("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const nav = useNavigate();
 
   useEffect(() => {
-    setLoading(true);
+    setLoading(true); setError(null);
     api.breaches(statusFilter ? { status: statusFilter } : {}).then((d) => {
       setRows(d.results);
       setLoading(false);
-    });
-  }, [statusFilter]);
+    }).catch((e) => { setError(String(e?.message ?? e)); setLoading(false); });
+  }, [statusFilter, attempt]);
 
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Control Exceptions</h1>
+        <h2>Control Exceptions</h2>
         <div className="subtitle">
           Active synthetic limit breaches. Age is the primary sort — an overdue small breach is still a governance
           problem, regardless of size. Expand a row for exposure/limit detail.
@@ -44,9 +46,10 @@ export function BreachesActions() {
         <a style={{ cursor: "pointer", color: statusFilter === "within_sla" ? "var(--primary)" : "var(--text-muted)" }} onClick={() => setStatusFilter("within_sla")}>Within SLA</a>
       </div>
 
+      {error && <ErrorState message={error} onRetry={() => setAttempt((n) => n + 1)} />}
       {loading && <div className="loading">Loading control exceptions…</div>}
 
-      {!loading && (
+      {!loading && !error && (
         <div className="card">
           <table className="table">
             <thead>
@@ -59,7 +62,7 @@ export function BreachesActions() {
                 <Fragment key={r.id}>
                   <tr style={{ cursor: "pointer", background: r.is_overdue ? "color-mix(in srgb, var(--error) 8%, transparent)" : undefined }}
                     onClick={() => setExpanded(expanded === r.id ? null : r.id)}>
-                    <td><a onClick={(e) => { e.stopPropagation(); nav(`/counterparty?id=${r.id}`); }}>{r.name}</a></td>
+                    <td><a onClick={(e) => { e.stopPropagation(); nav(`/cp/${r.id}`); }}>{r.name}</a></td>
                     <td style={{ fontSize: 11 }}>{r.limit?.limit_type || "Unavailable"}</td>
                     <td className="mono" style={{ color: "var(--error)" }}>+{r.excess}</td>
                     <td className="mono" style={{ color: r.is_overdue ? "var(--error)" : "var(--text)", fontWeight: r.is_overdue ? 700 : 400 }}>

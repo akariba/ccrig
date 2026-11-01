@@ -7,7 +7,7 @@
   --blue: #6ea5d8; --teal: #58be9c; --rose: #e07a90; --gold: #e2ae45; --amber: #f2a93b; --violet: #a28bf0;
   --kind-ingest: #6ea5d8; --kind-deterministic: #5fb7c9; --kind-llm: #a28bf0; --kind-verify: #d9b25a; --kind-gate: #e8e2d0; --kind-output: #7fd69a;
   --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
-  position: relative; height: 100vh; display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: Inter, -apple-system, sans-serif; overflow: hidden;
+  position: relative; height: calc(100vh - var(--topbar-h)); display: flex; flex-direction: column; background: var(--paper); color: var(--ink); font-family: Inter, -apple-system, sans-serif; overflow: hidden;
 }
 .ds-page * { box-sizing: border-box; }
 .ds-lab { font: 500 10px var(--mono); letter-spacing: .09em; text-transform: uppercase; color: var(--ink-3); }

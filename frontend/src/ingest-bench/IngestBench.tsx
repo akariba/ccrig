@@ -53,7 +53,7 @@ export function IngestBench() {
     const rmQuery = matchMedia("(prefers-reduced-motion: reduce)");
     let raf = 0, last = performance.now(), animT = 0, frame = 0, lastUi = 0, lastVersion = -1;
     const loop = (now: number) => {
-      const { stream: st, colors: C, version: ver } = latest.current, s = st.state, dt = Math.min(0.1, (now - last) / 1000); last = now;
+      const { stream: st, colors: C, version: ver } = latest.current, s = st.state, dt = Math.max(0, Math.min(0.1, (now - last) / 1000)); last = now;   // a first frame can carry a timestamp just before `last`: never run time backwards
       const d = disp.current, f = st.paused ? 0 : 1 - Math.exp(-9 * dt), ease = (cur: number, to: number) => cur + (to - cur) * f;
       const sIdx = stageIndex(s), done = s.status === "done";
       d.k = ease(d.k, s.k); d.loss = ease(d.loss, s.loss ?? d.loss); d.tokens = ease(d.tokens, s.tokens); d.records = ease(d.records, recordsDone(s));
@@ -95,8 +95,11 @@ export function IngestBench() {
       }
       raf = requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(raf);
+    // no idle animation: nothing is drawn while the tab is hidden, and the clock restarts cleanly when it returns
+    const onVisibility = () => { if (document.hidden) { cancelAnimationFrame(raf); raf = 0; } else if (!raf) { last = performance.now(); raf = requestAnimationFrame(loop); } };
+    document.addEventListener("visibilitychange", onVisibility);
+    if (!document.hidden) raf = requestAnimationFrame(loop);
+    return () => { document.removeEventListener("visibilitychange", onVisibility); cancelAnimationFrame(raf); };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- the loop reads everything it needs from refs
   }, []);
 

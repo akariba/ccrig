@@ -8,6 +8,8 @@ This is a strong proof of concept intended to demonstrate the complete business 
 
 ## What this is
 
+> **The interface is being redesigned** into 7 workspaces plus an Admin area (see `docs/REDESIGN_STATUS.md`; the baseline is described in `docs/SITE_AUDIT.md`). The list of views below describes the previous layout; every old address still works and redirects to its new home.
+
 10 views across three groups:
 
 - **Analyst**: Home / AI Copilot, Theme Radar, Entity 360, Counterparty 360, Event Studio, Graph Explorer

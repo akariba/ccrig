@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { api } from "../api/client";
 import { DataBadge, EvidenceBadge } from "../components/Badge";
@@ -13,8 +13,7 @@ function PriorityTag({ priority }: { priority: string }) {
 }
 
 export function Entity360() {
-  const [params, setParams] = useSearchParams();
-  const id = params.get("id") || "TSM";
+  const id = useParams().id || "TSM";        // /issuer/:id (a default issuer when none is given)
   const [inputId, setInputId] = useState(id);
   const [data, setData] = useState<any>(null);
   const [explain, setExplain] = useState<any>(null);
@@ -44,12 +43,12 @@ export function Entity360() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Entity 360</h1>
+        <h2>Entity 360</h2>
         <div className="subtitle">The relationship laboratory — what is this issuer connected to, and through which dimensions?</div>
         <div className="searchbar" style={{ maxWidth: 360, marginTop: 10 }}>
           <input className="input" value={inputId} onChange={(e) => setInputId(e.target.value.toUpperCase())}
-            onKeyDown={(e) => e.key === "Enter" && setParams({ id: inputId })} placeholder="Ticker/ID e.g. NVDA" />
-          <button className="btn secondary" onClick={() => setParams({ id: inputId })}>Load</button>
+            onKeyDown={(e) => e.key === "Enter" && nav(`/issuer/${encodeURIComponent(inputId)}`)} placeholder="Ticker/ID e.g. NVDA" />
+          <button className="btn secondary" onClick={() => nav(`/issuer/${encodeURIComponent(inputId)}`)}>Load</button>
         </div>
       </div>
 
@@ -83,7 +82,7 @@ export function Entity360() {
             <tbody>
               {(showAllRelated ? data.relationship_summary.top_related : data.relationship_summary.top_related.slice(0, 5)).map((r: any) => (
                 <tr key={r.entity_id}>
-                  <td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                  <td><a onClick={() => nav(`/issuer/${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
                   <td className="mono">{r.composite_score.toFixed(3)}</td>
                   <td><button className="btn secondary" style={{ padding: "3px 10px", fontSize: 11 }} onClick={() => loadExplain(r.entity_id)}>Explain</button></td>
                 </tr>
@@ -166,7 +165,7 @@ export function Entity360() {
           <div className="section-title" style={{ marginTop: 16 }}>Themes</div>
           <div className="pill-list">
             {data.theme_exposure.slice(0, 10).map((t: any) => (
-              <span key={t.theme_id} className="pill" onClick={() => nav(`/theme-radar?theme=${t.theme_id}`)}>
+              <span key={t.theme_id} className="pill" onClick={() => nav(`/events?tab=themes&theme=${t.theme_id}`)}>
                 {t.label} · {t.weight.toFixed(1)}
               </span>
             ))}
@@ -174,8 +173,8 @@ export function Entity360() {
 
           <div className="section-title" style={{ marginTop: 16 }}>Quick actions</div>
           <div className="hstack" style={{ flexWrap: "wrap", gap: 6 }}>
-            <span className="pill" onClick={() => nav(`/graph?id=${h.id}`)}>Open in Graph Explorer</span>
-            <span className="pill" onClick={() => nav(`/event-studio?text=${encodeURIComponent(h.name)}`)}>Use as event subject</span>
+            <span className="pill" onClick={() => nav(`/network?tab=graph&id=${h.id}`)}>Open in Graph Explorer</span>
+            <span className="pill" onClick={() => nav(`/events?tab=analyse&text=${encodeURIComponent(h.name)}`)}>Use as event subject</span>
           </div>
         </div>
       </div>
@@ -190,7 +189,7 @@ export function Entity360() {
               {data.fact_links.map((f: any, i: number) => (
                 <tr key={i}>
                   <td>{f.direction === "OUT" ? "→" : "←"}</td>
-                  <td><a onClick={() => nav(`/entity?id=${f.other_entity}`)} style={{ cursor: "pointer" }}>{f.other_name}</a></td>
+                  <td><a onClick={() => nav(`/issuer/${f.other_entity}`)} style={{ cursor: "pointer" }}>{f.other_name}</a></td>
                   <td>{f.relation}</td>
                   <td className="mono">{f.criticality?.toFixed(2)}</td>
                   <td>
@@ -213,14 +212,14 @@ export function Entity360() {
               {data.corporate_hierarchy.direct_parent && (
                 <div style={{ fontSize: 12.5, marginTop: 8 }}>
                   Direct parent: {data.corporate_hierarchy.direct_parent.tracked ? (
-                    <a onClick={() => nav(`/entity?id=${data.corporate_hierarchy.direct_parent.entity_id}`)} style={{ cursor: "pointer" }}>{data.corporate_hierarchy.direct_parent.name}</a>
+                    <a onClick={() => nav(`/issuer/${data.corporate_hierarchy.direct_parent.entity_id}`)} style={{ cursor: "pointer" }}>{data.corporate_hierarchy.direct_parent.name}</a>
                   ) : <span className="mono">{data.corporate_hierarchy.direct_parent.lei}</span>}
                 </div>
               )}
               {data.corporate_hierarchy.ultimate_parent && (
                 <div style={{ fontSize: 12.5, marginTop: 4 }}>
                   Ultimate parent: {data.corporate_hierarchy.ultimate_parent.tracked ? (
-                    <a onClick={() => nav(`/entity?id=${data.corporate_hierarchy.ultimate_parent.entity_id}`)} style={{ cursor: "pointer" }}>{data.corporate_hierarchy.ultimate_parent.name}</a>
+                    <a onClick={() => nav(`/issuer/${data.corporate_hierarchy.ultimate_parent.entity_id}`)} style={{ cursor: "pointer" }}>{data.corporate_hierarchy.ultimate_parent.name}</a>
                   ) : <span className="mono">{data.corporate_hierarchy.ultimate_parent.lei}</span>}
                 </div>
               )}
@@ -229,7 +228,7 @@ export function Entity360() {
                   <div className="section-title" style={{ fontSize: 11 }}>Subsidiaries (tracked entities only)</div>
                   <div className="pill-list">
                     {data.corporate_hierarchy.subsidiaries.map((s: any) => (
-                      <span key={s.lei} className="pill" onClick={() => s.tracked && nav(`/entity?id=${s.entity_id}`)} style={{ cursor: s.tracked ? "pointer" : "default" }}>{s.name || s.lei}</span>
+                      <span key={s.lei} className="pill" onClick={() => s.tracked && nav(`/issuer/${s.entity_id}`)} style={{ cursor: s.tracked ? "pointer" : "default" }}>{s.name || s.lei}</span>
                     ))}
                   </div>
                 </div>
@@ -258,7 +257,7 @@ export function Entity360() {
               <tbody>
                 {(data.counterparty_materiality?.results || []).map((r: any) => (
                   <tr key={r.id}>
-                    <td><a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                    <td><a onClick={() => nav(`/cp/${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
                     <td><PriorityTag priority={r.priority} /></td>
                     <td style={{ fontSize: 12 }}>{r.product}</td>
                     <td className="mono">{r.exposure?.pfe_current ?? "Unavailable"}</td>
@@ -278,7 +277,7 @@ export function Entity360() {
               <tbody>
                 {data.counterparties_exposed.map((c: any, i: number) => (
                   <tr key={i}>
-                    <td><a onClick={() => nav(`/counterparty?id=${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
+                    <td><a onClick={() => nav(`/cp/${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
                     <td>{c.relation}</td>
                     <td className="mono">{(c.exposure_pct * 100).toFixed(0)}%</td>
                   </tr>

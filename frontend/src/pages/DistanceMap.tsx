@@ -112,7 +112,7 @@ export function DistanceMap() {
   useEffect(() => {
     api.distanceMapCounterparties().then((r) => {
       setCounterparties(r.results);
-      if (!cpId && r.results[0]) setParams({ id: r.results[0].counterparty_id });
+      if (!cpId && r.results[0]) setParams((prev) => { const n = new URLSearchParams(prev); n.set("id", r.results[0].counterparty_id); return n; });
     });
   }, []);
 
@@ -141,7 +141,7 @@ export function DistanceMap() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Distance Map</h1>
+        <h2>Distance Map</h2>
         <div className="subtitle">
           For a counterparty, which issuers is it correlated with, through which channel, and how strongly.
           rho = 1 &minus; graph distance &mdash; an inferred proxy over the existing relatedness engine, never an
@@ -157,7 +157,7 @@ export function DistanceMap() {
               key={c.counterparty_id}
               className="pill"
               style={cpId === c.counterparty_id ? { borderColor: "var(--primary)", color: "var(--text)" } : {}}
-              onClick={() => setParams({ id: c.counterparty_id })}
+              onClick={() => setParams((prev) => { const n = new URLSearchParams(prev); n.set("id", c.counterparty_id); return n; })}
             >
               {c.name}
             </span>

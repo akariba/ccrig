@@ -50,15 +50,29 @@ function watch(page, label) {
   page.on("console", (m) => { if (m.type() === "error") problems.push(`[${label}] console.error: ${m.text().slice(0, 200)}`); });
 }
 const shot = async (page, name) => page.screenshot({ path: `${SHOTS}${name}.png`, fullPage: false });
-const badge = (page) => page.locator(".ai-mode-pill").innerText().catch(() => "");
+const badge = (page) => page.locator(".u-status").innerText().catch(() => "");       // top-bar mode pill: "Deterministic · backend OK" | "… · backend unreachable" | "… · connecting"
 const settled = async (page) => { await page.waitForFunction(() => !document.querySelector(".loading"), null, { timeout: SLOW }).catch(() => {}); };
-const navTo = async (page, label) => { await page.locator("nav a", { hasText: new RegExp(`^${label}$`) }).click(); };
+// The old 16 pages now live in workspaces; a "view" is (sidebar item, tab, the heading the old page still shows).
+const VIEWS = {
+  "Relationships": ["Network", "Search relationships"], "Events": ["Events & News", "Analyse a headline"], "Event Impact Map": ["Events & News", "Map"], "Theme Radar": ["Events & News", "Themes"],
+  "Counterparties": ["Counterparty", null], "Controls": ["Today", "Controls"], "Inbox": ["Today", "Inbox"], "Exposure Movers": ["Today", "Exposure movers"],
+  "Graph Explorer": ["Network", "Graph"], "Distance Map": ["Network", "Distance map"], "Model Lab": ["Models", "Weights"], "Backtest Lab": ["Models", "Backtest"], "Data Sources": ["Data sources", null], "Entity Explorer": ["@/issuer", null],     // an issuer page has no sidebar item: it is reached from search and links
+};
+const clientNav = async (page, path) => { await page.evaluate((u) => { history.pushState({}, "", u); window.dispatchEvent(new PopStateEvent("popstate")); }, new URL(BASE).pathname.replace(/\/$/, "") + path); };
+const navTo = async (page, label) => {
+  const v = VIEWS[label];
+  if (!v) { await page.locator("nav a", { hasText: new RegExp(`^${label}$`) }).click(); return; }
+  if (v[0].startsWith("@")) { await clientNav(page, v[0].slice(1)); return; }
+  await page.locator("nav a", { hasText: new RegExp(`^${v[0]}$`) }).click();
+  if (v[1]) await page.getByRole("tab", { name: v[1], exact: true }).click();
+};
 const navAndWait = async (page, label, heading) => {      // wait for the NEW route to render before reading anything
   await navTo(page, label);
-  await page.waitForFunction((h) => document.querySelector("h1")?.textContent === h, heading, { timeout: SLOW }).catch(() => {});
+  await page.waitForFunction((h) => [...document.querySelectorAll("main h1, main h2")].some((e) => e.textContent === h), heading, { timeout: SLOW }).catch(() => {});
   await settled(page);
 };
-const h1 = (page) => page.locator("h1").first().innerText({ timeout: SLOW });
+const h1 = (page) => page.evaluate(() => (document.querySelector(".page-header h2") ?? document.querySelector(".iw-title h1") ?? document.querySelector(".ds-title h1") ?? document.querySelector("main h1"))?.textContent ?? "");
+const workspaceTitle = (page) => page.locator("main h1").first().innerText({ timeout: SLOW });
 const setRange = (page, index, value) => page.evaluate(([i, v]) => {
   const el = document.querySelectorAll('input[type="range"]')[i];
   Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value").set.call(el, String(v));
@@ -75,9 +89,9 @@ try {
     check("static: boot overlay shown while Python loads", sawOverlay);
     await shot(page, "00_boot_overlay");
   }
-  await page.locator(".ai-mode-pill", { hasText: "Offline deterministic mode" }).waitFor({ timeout: 300_000 });
+  await page.locator(".u-status", { hasText: "backend OK" }).waitFor({ timeout: 300_000 });
   check(`boot: app reaches a healthy state (${((Date.now() - t0) / 1000).toFixed(0)}s)`, true, (await badge(page)).replace(/\n/g, " | "));
-  check("boot: overlay gone, sidebar and Relationships page rendered", (await h1(page)) === "Relationships" && !(await page.getByText("Preparing offline demo").isVisible().catch(() => false)));
+  check("boot: overlay gone, shell and the Today workspace rendered (default landing)", (await workspaceTitle(page)) === "Today" && !(await page.getByText("Preparing offline demo").isVisible().catch(() => false)));
   await shot(page, "01_relationships");
 
   // ------------------------------------------------------------------ 2. navigation over all views
@@ -270,7 +284,8 @@ try {
   const studioReqs = [];
   const onReq = (r) => { if (/\/api\/studio\/(flow|jobs|datasets)/.test(r.url())) studioReqs.push(r.url()); };
   page.on("request", onReq);
-  await page.getByRole("link", { name: "Data Intelligence Studio" }).click();
+  check("admin: operator tools are not in the analyst navigation when the operator switch is off", (await page.locator("nav a", { hasText: /Data Intelligence Studio|Ingest Bench/ }).count()) === 0);
+  await clientNav(page, "/admin/studio");
   await page.getByTestId("studio-page").waitFor({ timeout: SLOW });
   await page.waitForFunction(() => document.querySelector('[data-testid="studio-page"]')?.dataset.source === "recording", null, { timeout: SLOW });
   check("studio: without an operator Studio the page says it is read-only and shows a recording labelled as such",
@@ -312,7 +327,7 @@ try {
   const ibReqs = [];
   const onIb = (r) => { if (/\/api\/ingest\//.test(r.url())) ibReqs.push(r.url()); };
   page.on("request", onIb);
-  await page.getByRole("link", { name: "Ingest Bench" }).click();
+  await clientNav(page, "/admin/ingest");
   await page.getByTestId("ib-root").waitFor({ timeout: SLOW });
   await page.waitForFunction(() => document.querySelector('[data-testid="ib-root"]')?.dataset.mode === "demo", null, { timeout: SLOW });
   check("ingest bench: without a live run it is the simulator, labelled SIMULATED, and runs (stage letter advances, canvases painted)",
@@ -383,7 +398,7 @@ try {
   const cp360 = await page.locator("body").innerText();
   check("counterparty 360: portfolio-holdings counterparty selected, shows its holdings and issuer-only indirect relationships",
     /PORTFOLIO-HOLDINGS INTELLIGENCE/.test(cp360) && /NVDA[\s\S]{0,40}HOLDS_EQUITY[\s\S]{0,20}32%/.test(cp360) && /No CCR investigation record/.test(cp360), "");
-  const ccrOnly = await page.getByText("Sovereign Debt Office — Nation Alpha").first().click().then(() => page.getByText(/No portfolio-holdings data for this counterparty \(CCR-only record\)/).waitFor({ timeout: SLOW })).then(() => true).catch(() => false);
+  const ccrOnly = await page.locator("main").getByText("Sovereign Debt Office — Nation Alpha").first().click().then(() => page.getByText(/No portfolio-holdings data for this counterparty \(CCR-only record\)/).waitFor({ timeout: SLOW })).then(() => true).catch(() => false);
   check("counterparty 360: a CCR-only record says so instead of failing", ccrOnly);
   await shot(page, "06_counterparty_360");
 
@@ -401,7 +416,8 @@ try {
     await page.goto(`${BASE}entity?id=JPM`, { waitUntil: "domcontentloaded" });
   }
   await settled(page);
-  await page.locator("h1", { hasText: "Entity 360" }).waitFor({ timeout: SLOW });
+  await page.locator(".page-header h2", { hasText: "Entity 360" }).waitFor({ timeout: SLOW });
+  check("redirect: the old /entity?id=JPM address lands on /issuer/JPM", /\/issuer\/JPM$/.test(new URL(page.url()).pathname));
   const related = await page.locator("body").innerText();
   check("entity 360 (JPM): counterparties CP_CASCADE / CP_ANCHOR no longer listed as related issuers", !/CP_CASCADE[\s\S]{0,40}0\.\d{3}/.test(related) || true, "(API-level proof in tests; page text sampled)");
   await shot(page, "08_entity_360");
@@ -413,22 +429,22 @@ try {
     const seenBadges = new Set();
     await p2.route(API, (r) => r.abort());
     await p2.goto(BASE, { waitUntil: "domcontentloaded" });
-    await p2.locator(".ai-mode-pill", { hasText: "Backend unreachable" }).waitFor({ timeout: 15_000 });
+    await p2.locator(".u-status", { hasText: "backend unreachable" }).waitFor({ timeout: 15_000 });
     seenBadges.add((await badge(p2)).split("\n")[0]);
     const unreachableText = await badge(p2);
-    check("unreachable backend: badge says so, not 'Offline deterministic mode'", /Backend unreachable/.test(unreachableText) && !/Offline deterministic|full functionality retained/.test(unreachableText), unreachableText.replace(/\n/g, " | "));
+    check("unreachable backend: badge says so, not 'Offline deterministic mode'", /backend unreachable/.test(unreachableText) && !/backend OK/.test(unreachableText), unreachableText.replace(/\n/g, " | "));
     await shot(p2, "09_backend_unreachable");
     await p2.unroute(API);
-    const recovered = await p2.locator(".ai-mode-pill", { hasText: "Offline deterministic mode" }).waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
+    const recovered = await p2.locator(".u-status", { hasText: "backend OK" }).waitFor({ timeout: 15_000 }).then(() => true).catch(() => false);
     check("unreachable backend: badge recovers by itself once the API answers (~5s retry)", recovered);
     await p2.close();
 
     const p3 = await context.newPage(); watch(p3, "loading");
     await p3.route(apiRe("health"), async (r) => { await sleep(2500); await r.continue(); });
     await p3.goto(BASE, { waitUntil: "domcontentloaded" });
-    const connecting = await p3.locator(".ai-mode-pill", { hasText: "Connecting" }).isVisible({ timeout: 2000 }).catch(() => false);
+    const connecting = await p3.locator(".u-status", { hasText: "connecting" }).waitFor({ state: "visible", timeout: 2000 }).then(() => true).catch(() => false);
     check("loading state: badge shows 'Connecting...' until the API answers", connecting);
-    await p3.locator(".ai-mode-pill", { hasText: "Offline deterministic mode" }).waitFor({ timeout: 15_000 });
+    await p3.locator(".u-status", { hasText: "backend OK" }).waitFor({ timeout: 15_000 });
     await p3.unroute(apiRe("health"));
 
     await p3.route(apiRe("event/parse"), async (r) => { await sleep(1500); await r.continue(); });
@@ -447,11 +463,11 @@ try {
     await p2.route(/cdn\.jsdelivr\.net/, (r) => r.abort());
     await p2.goto(BASE, { waitUntil: "domcontentloaded" });
     const failed = await p2.getByText("Failed to start the offline demo").waitFor({ timeout: 120_000 }).then(() => true).catch(() => false);
-    check("static unreachable runtime: failure state with a Retry button (not a blank page)", failed && (await p2.getByRole("button", { name: "Retry" }).isVisible()));
+    check("static unreachable runtime: failure state with a Retry button (not a blank page)", failed && (await p2.locator("button:not(.btn)", { hasText: /^Retry$/ }).isVisible()));   // the boot overlay's own button (pages now show their own Retry too)
     await shot(p2, "09_static_boot_failed");
     await p2.unroute(/cdn\.jsdelivr\.net/);
-    await p2.getByRole("button", { name: "Retry" }).click();
-    const back = await p2.locator(".ai-mode-pill", { hasText: "Offline deterministic mode" }).waitFor({ timeout: 300_000 }).then(() => true).catch(() => false);
+    await p2.locator("button:not(.btn)", { hasText: /^Retry$/ }).click();
+    const back = await p2.locator(".u-status", { hasText: "backend OK" }).waitFor({ timeout: 300_000 }).then(() => true).catch(() => false);
     check("static unreachable runtime: Retry recovers once the CDN is reachable", back);
     await p2.close();
   }

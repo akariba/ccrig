@@ -33,7 +33,7 @@ export function BacktestLab() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Backtest Lab</h1>
+        <h2>Backtest Lab</h2>
         <div className="subtitle">
           Look-ahead is prevented by design: the model score is computed as-of the event date using only fact-graph
           and pre-event correlation windows; observed labels use strictly forward, market-adjusted price moves over one

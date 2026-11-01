@@ -73,7 +73,7 @@ export function EventStudio() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Event Studio</h1>
+        <h2>Event Studio</h2>
         <div className="subtitle">
           Paste any headline or narrative. Two ranking modes are computed and never mixed in the same table: Mode 1 is
           a bounded typed-path traversal (decayed criticality per hop); Mode 2 is relation-aware Personalized PageRank
@@ -157,8 +157,8 @@ export function EventStudio() {
                             border: `1px solid currentColor`,
                           }}>{r.priority}</span>
                         </td>
-                        <td><a onClick={() => nav(`/counterparty?id=${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
-                        <td><a onClick={() => nav(`/entity?id=${r.reference_entity_id}`)} style={{ cursor: "pointer" }}>{r.reference_entity_id}</a></td>
+                        <td><a onClick={() => nav(`/cp/${r.id}`)} style={{ cursor: "pointer" }}>{r.name}</a></td>
+                        <td><a onClick={() => nav(`/issuer/${r.reference_entity_id}`)} style={{ cursor: "pointer" }}>{r.reference_entity_id}</a></td>
                         <td style={{ fontSize: 11 }}>{r.product}</td>
                         <td className="mono">{r.delta_pfe != null ? `${r.delta_pfe > 0 ? "+" : ""}${r.delta_pfe}` : (r.delta_nse != null ? `${r.delta_nse > 0 ? "+" : ""}${r.delta_nse} (NSE)` : "n/a")}</td>
                         <td className="mono">{r.utilisation_pct != null ? `${r.utilisation_pct}%` : "Unavailable"}</td>
@@ -203,7 +203,7 @@ export function EventStudio() {
                   {(!result.ai_context_extraction || result.ai_context_extraction.entities.length === 0) && <span className="empty-state">None detected</span>}
                   {result.ai_context_extraction?.entities.map((e: any) => (
                     <span key={e.entity_id} className="hstack" style={{ gap: 4 }}>
-                      <span className="pill" onClick={() => nav(`/entity?id=${e.entity_id}`)} style={{ cursor: "pointer" }}>{e.name}</span>
+                      <span className="pill" onClick={() => nav(`/issuer/${e.entity_id}`)} style={{ cursor: "pointer" }}>{e.name}</span>
                       <SourceBadge source={e.source} />
                     </span>
                   ))}
@@ -248,7 +248,7 @@ export function EventStudio() {
                   <tbody>
                     {result.mode1_bounded_traversal.results.length === 0 && <tr><td colSpan={2} className="empty-state">No hops within bound.</td></tr>}
                     {result.mode1_bounded_traversal.results.map((r: any) => (
-                      <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.score.toFixed(3)}</td></tr>
+                      <tr key={r.entity_id}><td><a onClick={() => nav(`/issuer/${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.score.toFixed(3)}</td></tr>
                     ))}
                   </tbody>
                 </table>
@@ -259,7 +259,7 @@ export function EventStudio() {
                   <thead><tr><th>Entity</th><th>PPR score</th></tr></thead>
                   <tbody>
                     {result.mode2_personalized_pagerank.results.map((r: any) => (
-                      <tr key={r.entity_id}><td><a onClick={() => nav(`/entity?id=${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.ppr_score.toFixed(4)}</td></tr>
+                      <tr key={r.entity_id}><td><a onClick={() => nav(`/issuer/${r.entity_id}`)} style={{ cursor: "pointer" }}>{r.entity_id}</a></td><td className="mono">{r.ppr_score.toFixed(4)}</td></tr>
                     ))}
                   </tbody>
                 </table>
@@ -271,7 +271,7 @@ export function EventStudio() {
               <tbody>
                 {result.relevant_counterparties.map((c: any) => (
                   <tr key={c.counterparty}>
-                    <td><a onClick={() => nav(`/counterparty?id=${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
+                    <td><a onClick={() => nav(`/cp/${c.counterparty}`)} style={{ cursor: "pointer" }}>{c.counterparty}</a></td>
                     <td className="mono">{c.exposure_weighted_relevance.toFixed(3)}</td>
                     <td>{c.issuers.map((i: any) => i.issuer).join(", ")}</td>
                   </tr>

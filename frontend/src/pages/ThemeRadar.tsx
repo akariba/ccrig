@@ -41,7 +41,7 @@ export function ThemeRadar() {
   return (
     <div className="stack">
       <div className="page-header">
-        <h1>Dynamic Theme Radar</h1>
+        <h2>Dynamic Theme Radar</h2>
         <div className="subtitle">
           X = attention velocity: (recent mentions − prior mentions) / prior mentions, over the corpus timeline
           midpoint. Y = entity coverage: distinct issuers linked to the theme. Bubble size = counterparty portfolio
@@ -154,7 +154,7 @@ export function ThemeRadar() {
               <div className="section-title">Covered entities</div>
               <div className="pill-list">
                 {selected.covered_entities.map((e: string) => (
-                  <span key={e} className="pill" onClick={() => nav(`/entity?id=${e}`)}>{e}</span>
+                  <span key={e} className="pill" onClick={() => nav(`/issuer/${e}`)}>{e}</span>
                 ))}
               </div>
             </div>
@@ -162,7 +162,7 @@ export function ThemeRadar() {
               <div className="section-title">Exposed counterparties</div>
               <div className="pill-list">
                 {selected.exposed_counterparties.map((c: string) => (
-                  <span key={c} className="pill" onClick={() => nav(`/counterparty?id=${c}`)}>{c}</span>
+                  <span key={c} className="pill" onClick={() => nav(`/cp/${c}`)}>{c}</span>
                 ))}
               </div>
             </div>

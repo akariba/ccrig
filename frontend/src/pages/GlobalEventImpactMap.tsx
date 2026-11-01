@@ -84,7 +84,7 @@ export function GlobalEventImpactMap() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    const next = new URLSearchParams(); next.set("q", query); next.set("days", String(days));
+    const next = new URLSearchParams(params); next.set("q", query); next.set("days", String(days)); next.delete("event");
     setParams(next, { replace: true });
     run(query, days);
   }
@@ -200,7 +200,7 @@ export function GlobalEventImpactMap() {
             </div>
           </div>
 
-          {selectedEntity && data && <EntityBlock data={data} entityId={selectedEntity} onOpen={() => nav(`/entity?id=${selectedEntity}`)} onClose={() => setSelectedEntity(null)} />}
+          {selectedEntity && data && <EntityBlock data={data} entityId={selectedEntity} onOpen={() => nav(`/issuer/${selectedEntity}`)} onClose={() => setSelectedEntity(null)} />}
           {selected ? <EventPanel event={selected} names={names} onClose={() => selectEvent(null)} /> : (
             <div className="iw-card" data-testid="no-selection">
               <div className="iw-h">Global overview</div>

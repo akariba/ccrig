@@ -1,50 +1,66 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Layout } from "./components/Layout";
+import { lazy, Suspense } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { PyodideBootOverlay } from "./components/PyodideBootOverlay";
 import { InvestigationProvider } from "./context/InvestigationContext";
-import { DailyReview } from "./pages/DailyReview";
-import { RelationshipWorkbench } from "./pages/RelationshipWorkbench";
-import { ThemeRadar } from "./pages/ThemeRadar";
-import { Entity360 } from "./pages/Entity360";
-import { Counterparty360 } from "./pages/Counterparty360";
-import { EventStudio } from "./pages/EventStudio";
-import { GraphExplorer } from "./pages/GraphExplorer";
-import { DistanceMap } from "./pages/DistanceMap";
-import { GlobalEventImpactMap } from "./pages/GlobalEventImpactMap";
-import { ModelLab } from "./pages/ModelLab";
-import { BacktestLab } from "./pages/BacktestLab";
-import { Provenance } from "./pages/Provenance";
-import { BreachesActions } from "./pages/BreachesActions";
-import { ExposureMovers } from "./pages/ExposureMovers";
-import { DataIntelligenceStudio } from "./pages/DataIntelligenceStudio";
-import { IngestBenchPage } from "./pages/IngestBenchPage";
+import { queryClient } from "./api/query";
+import { redirectFor } from "./app/redirects";
+import { AppShell } from "./ui/AppShell";
+import { Skeleton } from "./ui/primitives";
+import NotFound from "./workspaces/NotFound";
 
+const named = <K extends string>(load: () => Promise<Record<K, React.ComponentType>>, key: K) => lazy(() => load().then((m) => ({ default: m[key] })));
+const Today = named(() => import("./workspaces/Workspaces"), "Today");
+const Network = named(() => import("./workspaces/Workspaces"), "Network");
+const Events = named(() => import("./workspaces/Workspaces"), "Events");
+const Models = named(() => import("./workspaces/Workspaces"), "Models");
+const Stress = named(() => import("./workspaces/Workspaces"), "Stress");
+const Comovement = named(() => import("./workspaces/Workspaces"), "Comovement");
+const Counterparty = named(() => import("./workspaces/Entity"), "Counterparty");
+const Issuer = named(() => import("./workspaces/Entity"), "Issuer");
+const Relationship = lazy(() => import("./workspaces/Relationship"));
+const Sources = named(() => import("./workspaces/Admin"), "Sources");
+const StudioPage = named(() => import("./workspaces/Admin"), "StudioPage");
+const IngestPage = named(() => import("./workspaces/Admin"), "IngestPage");
+const GalleryPage = named(() => import("./workspaces/Admin"), "GalleryPage");
+
+/** Any old address: sent to its new home with its parameters; anything else is a 404. */
+function LegacyOrNotFound() {
+  const { pathname, search } = useLocation(), r = redirectFor(pathname, search);
+  return r ? <Navigate to={{ pathname: r.pathname, search: r.search }} replace /> : <NotFound />;
+}
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <PyodideBootOverlay />
-      <InvestigationProvider>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<RelationshipWorkbench />} />
-          <Route path="/inbox" element={<DailyReview />} />
-          <Route path="/theme-radar" element={<ThemeRadar />} />
-          <Route path="/entity" element={<Entity360 />} />
-          <Route path="/counterparty" element={<Counterparty360 />} />
-          <Route path="/event-studio" element={<EventStudio />} />
-          <Route path="/graph" element={<GraphExplorer />} />
-          <Route path="/event-impact-map" element={<GlobalEventImpactMap />} />
-          <Route path="/distance-map" element={<DistanceMap />} />
-          <Route path="/exposure-movers" element={<ExposureMovers />} />
-          <Route path="/breaches" element={<BreachesActions />} />
-          <Route path="/model-lab" element={<ModelLab />} />
-          <Route path="/backtest-lab" element={<BacktestLab />} />
-          <Route path="/provenance" element={<Provenance />} />
-          <Route path="/data-studio" element={<DataIntelligenceStudio />} />
-          <Route path="/ingest-bench" element={<IngestBenchPage />} />
-        </Route>
-      </Routes>
-      </InvestigationProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <PyodideBootOverlay />
+        <InvestigationProvider>
+          <Suspense fallback={<div className="u-host"><Skeleton lines={6} /></div>}>
+            <Routes>
+              <Route element={<AppShell />}>
+                <Route path="/" element={<Today />} />
+                <Route path="/network" element={<Network />} />
+                <Route path="/cp" element={<Counterparty />} />
+                <Route path="/cp/:id" element={<Counterparty />} />
+                <Route path="/issuer" element={<Issuer />} />
+                <Route path="/issuer/:id" element={<Issuer />} />
+                <Route path="/rel" element={<Relationship />} />
+                <Route path="/rel/:a/:b" element={<Relationship />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/stress" element={<Stress />} />
+                <Route path="/comovement" element={<Comovement />} />
+                <Route path="/models" element={<Models />} />
+                <Route path="/admin" element={<Navigate to="/admin/sources" replace />} />
+                <Route path="/admin/sources" element={<Sources />} />
+                <Route path="/admin/studio" element={<StudioPage />} />
+                <Route path="/admin/ingest" element={<IngestPage />} />
+                <Route path="/admin/ui" element={<GalleryPage />} />
+                <Route path="*" element={<LegacyOrNotFound />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </InvestigationProvider>
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
