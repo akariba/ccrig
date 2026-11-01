@@ -63,6 +63,12 @@ cp .env.example backend/.env
 
 Restart the backend. The sidebar badge will change from "Offline deterministic mode" to reflect the active provider. The AI layer is never used for bulk pairwise relationship scoring in either mode — see `docs/LIMITATIONS.md`.
 
+### Deployments and CORS
+
+* **Local development** needs nothing: Vite proxies `/api` to the backend, and the API allows `localhost` / `127.0.0.1` origins by default.
+* **GitHub Pages** (`npm run build:static`) has no server; the backend runs in the browser via Pyodide.
+* **Render** serves the frontend from a different origin, so `render.yaml` sets `CCRIG_CORS_ORIGIN_REGEX` for the backend. Rename the frontend service or use a custom domain and you must update it (or set `CCRIG_CORS_ORIGINS`). See `.env.example`.
+
 ### 4. Run tests
 
 ```bash

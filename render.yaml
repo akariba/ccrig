@@ -9,6 +9,14 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.13.10
+      # The static frontend below is a different origin, so the API must allow
+      # it explicitly (the default allows localhost only). Matches
+      # https://ccrig-frontend.onrender.com and Render's suffixed variants
+      # (https://ccrig-frontend-xxxx.onrender.com). If you rename the frontend
+      # service or serve it from a custom domain, change this (or use
+      # CCRIG_CORS_ORIGINS=https://your-domain).
+      - key: CCRIG_CORS_ORIGIN_REGEX
+        value: '^https://ccrig-frontend(-[a-z0-9]+)?\.onrender\.com$'
 
   - type: web
     name: ccrig-frontend

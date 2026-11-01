@@ -1,6 +1,7 @@
 """Runtime configuration. All AI settings are optional; the app must run
 fully offline without them (BUILD_MANDATE section 4 & 27)."""
 import os
+import re
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parents[2]
@@ -12,6 +13,49 @@ AI_BASE_URL = os.environ.get("AI_BASE_URL", "").strip()
 AI_API_KEY = os.environ.get("AI_API_KEY", "").strip()
 AI_MODEL = os.environ.get("AI_MODEL", "").strip()
 AI_ENABLED = bool(AI_BASE_URL and AI_API_KEY and AI_MODEL)
+
+# --- CORS ---
+# The API has no cookies, sessions or authentication, so credentialed CORS is
+# never needed (allow_credentials stays False). Which BROWSER ORIGINS may read
+# responses is configurable:
+#   CCRIG_CORS_ORIGINS        comma-separated origins, e.g. https://app.example.com
+#                             ("*" is accepted only as an explicit operator opt-in)
+#   CCRIG_CORS_ORIGIN_REGEX   a regex matched against the whole Origin header
+# With neither set, only local development origins (localhost / 127.0.0.1 / ::1,
+# any port) are allowed. This never blocks a request from being served - it only
+# controls whether a browser on another origin may read the response - so the
+# Vite dev proxy (same-origin to the browser) and the serverless GitHub Pages
+# build are unaffected. Cross-origin deployments (e.g. the Render static
+# frontend) must set one of the two variables; see render.yaml.
+LOCAL_ORIGIN_REGEX = r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d{1,5})?$"
+_ORIGIN_RE = re.compile(r"^https?://[A-Za-z0-9._-]+(:\d{1,5})?$")
+
+
+def cors_settings(environ=None):
+    """Keyword arguments for CORSMiddleware, derived from the environment."""
+    environ = os.environ if environ is None else environ
+    origins = [o.strip().rstrip("/") for o in environ.get("CCRIG_CORS_ORIGINS", "").split(",") if o.strip()]
+    for origin in origins:
+        if origin != "*" and not _ORIGIN_RE.match(origin):
+            raise ValueError(
+                f"CCRIG_CORS_ORIGINS entry {origin!r} is not an origin (expected scheme://host[:port], "
+                "e.g. https://app.example.com, or '*')")
+    regex = environ.get("CCRIG_CORS_ORIGIN_REGEX", "").strip()
+    if regex:
+        try:
+            re.compile(regex)
+        except re.error as exc:
+            raise ValueError(f"CCRIG_CORS_ORIGIN_REGEX is not a valid regular expression: {exc}")
+    if not origins and not regex:
+        regex = LOCAL_ORIGIN_REGEX
+    return {
+        "allow_origins": origins,
+        "allow_origin_regex": regex or None,
+        "allow_credentials": False,
+        "allow_methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"],
+    }
+
 
 # --- Document ingestion (POC) ---
 # POST /api/themes/ingest appends to the process-wide in-memory news corpus

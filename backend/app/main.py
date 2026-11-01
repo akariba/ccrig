@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .core.config import cors_settings
 from .routers import entities, counterparties, themes, search, event, graph, model_lab, misc, priority, distance_map
 
 app = FastAPI(
@@ -10,13 +11,9 @@ app = FastAPI(
     version="0.1.0-poc",
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Origins are configurable (CCRIG_CORS_ORIGINS / CCRIG_CORS_ORIGIN_REGEX); the
+# default allows local development only. See core/config.py:cors_settings.
+app.add_middleware(CORSMiddleware, **cors_settings())
 
 app.include_router(entities.router)
 app.include_router(counterparties.router)
