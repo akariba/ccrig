@@ -100,7 +100,7 @@ export function spreadOverlaps(items: { id: string; pt: Pt }[], minDist = 20): R
 
 // ------------------------------------------------------------------ scene
 export type MarkerKind = "event" | "entity" | "region";
-export interface Marker { id: string; kind: MarkerKind; label: string; lat: number; lon: number; precision: string; role?: string; rank?: number; eventId?: string; entityId?: string; ticker?: string }
+export interface Marker { id: string; kind: MarkerKind; label: string; lat: number; lon: number; precision: string; role?: string; rank?: number; place?: string; eventId?: string; entityId?: string; ticker?: string }
 export interface Cable { id: string; type: GraphEdge["type"]; from: string; to: string; eventIds: string[]; relation?: string }
 export interface Scene { markers: Marker[]; cables: Cable[]; unmapped: { id: string; label: string; reason: string }[] }
 
@@ -113,7 +113,7 @@ export function buildScene(data: ImpactResponse): Scene {
     have.add(n.id);
     markers.push({
       id: n.id, kind: n.type.toLowerCase() as MarkerKind, label: n.label, lat: n.position.lat, lon: n.position.lon, precision: n.position.precision,
-      role: n.role, rank: n.event_id ? rank.get(n.event_id) : undefined, eventId: n.event_id, entityId: n.entity_id, ticker: n.ticker,
+      role: n.role, rank: n.event_id ? rank.get(n.event_id) : undefined, place: n.type === "EVENT" ? n.position.label : undefined, eventId: n.event_id, entityId: n.entity_id, ticker: n.ticker,
     });
   }
   const cables: Cable[] = data.graph.edges
@@ -145,16 +145,30 @@ const HUES = { documented: [205, 175], mention: [215, 215], region: [38, 38] } a
  * relationship, source -> target) and never for a mere mention. Nothing is drawn unless there is data to show (phase "ready").
  * With reduced motion there are no pulses at all.
  */
-export function cableStyle(cable: Cable, ctx: { phase: Phase; selectedEventId: string | null; reducedMotion: boolean }): CableStyle {
+export function cableStyle(cable: Cable, ctx: { phase: Phase; selectedEventId: string | null; reducedMotion: boolean; hoverEventId?: string | null }): CableStyle {
   const kind = cable.type === "DOCUMENTED_RELATION" ? "documented" : cable.type === "MENTIONS" ? "mention" : "region";
   const [hueFrom, hueTo] = HUES[kind];
   const base = { kind, hueFrom, hueTo, dash: kind === "documented" ? null : kind === "mention" ? [5, 4] : [1.5, 5], width: kind === "documented" ? 1.8 : 1.1 } as const;
   if (ctx.phase !== "ready") return { ...base, draw: false, alpha: 0, pulses: 0, glow: false };
   const selected = ctx.selectedEventId !== null;
   const active = selected && cable.eventIds.includes(ctx.selectedEventId as string);
-  const alpha = selected ? (active ? 1 : 0.16) : kind === "documented" ? 0.8 : kind === "mention" ? 0.4 : 0.22;
-  const pulses = ctx.reducedMotion || kind !== "documented" ? 0 : selected ? (active ? 3 : 0) : 1;
+  const hovered = !active && !!ctx.hoverEventId && cable.eventIds.includes(ctx.hoverEventId);
+  // A quiet contextual network by default; only the selected event's paths are emphasised (hover previews at medium strength).
+  const context = kind === "documented" ? 0.3 : kind === "mention" ? 0.14 : 0.1;
+  const alpha = active ? (kind === "documented" ? 1 : kind === "mention" ? 0.85 : 0.5) : hovered ? 0.6 : selected ? (kind === "documented" ? 0.12 : 0.05) : context;
+  const pulses = ctx.reducedMotion || kind !== "documented" ? 0 : active ? 3 : selected ? 0 : 1;
   return { ...base, draw: true, alpha, pulses, glow: active, width: active ? base.width + 0.8 : base.width };
+}
+
+/** Pan/zoom that frames a set of points inside a w x h stage (zoom 1 = the whole world). Pure; clamped so the map never leaves the stage. */
+export function fitView(points: Pt[], w: number, h: number, pad = 110, maxZoom = 2.4): { zoom: number; tx: number; ty: number } {
+  if (points.length === 0) return { zoom: 1, tx: 0, ty: 0 };
+  const xs = points.map((p) => p[0]), ys = points.map((p) => p[1]);
+  const x0 = Math.min(...xs) - pad, x1 = Math.max(...xs) + pad, y0 = Math.min(...ys) - pad, y1 = Math.max(...ys) + pad;
+  const zoom = Math.max(1, Math.min(maxZoom, w / (x1 - x0), h / (y1 - y0)));
+  const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+  const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
+  return { zoom, tx: clamp(w / 2 - cx * zoom, w - w * zoom, 0), ty: clamp(h / 2 - cy * zoom, h - h * zoom, 0) };
 }
 
 // ------------------------------------------------------------------ reading a path

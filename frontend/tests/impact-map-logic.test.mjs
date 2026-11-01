@@ -155,3 +155,32 @@ test("dates and links are formatted safely", () => {
   assert.equal(m.safeHttpsUrl("https://investor.nvidia.com/x"), "https://investor.nvidia.com/x");
   for (const bad of ["javascript:alert(1)", "http://example.org", "ftp://x", "not a url", "data:text/html,x"]) assert.equal(m.safeHttpsUrl(bad), null);
 });
+
+// ------------------------------------------------------------------ refinement: quiet context, hover preview, camera
+test("by default the network is a quiet context; only the selected event's paths are emphasised", () => {
+  const ctxQuiet = ctx({});
+  for (const c of [documented, mention, region]) assert.ok(m.cableStyle(c, ctxQuiet).alpha <= 0.3);
+  const sel = ctx({ selectedEventId: "e1" });
+  assert.equal(m.cableStyle(documented, sel).alpha, 1);
+  for (const c of [mention, region]) assert.ok(m.cableStyle({ ...c, eventIds: ["e2"] }, sel).alpha <= 0.05);
+  assert.ok(m.cableStyle({ ...documented, eventIds: ["e2"] }, sel).alpha <= 0.12);
+});
+
+test("hovering an event previews its cables at medium strength without pulses, and never outranks the selection", () => {
+  const h = m.cableStyle(documented, ctx({ selectedEventId: "e2", hoverEventId: "e1" }));
+  assert.equal(h.alpha, 0.6); assert.equal(h.pulses, 0); assert.equal(h.glow, false);
+  assert.equal(m.cableStyle(documented, ctx({ selectedEventId: "e1", hoverEventId: "e1" })).alpha, 1);
+});
+
+test("the camera frames a selection, never zooms out past the world, and never leaves the stage", () => {
+  assert.deepEqual(m.fitView([], 900, 480), { zoom: 1, tx: 0, ty: 0 });
+  const wide = m.fitView([[50, 100], [850, 400]], 900, 480);
+  assert.equal(wide.zoom, 1); assert.equal(wide.tx, 0); assert.equal(wide.ty, 0);
+  const tight = m.fitView([[200, 200], [240, 230]], 900, 480);
+  assert.ok(tight.zoom > 1 && tight.zoom <= 2.4);
+  for (const v of [wide, tight, m.fitView([[5, 5]], 900, 480), m.fitView([[895, 475]], 900, 480)]) {
+    assert.ok(v.tx <= 0 && v.tx >= 900 - 900 * v.zoom - 1e-9); assert.ok(v.ty <= 0 && v.ty >= 480 - 480 * v.zoom - 1e-9);
+  }
+  const x = 220 * tight.zoom + tight.tx, y = 215 * tight.zoom + tight.ty;       // the framed centre stays on screen
+  assert.ok(x > 0 && x < 900 && y > 0 && y < 480);
+});
