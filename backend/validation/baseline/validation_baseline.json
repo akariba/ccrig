@@ -1,4 +1,63 @@
 {
+ "anchors": {
+  "entity_disjoint_capacity": {
+   "anchors_crossing_folds_unusable": 20,
+   "anchors_fully_inside_fold_A": 11,
+   "anchors_fully_inside_fold_B": 3,
+   "min_anchors_to_fit": 8
+  },
+  "existing_split_independence": {
+   "holdout_anchors_sharing_an_entity_with_train": 9,
+   "holdout_anchors_sharing_the_query_entity_with_train": 3,
+   "n_holdout": 9,
+   "n_train": 25,
+   "verdict": "NOT entity-disjoint: the holdout cannot show that anything generalises to unseen entities"
+  },
+  "n_anchors": 34,
+  "note": "Anchors are weak-supervision judgments, many easy (supplier vs an oil major). Accuracy near the single-feature baselines means the anchors cannot tell weight sets apart.",
+  "pairwise_accuracy": {
+   "baseline_news_only": {
+    "all_34": 1.0,
+    "existing_holdout": 1.0,
+    "existing_train": 1.0
+   },
+   "baseline_random": {
+    "all_34": 0.5,
+    "existing_holdout": 0.5,
+    "existing_train": 0.5
+   },
+   "baseline_sector_only": {
+    "all_34": 0.9412,
+    "existing_holdout": 1.0,
+    "existing_train": 0.92
+   },
+   "baseline_sector_plus_semantic": {
+    "all_34": 0.9853,
+    "existing_holdout": 1.0,
+    "existing_train": 0.98
+   },
+   "baseline_semantic_only": {
+    "all_34": 0.9559,
+    "existing_holdout": 1.0,
+    "existing_train": 0.94
+   },
+   "current_composite": {
+    "all_34": 1.0,
+    "existing_holdout": 1.0,
+    "existing_train": 1.0
+   },
+   "reference_shrinkage": {
+    "all_34": 1.0,
+    "existing_holdout": 1.0,
+    "existing_train": 1.0
+   },
+   "reference_zero_fill": {
+    "all_34": 1.0,
+    "existing_holdout": 1.0,
+    "existing_train": 1.0
+   }
+  }
+ },
  "availability": {
   "issuer_pairs": 903,
   "pairs_with_component": {
@@ -16,7 +75,10 @@
   "Small sample (21 queries, 68 directed positives): read the bootstrap intervals, not the point estimates.",
   "The news feature is built from keyword weights curated by the same author as the documented edges; its strong baseline performance may reflect curation leakage rather than independent signal.",
   "Ties are broken by seeded random shuffles averaged over several trials (deterministic, not exact ranks).",
-  "Reference variants (zero-fill, shrinkage) are analysis aids only; the application does not use them."
+  "Reference variants (zero-fill, shrinkage) are analysis aids only; the application does not use them.",
+  "'Hard negatives' are issuers with NO DOCUMENTED edge to the query. The edge list is curated and incomplete, so undocumented is not proven unrelated.",
+  "The composite measures SIMILARITY (sector, geography, text, themes); the documented edges are supply/licence DEPENDENCIES. With the edges masked, ranking dependencies by similarity is a hard task by construction - a low score here says the composite is not a dependency detector, not that the similarity it computes is wrong.",
+  "The 34 expert anchors are easy (a supplier vs an oil major): single features score 94-100% on them, so they cannot tell weight sets apart, and the existing train/holdout split shares entities."
  ],
  "default_weights": {
   "geography": 0.08,
@@ -27,6 +89,224 @@
   "sector": 0.15,
   "semantic": 0.12,
   "supply_chain": 0.25
+ },
+ "entity_disjoint_holdout": {
+  "design": "universe = one fold's issuers; queries, candidates and documented positives all inside it",
+  "folds": {
+   "A": [
+    "TSM",
+    "NVDA",
+    "SKHY",
+    "ASML",
+    "AMAT",
+    "MU",
+    "QCOM",
+    "IBM",
+    "AAPL",
+    "AMZN",
+    "JPM",
+    "DBK",
+    "GS",
+    "MS",
+    "UBS",
+    "BA",
+    "RTX",
+    "GD",
+    "MAERSK",
+    "CAT",
+    "XOM",
+    "BP"
+   ],
+   "B": [
+    "AMD",
+    "INTC",
+    "SSNLF",
+    "AVGO",
+    "ARM",
+    "MSFT",
+    "GOOGL",
+    "META",
+    "ORCL",
+    "C",
+    "BAC",
+    "WFC",
+    "HSBC",
+    "AIG",
+    "LMT",
+    "NOC",
+    "SHEL",
+    "CVX",
+    "TTE",
+    "FCX",
+    "RIO"
+   ]
+  },
+  "per_fold": {
+   "A": {
+    "baseline_news_only": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.6598,
+     "map_ci95": [
+      0.5825,
+      0.7552
+     ],
+     "n_queries": 11
+    },
+    "baseline_random": {
+     "hit_at_10": 0.7121,
+     "hit_at_5": 0.4818,
+     "map": 0.241,
+     "map_ci95": [
+      0.2052,
+      0.286
+     ],
+     "n_queries": 11
+    },
+    "baseline_sector_only": {
+     "hit_at_10": 0.9455,
+     "hit_at_5": 0.8545,
+     "map": 0.4488,
+     "map_ci95": [
+      0.3298,
+      0.5695
+     ],
+     "n_queries": 11
+    },
+    "baseline_sector_plus_semantic": {
+     "hit_at_10": 0.9091,
+     "hit_at_5": 0.8182,
+     "map": 0.4061,
+     "map_ci95": [
+      0.2979,
+      0.4973
+     ],
+     "n_queries": 11
+    },
+    "baseline_semantic_only": {
+     "hit_at_10": 0.9091,
+     "hit_at_5": 0.9091,
+     "map": 0.3628,
+     "map_ci95": [
+      0.2646,
+      0.4792
+     ],
+     "n_queries": 11
+    },
+    "current_composite": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.5004,
+     "map_ci95": [
+      0.421,
+      0.5933
+     ],
+     "n_queries": 11
+    },
+    "reference_shrinkage": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.5077,
+     "map_ci95": [
+      0.4205,
+      0.6061
+     ],
+     "n_queries": 11
+    },
+    "reference_zero_fill": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.514,
+     "map_ci95": [
+      0.4289,
+      0.6072
+     ],
+     "n_queries": 11
+    }
+   },
+   "B": {
+    "baseline_news_only": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 0.9556,
+     "map": 0.6488,
+     "map_ci95": [
+      0.4584,
+      0.838
+     ],
+     "n_queries": 6
+    },
+    "baseline_random": {
+     "hit_at_10": 0.5,
+     "hit_at_5": 0.2833,
+     "map": 0.1887,
+     "map_ci95": [
+      0.1541,
+      0.2201
+     ],
+     "n_queries": 6
+    },
+    "baseline_sector_only": {
+     "hit_at_10": 0.6167,
+     "hit_at_5": 0.4222,
+     "map": 0.4048,
+     "map_ci95": [
+      0.1019,
+      0.7056
+     ],
+     "n_queries": 6
+    },
+    "baseline_sector_plus_semantic": {
+     "hit_at_10": 0.8333,
+     "hit_at_5": 0.6667,
+     "map": 0.4388,
+     "map_ci95": [
+      0.1315,
+      0.7417
+     ],
+     "n_queries": 6
+    },
+    "baseline_semantic_only": {
+     "hit_at_10": 0.8333,
+     "hit_at_5": 0.6667,
+     "map": 0.4911,
+     "map_ci95": [
+      0.1488,
+      0.8135
+     ],
+     "n_queries": 6
+    },
+    "current_composite": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 0.8333,
+     "map": 0.4655,
+     "map_ci95": [
+      0.1798,
+      0.7417
+     ],
+     "n_queries": 6
+    },
+    "reference_shrinkage": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.4833,
+     "map_ci95": [
+      0.2167,
+      0.75
+     ],
+     "n_queries": 6
+    },
+    "reference_zero_fill": {
+     "hit_at_10": 1.0,
+     "hit_at_5": 1.0,
+     "map": 0.4917,
+     "map_ci95": [
+      0.2333,
+      0.75
+     ],
+     "n_queries": 6
+    }
+   }
+  }
  },
  "ground_truth": {
   "directed_positives": 68,
@@ -47,6 +327,125 @@
    "AMAT",
    "AVGO"
   ]
+ },
+ "hard_cases_extended": {
+  "counts": {
+   "directed_edges": 68,
+   "easy_positive_edges": 44,
+   "hard_negative_triples": 242,
+   "hard_positive_edges": 24
+  },
+  "definitions": {
+   "easy_positives": "documented edges between issuers of the same sector",
+   "hard_negatives": "same sector AND same country as the query, no documented edge ('undocumented', not proven unrelated)",
+   "hard_positives": "documented supply/licence edges between issuers of different sectors"
+  },
+  "variants": {
+   "baseline_news_only": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.2186,
+     "median_rank": 5.0,
+     "share_in_top10": 0.8409
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.1839,
+     "median_rank": 7.25,
+     "share_in_top10": 0.7917
+    },
+    "partner_above_lookalike": 0.6446
+   },
+   "baseline_random": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.0465,
+     "median_rank": 21.5,
+     "share_in_top10": 0.0
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.0465,
+     "median_rank": 21.5,
+     "share_in_top10": 0.0
+    },
+    "partner_above_lookalike": 0.5
+   },
+   "baseline_sector_only": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.1829,
+     "median_rank": 6.0,
+     "share_in_top10": 1.0
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.0389,
+     "median_rank": 25.75,
+     "share_in_top10": 0.0
+    },
+    "partner_above_lookalike": 0.25
+   },
+   "baseline_sector_plus_semantic": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.2163,
+     "median_rank": 7.5,
+     "share_in_top10": 0.7955
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.0683,
+     "median_rank": 16.0,
+     "share_in_top10": 0.1667
+    },
+    "partner_above_lookalike": 0.0847
+   },
+   "baseline_semantic_only": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.1807,
+     "median_rank": 10.0,
+     "share_in_top10": 0.5227
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.1054,
+     "median_rank": 12.5,
+     "share_in_top10": 0.4167
+    },
+    "partner_above_lookalike": 0.1364
+   },
+   "current_composite": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.2654,
+     "median_rank": 7.0,
+     "share_in_top10": 0.9091
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.0927,
+     "median_rank": 12.0,
+     "share_in_top10": 0.3333
+    },
+    "partner_above_lookalike": 0.155
+   },
+   "reference_shrinkage": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.2696,
+     "median_rank": 6.0,
+     "share_in_top10": 0.9091
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.092,
+     "median_rank": 11.5,
+     "share_in_top10": 0.3333
+    },
+    "partner_above_lookalike": 0.155
+   },
+   "reference_zero_fill": {
+    "easy_positives": {
+     "mean_reciprocal_rank": 0.2742,
+     "median_rank": 6.0,
+     "share_in_top10": 0.9091
+    },
+    "hard_positives": {
+     "mean_reciprocal_rank": 0.0906,
+     "median_rank": 11.5,
+     "share_in_top10": 0.375
+    },
+    "partner_above_lookalike": 0.1508
+   }
+  }
  },
  "inversions": {
   "current_composite": {

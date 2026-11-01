@@ -28,6 +28,24 @@ def _print_report(report: dict) -> None:
         print(f"  {name:22} all: {a['share_with_at_least_one_outranker']:.0%} (mean {a['mean_outrankers']})"
               f" | crit>=0.8: {h['share_with_at_least_one_outranker']:.0%} (mean {h['mean_outrankers']})")
     print("\nhard cases:", json.dumps(report["hard_cases"], indent=1))
+    hx = report["hard_cases_extended"]
+    print("\nhard positives (cross-sector edges) / look-alike negatives:", hx["counts"])
+    for name, v in hx["variants"].items():
+        hp = v.get("hard_positives", {})
+        print(f"  {name:32} hard+ median rank {hp.get('median_rank', '-'):>6}  top10 {hp.get('share_in_top10', '-'):>6}"
+              f"  partner above look-alike {v.get('partner_above_lookalike', '-')}")
+    an = report["anchors"]
+    print("\nexpert anchors (pairwise accuracy):", an["existing_split_independence"]["verdict"])
+    for name, v in an["pairwise_accuracy"].items():
+        print(f"  {name:32} all {v['all_34']}  existing holdout {v['existing_holdout']}")
+    print("\nentity-disjoint folds (MAP):")
+    for fold, variants in report["entity_disjoint_holdout"]["per_fold"].items():
+        print(f"  fold {fold}: " + ", ".join(f"{n.replace('baseline_', '')} {m['map']}" for n, m in variants.items()
+                                             if n in ("current_composite", "baseline_sector_only", "baseline_news_only", "baseline_random")))
+    print("\ninformational - weights fitted on the other fold:")
+    for fold, info in harness.fitted_on_other_fold().items():
+        extra = f" retrieval MAP {info['retrieval']['map']} vs default {info['default_weights_retrieval']['map']}" if "retrieval" in info else ""
+        print(f"  tested on {fold}: {info['status']} (anchors {info['n_anchors_used']}){extra}")
     print("\ncaveats:")
     for c in report["caveats"]:
         print("  -", c)
