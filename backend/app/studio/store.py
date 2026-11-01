@@ -32,6 +32,9 @@ CREATE TABLE IF NOT EXISTS decisions(decision_id INTEGER PRIMARY KEY AUTOINCREME
 CREATE TABLE IF NOT EXISTS releases(
   release_id INTEGER PRIMARY KEY AUTOINCREMENT, dataset TEXT NOT NULL, scope TEXT NOT NULL DEFAULT '', version INTEGER NOT NULL, job_id TEXT NOT NULL, content_hash TEXT NOT NULL,
   path TEXT NOT NULL, rows INTEGER NOT NULL, status TEXT NOT NULL, parent_release_id INTEGER, created_at TEXT NOT NULL, approved_by TEXT NOT NULL, UNIQUE(dataset, scope, version));
+CREATE TABLE IF NOT EXISTS discovery_runs(
+  run_id TEXT PRIMARY KEY, entity_id TEXT NOT NULL, as_of TEXT NOT NULL, created_at TEXT NOT NULL, status TEXT NOT NULL, job_id TEXT, selected INTEGER NOT NULL DEFAULT 0, path TEXT NOT NULL);
+CREATE INDEX IF NOT EXISTS discovery_runs_entity ON discovery_runs(entity_id, created_at);
 CREATE TABLE IF NOT EXISTS current_release(dataset TEXT NOT NULL, scope TEXT NOT NULL DEFAULT '', release_id INTEGER, PRIMARY KEY(dataset, scope));
 """
 
@@ -77,7 +80,7 @@ class StudioStore:
     def __init__(self, root, clock=None):
         self.root = Path(root)
         self.clock = clock or utcnow
-        for sub in ("raw", "staging", "releases"):
+        for sub in ("raw", "staging", "releases", "discovery"):
             (self.root / sub).mkdir(parents=True, exist_ok=True)
         self.db_path = self.root / "studio.db"
         boot = sqlite3.connect(self.db_path, timeout=30)
@@ -322,3 +325,24 @@ class StudioStore:
             c.execute("INSERT INTO current_release(dataset, scope, release_id) VALUES (?,?,?) ON CONFLICT(dataset, scope) DO UPDATE SET release_id=excluded.release_id", (dataset, scope, target_release_id))
             self._event(c, cur["job_id"] if cur else None, "REVIEW", kind, message=f"{dataset}{('/' + scope) if scope else ''}: {reason[:160]}",
                         counts={"from_release": cur["release_id"] if cur else None, "to_release": target_release_id, "reviewer": reviewer})
+
+    # ------------------------------------------------------------------ discovery runs (artifacts + index)
+    def save_run(self, run: dict) -> Path:
+        path = self.root / "discovery" / f"{run['run_id']}.json"
+        _atomic_write(path, canonical_json(run).encode("utf-8"))
+        with self._tx() as c:
+            c.execute("INSERT INTO discovery_runs(run_id, entity_id, as_of, created_at, status, job_id, selected, path) VALUES (?,?,?,?,?,?,?,?) "
+                      "ON CONFLICT(run_id) DO UPDATE SET created_at=excluded.created_at, status=excluded.status, job_id=excluded.job_id, selected=excluded.selected",
+                      (run["run_id"], run["entity"]["entity_id"], run["as_of"], self.clock(), run["status"], run.get("staging_job_id"), len(run.get("selected_event_ids", [])), str(path)))
+        return path
+
+    def load_run(self, run_id) -> dict | None:
+        row = self._one("SELECT path FROM discovery_runs WHERE run_id=?", (run_id,))
+        return json.loads(Path(row["path"]).read_text("utf-8")) if row else None
+
+    def latest_run(self, entity_id) -> dict | None:
+        row = self._one("SELECT run_id FROM discovery_runs WHERE entity_id=? ORDER BY created_at DESC, rowid DESC LIMIT 1", (entity_id,))
+        return self.load_run(row["run_id"]) if row else None
+
+    def list_runs(self, limit=50) -> list:
+        return self._all("SELECT run_id, entity_id, as_of, created_at, status, job_id, selected FROM discovery_runs ORDER BY created_at DESC LIMIT ?", (limit,))

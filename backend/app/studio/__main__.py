@@ -37,6 +37,11 @@ def main(argv=None) -> int:
     q = sub.add_parser("rollback"); q.add_argument("dataset"); q.add_argument("--scope", default=""); q.add_argument("--reviewer", required=True); q.add_argument("--reason", required=True)
     q = sub.add_parser("restore"); q.add_argument("dataset"); q.add_argument("--scope", default=""); q.add_argument("--release-id", type=int, required=True)
     q.add_argument("--reviewer", required=True); q.add_argument("--reason", required=True)
+    q = sub.add_parser("discover", help="find, verify and stage recent events for a company from approved sources (needs CCRIG_DISCOVERY_NETWORK=1 for a live search)")
+    q.add_argument("query"); q.add_argument("--window", type=int, default=180); q.add_argument("--limit", type=int, default=5); q.add_argument("--no-stage", action="store_true")
+    q.add_argument("--as-of", help="YYYY-MM-DD (default: today, UTC)")
+    sub.add_parser("providers"); sub.add_parser("runs")
+    q = sub.add_parser("run"); q.add_argument("run_id")
     a = ap.parse_args(argv)
 
     try:
@@ -70,6 +75,21 @@ def main(argv=None) -> int:
             _out(review.rollback(store, a.dataset, a.scope, reviewer=a.reviewer, reason=a.reason))
         elif a.cmd == "restore":
             _out(review.restore(store, a.dataset, a.scope, a.release_id, reviewer=a.reviewer, reason=a.reason))
+        elif a.cmd == "discover":
+            from datetime import date as _date
+            from ..discovery import service as dservice
+
+            out = dservice.run(store, a.query, window_days=a.window, limit=a.limit, stage=not a.no_stage, operator="cli", as_of=_date.fromisoformat(a.as_of) if a.as_of else None)
+            _out(out)
+        elif a.cmd == "providers":
+            from ..discovery import agent as dagent, net as dnet, providers as dprov
+
+            _out({"network_enabled": dnet.network_enabled(), "ai_configured": dagent.configured_client() is not None,
+                  "providers": [{"id": p.id, "label": p.label, "approved_source": p.source["id"], "entities": p.cfg["entities"]} for p in dprov.load_providers()]})
+        elif a.cmd == "runs":
+            _out(store.list_runs())
+        elif a.cmd == "run":
+            _out(store.load_run(a.run_id) or {"error": "NOT_FOUND"})
         elif a.cmd == "verify-ledger":
             _out(store.verify_chain())
     except (review.ReviewError, pipeline.BadRequest, config.UnsafeWorkspace, acquire.IngestRejected) as exc:

@@ -9,6 +9,8 @@ from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
 
 from ..studio import config, pipeline, review
+from ..discovery import agent as discovery_agent, net as discovery_net, providers as discovery_providers, service as discovery_service
+from ..discovery.entity import resolve_entity
 from ..studio.store import IntegrityError, StudioStore
 
 
@@ -153,3 +155,42 @@ def export(dataset: str, scope: str = Query(default="", max_length=40), store: S
 @router.get("/ledger/verify")
 def verify(store: StudioStore = Depends(get_store)):
     return store.verify_chain()
+
+
+# ------------------------------------------------------------------ event discovery (operator only)
+class DiscoveryRequest(BaseModel):
+    query: str = Field(min_length=1, max_length=100)
+    window_days: int = Field(default=180, ge=1, le=730)
+    limit: int = Field(default=5, ge=1, le=5)
+    stage: bool = True
+
+
+@router.get("/discovery/providers")
+def discovery_providers_status():
+    """Which approved providers exist, whether this server may use the network, and whether a language model is configured."""
+    return {"network_enabled": discovery_net.network_enabled(), "network_note": "Retrieval from approved sources happens only when the operator sets CCRIG_DISCOVERY_NETWORK=1.",
+            "ai_configured": discovery_agent.configured_client() is not None,
+            "providers": [{"id": p.id, "label": p.label, "approved_source": p.source["id"], "entities": p.cfg["entities"], "url": p.cfg["url"]} for p in discovery_providers.load_providers()]}
+
+
+@router.get("/discovery/resolve")
+def discovery_resolve(q: str = Query(min_length=1, max_length=100)):
+    return resolve_entity(q).as_dict()
+
+
+@router.post("/discovery/run")
+async def discovery_run(body: DiscoveryRequest, store: StudioStore = Depends(get_store)):
+    return await run_in_threadpool(lambda: _call(discovery_service.run, store, body.query, window_days=body.window_days, limit=body.limit, stage=body.stage, operator="operator-api"))
+
+
+@router.get("/discovery/runs")
+def discovery_runs(store: StudioStore = Depends(get_store)):
+    return {"runs": store.list_runs()}
+
+
+@router.get("/discovery/runs/{run_id}")
+def discovery_run_detail(run_id: str, store: StudioStore = Depends(get_store)):
+    run = store.load_run(run_id)
+    if not run:
+        raise _err(404, "NOT_FOUND", f"no discovery run {run_id}")
+    return run
