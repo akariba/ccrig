@@ -1496,3 +1496,7 @@ Create clean adapters/interfaces if useful.
 Continue to use synthetic data for unsupported areas.
 
 The objective is an auditable, credible CCR prototype — not a demo that falsely presents synthetic or guessed data as Citi production data.
+
+### Global Event Impact Map (pilot)
+
+`/event-impact-map` (API: `/api/impact-map/*`) shows up to five recent, source-verified events about a company on a world map with their documented relationship paths. Events are real publications from approved primary sources, retrieved and verified by `backend/scripts/event_register.py`; impact is deliberately **not estimated**. See `docs/EVENT_IMPACT_MAP.md`.

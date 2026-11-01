@@ -103,6 +103,7 @@ for (const [name, version] of Object.entries(pins.bundledByPyodide)) {
 if (report.pandas_importable) problems.push("pandas is importable in the runtime but nothing uses it");
 // 4. behaviour
 if (report.snapshot_diffs.length) problems.push(`analytics differ from the baseline: ${JSON.stringify(report.snapshot_diffs)}`);
+if (report.impact_map_diffs.length) problems.push(`Global Event Impact Map responses differ from the baseline: ${JSON.stringify(report.impact_map_diffs)}`);
 if (report.request_case_failures.length) problems.push(`request cases failed: ${JSON.stringify(report.request_case_failures)}`);
 
 console.log(JSON.stringify({ python: report.python, versions: report.versions, snapshot_entries: report.snapshot_entries,

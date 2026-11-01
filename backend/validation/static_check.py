@@ -37,6 +37,11 @@ def run():
         snapshot.normalise(snapshot.capture(snapshot.dispatch_request())),
     )
 
+    from . import impact_snapshot
+    impact_diffs = snapshot.diff(
+        json.loads(impact_snapshot.IMPACT_FILE.read_text()),
+        snapshot.normalise(impact_snapshot.capture(snapshot.dispatch_request())))
+
     failures = []
     for name, method, path, body, expected in request_cases.INVALID + request_cases.VALID:
         parts = urlsplit(path)
@@ -57,6 +62,7 @@ def run():
         "pandas_importable": find_spec("pandas") is not None,
         "snapshot_entries": len(snapshot.load_snapshot()),
         "snapshot_diffs": [[p, repr(e)[:80], repr(a)[:80]] for p, e, a in snapshot_diffs[:10]],
+        "impact_map_diffs": [[p, repr(e)[:80], repr(a)[:80]] for p, e, a in impact_diffs[:10]],
         "request_cases": len(request_cases.INVALID) + len(request_cases.VALID),
         "request_case_failures": failures,
     }
@@ -65,7 +71,7 @@ def run():
 def main():
     report = run()
     print(json.dumps(report, indent=1))
-    return 0 if not report["snapshot_diffs"] and not report["request_case_failures"] else 1
+    return 0 if not (report["snapshot_diffs"] or report["impact_map_diffs"] or report["request_case_failures"]) else 1
 
 
 if __name__ == "__main__":

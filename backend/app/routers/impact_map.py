@@ -1,0 +1,59 @@
+"""Global Event Impact Map API (pilot: NVIDIA).
+
+    GET /api/impact-map/search?q=            which entity does the query mean, and does the register cover it
+    GET /api/impact-map/{entity_id}/events   up to five verified, approved-source events with typed paths
+    GET /api/impact-map/register             the register's policy and its own admissibility check
+
+All of it is pure and offline (no network at request time), so it runs unchanged in the
+in-browser (Pyodide) build. See docs/EVENT_IMPACT_MAP.md.
+"""
+from datetime import date
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Query
+
+from ..core import event_discovery, event_entities
+from ..core.data import STORE
+from ..request_validation import MAX_ID_CHARS
+
+router = APIRouter(prefix="/api/impact-map", tags=["impact-map"])
+
+
+def _issuer_or_404(entity_id: str) -> str:
+    entity_id = entity_id.upper()
+    entity = STORE.entity(entity_id)
+    if not entity or entity["node_type"] != "Company/Issuer":
+        raise HTTPException(404, f"Issuer '{entity_id}' not found")
+    return entity_id
+
+
+@router.get("/search")
+def search(q: str = Query(..., min_length=1, max_length=100)):
+    matches = event_entities.resolve_query(q)
+    out = []
+    for m in matches:
+        result = event_discovery.discover(m["entity_id"], limit=event_discovery.MAX_LIMIT, recency_days=730)
+        out.append({**m, "event_coverage": len(result["events"]) > 0,
+                    "events_in_register": len(result["events"]) + len([r for r in result["not_returned"] if "ranks below" in r["reason"]])})
+    return {"query": q, "matches": out,
+            "message": None if out else f"No issuer matches '{q}'. Nothing is guessed: try a company name or ticker."}
+
+
+@router.get("/register")
+def register():
+    return event_discovery.register_overview()
+
+
+@router.get("/{entity_id}/events")
+def events(entity_id: str,
+           limit: int = Query(5, ge=1, le=event_discovery.MAX_LIMIT),
+           recency_days: int = Query(event_discovery.DEFAULT_RECENCY_DAYS, ge=1, le=730),
+           as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$")):
+    entity_id = _issuer_or_404(entity_id)
+    when = None
+    if as_of is not None:
+        try:
+            when = date.fromisoformat(as_of)
+        except ValueError:
+            raise HTTPException(422, f"as_of '{as_of}' is not a real calendar date (use YYYY-MM-DD)")
+    return event_discovery.discover(entity_id, limit=limit, recency_days=recency_days, as_of=when)

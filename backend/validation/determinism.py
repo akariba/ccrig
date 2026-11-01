@@ -76,6 +76,9 @@ def requests(request) -> list:
     for i, text in enumerate(EVENT_TEXTS):
         out.append((f"event:{i}", "POST", "/api/event/parse", {"text": text}))
         out.append((f"event_hops3:{i}", "POST", "/api/event/parse", {"text": text, "max_hops": 3, "top_k": 30}))
+    out += [("impact_search", "GET", "/api/impact-map/search?q=NVIDIA", None), ("impact_register", "GET", "/api/impact-map/register", None),
+            ("impact_nvda", "GET", "/api/impact-map/NVDA/events", None), ("impact_nvda_30d", "GET", "/api/impact-map/NVDA/events?recency_days=30", None),
+            ("impact_nvda_wide", "GET", "/api/impact-map/NVDA/events?recency_days=730&limit=3", None), ("impact_tsm", "GET", "/api/impact-map/TSM/events", None)]
     for q in SEARCH_QUERIES:
         out.append((f"search:{q}", "GET", f"/api/search?q={q}", None))
     for preset in ("general", "supply_chain_shock", "market_funding_shock", "thematic_tech_shock"):
