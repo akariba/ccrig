@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from ..request_validation import EntityId, Weights, Preset, MAX_TOP_K
 from ..core.data import STORE
-from ..core import candidates, scoring, calibration
+from ..core import candidates, scoring, calibration, weight_usability
 from ..core.config import WEIGHT_PRESETS, DEFAULT_WEIGHTS
 
 router = APIRouter(prefix="/api/model-lab", tags=["model-lab"])
@@ -44,6 +44,9 @@ def score(req: ScoreRequest):
 
     cand = candidates.generate_candidates(entity_id)
     ranked = scoring.rank_candidates(entity_id, cand["candidate_ids"], weights, top_k=req.top_k)
+    if ranked["scored_pair_count"] == 0:
+        # An empty ranking here means "nothing could be computed", not "nothing is related".
+        raise HTTPException(422, weight_usability.ranking_problem(entity_id, cand["candidate_ids"], weights))
     return {
         "entity_id": entity_id,
         "weights_used": weights,
@@ -71,7 +74,10 @@ def pair(req: PairRequest):
     weights = req.weights
     if req.preset and req.preset in WEIGHT_PRESETS:
         weights = WEIGHT_PRESETS[req.preset]["weights"]
-    result = scoring.score_pair(a, b, weights or DEFAULT_WEIGHTS)
+    weights = weights or DEFAULT_WEIGHTS
+    result = scoring.score_pair(a, b, weights)
+    if result["composite"]["score"] is None:
+        raise HTTPException(422, weight_usability.pair_problem(a, b, weights))
     return result
 
 

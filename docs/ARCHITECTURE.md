@@ -77,6 +77,8 @@ Every response is a pure function of the request and the shipped data: it does n
 
 `frontend/src/api/pyodide-pins.json` is the single source of truth for the in-browser runtime: the Pyodide release (the npm `pyodide` dependency is pinned to the same exact version), the scientific packages Pyodide loads (`numpy`, `scipy`, `scikit-learn`), and exact `micropip` pins for everything fetched from PyPI (`fastapi` equal to `requirements.txt`, plus its resolved dependencies). Packages bundled by Pyodide (pydantic, networkx, ...) are fixed by the release; the file records their versions so drift is detected. These can differ from `requirements.txt` (the server's pins) - the analytical baseline in `backend/validation/` is what shows that results do not depend on the difference. pandas is not used by the application and is not installed.
 
+Weights are also checked for *usability*: if every component carrying weight has no data (ownership has none anywhere in this dataset; market components need price history; supply-chain needs a documented edge), the request is a `422` that names the components, says why, and lists the ones that do have data - it is never answered with an empty ranking that reads as "nothing is related". Dataset-wide cases are caught in the shared `Weights` validator (every weight-taking endpoint); entity- or pair-specific cases in `/score` and `/pair` (`app/core/weight_usability.py`). Scoring itself is unchanged: weighted components with missing values are still excluded and the rest re-normalised.
+
 ## API surface
 
 All endpoints are namespaced under `/api/*` and registered in `backend/app/main.py`:

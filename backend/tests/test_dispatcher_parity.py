@@ -31,7 +31,10 @@ INVALID, VALID = request_cases.INVALID, request_cases.VALID
 
 
 def _error_signature(body):
-    return sorted((tuple(e["loc"]), e["type"]) for e in body["detail"])
+    detail = body["detail"]
+    if isinstance(detail, str):              # an explicit explanation, identical on both paths
+        return [detail]
+    return sorted((tuple(e["loc"]), e["type"]) for e in detail)
 
 
 @pytest.mark.parametrize("case", INVALID, ids=[c[0] for c in INVALID])

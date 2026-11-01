@@ -12,6 +12,7 @@ from typing import Annotated, Dict
 
 from pydantic import AfterValidator, StringConstraints
 
+from .core import weight_usability
 from .core.config import DEFAULT_WEIGHTS, MAX_TOP_K, WEIGHT_PRESETS  # noqa: F401  (MAX_TOP_K re-exported for routers)
 
 MAX_TEXT_CHARS = 20_000       # headline / narrative / search box: far above any real input
@@ -36,6 +37,9 @@ def _check_weights(weights: Dict[str, float]) -> Dict[str, float]:
         raise ValueError(f"weights must be finite numbers between 0 and 1; got {bad}")
     if sum(weights.values()) <= 0:
         raise ValueError("at least one weight must be greater than 0")
+    problem = weight_usability.dataset_problem(weights)
+    if problem:
+        raise ValueError(problem)
     return weights
 
 

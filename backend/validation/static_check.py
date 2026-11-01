@@ -44,7 +44,10 @@ def run():
         ok = status == expected
         if expected == 422:
             detail = data.get("detail") if isinstance(data, dict) else None
-            ok = ok and isinstance(detail, list) and bool(detail) and detail[0]["loc"][0] in ("query", "body", "path")
+            if isinstance(detail, list):       # request-validation error
+                ok = ok and bool(detail) and detail[0]["loc"][0] in ("query", "body", "path")
+            else:                              # explicit "cannot be calculated" explanation
+                ok = ok and isinstance(detail, str) and bool(detail.strip())
         if not ok:
             failures.append([name, expected, status, str(data)[:160]])
 
