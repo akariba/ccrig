@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { feature } from "topojson-client";
 import {
-  arcControl, cableStyle, fitView, makeView, quadPoint, spreadOverlaps,
-  type Marker, type Phase, type Pt, type Scene,
+  arcControl, cableStyle, fitView, makeView, placeCallout, quadPoint, spreadOverlaps,
+  type Marker, type Rect, type Phase, type Pt, type Scene,
 } from "../impactmap/model";
 
 // World map with animated cables, driven entirely by real state:
@@ -60,7 +60,8 @@ export function ImpactMapCanvas(props: {
 
   const view = useMemo(() => makeView(width), [width]);
   const positions = useMemo(
-    () => spreadOverlaps(scene.markers.map((m) => ({ id: m.id, pt: view.project(m.lon, m.lat) as Pt })), 30),
+    // a marker never sits half outside the stage; its hairline still points at the true spot
+    () => spreadOverlaps(scene.markers.map((m) => ({ id: m.id, pt: view.project(m.lon, m.lat) as Pt })), 30, { w: view.width, h: view.height, edge: 18 }),
     [scene, view],
   );
 
@@ -81,6 +82,27 @@ export function ImpactMapCanvas(props: {
     const pts = [...relatedIds].map((id) => positions[id]).filter(Boolean);
     return fitView(pts, view.width, view.height, Math.max(40, view.width * 0.09));
   }, [wholeMap, selectedEventId, relatedIds, positions, view]);
+
+  // Markers the camera has framed out of view are hidden (not half-clipped); the list stays the way to reach them, and the button says how many.
+  const onScreen = (id: string) => {
+    const p = positions[id]; if (!p) return false;
+    const x = p[0] * camera.zoom + camera.tx, y = p[1] * camera.zoom + camera.ty;
+    return x >= 12 && x <= view.width - 12 && y >= 12 && y <= view.height - 12;
+  };
+  const outOfFrame = scene.markers.filter((m) => m.kind !== "region" && !onScreen(m.id)).length;
+
+  const calloutSide = useMemo(() => {
+    const sel = scene.markers.find((m) => m.kind === "event" && m.eventId === selectedEventId);
+    if (!sel || !positions[sel.id]) return "above" as const;
+    const at = (id: string): [number, number] => [positions[id][0] * camera.zoom + camera.tx, positions[id][1] * camera.zoom + camera.ty];
+    const boxes: Rect[] = scene.markers.filter((m) => m.id !== sel.id && positions[m.id] && m.kind !== "region" && onScreen(m.id)).map((m) => {
+      const [x, y] = at(m.id), dim = m.kind === "entity" && !relatedIds.has(m.id);
+      const w = m.kind === "event" ? 28 : dim ? 12 : 48, h = m.kind === "event" ? 28 : dim ? 12 : 22;
+      return { x: x - w / 2, y: y - h / 2, w, h };
+    });
+    return placeCallout(at(sel.id), { w: 230, h: 64 }, boxes, { w: view.width, h: view.height });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene, positions, camera, selectedEventId, relatedIds, view]);
 
   function sizeCanvas(c: HTMLCanvasElement) {
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -184,7 +206,7 @@ export function ImpactMapCanvas(props: {
         <canvas ref={cableRef} className="layer-cables" aria-hidden="true" />
         {phase === "ready" && scene.markers.map((m) => {
           const [x, y] = positions[m.id] ?? view.project(m.lon, m.lat);
-          const common = { style: { left: x, top: y } as React.CSSProperties, "data-marker-id": m.id };
+          const common = { style: { left: x, top: y, ...(onScreen(m.id) ? {} : { visibility: "hidden" as const }) } as React.CSSProperties, "data-marker-id": m.id };
           if (m.kind === "event") {
             const selected = m.eventId === selectedEventId, hovered = m.eventId === hoverEventId;
             return (
@@ -197,8 +219,8 @@ export function ImpactMapCanvas(props: {
                 onFocus={() => onHoverEvent(m.eventId as string)} onBlur={() => onHoverEvent(null)}
                 onKeyDown={(e) => { if (e.key === "Escape") onSelectEvent(null); }}
               >{m.rank}
-                {selected && <span className={`callout${y * camera.zoom + camera.ty < 130 ? " below" : ""}`} aria-hidden="true"><b>{m.place}</b><span>{m.label}</span></span>}
-                {hovered && !selected && <span className="tag" aria-hidden="true">{m.place ?? ""}</span>}</button>
+                {selected && view.width >= 600 && <span className={`callout ${calloutSide}`} aria-hidden="true"><b>{m.place}</b><span>{m.label}</span></span>}
+                {((hovered && !(selected && view.width >= 600)) || (selected && view.width < 600)) && <span className={`tag${x * camera.zoom + camera.tx > view.width * 0.7 ? " end" : x * camera.zoom + camera.tx < view.width * 0.3 ? " start" : ""}`} aria-hidden="true">{m.place ?? ""}</span>}</button>
             );
           }
           if (m.kind === "entity") {
@@ -217,7 +239,7 @@ export function ImpactMapCanvas(props: {
       </div>
       {phase === "loading" && <div className="impact-overlay" data-testid="impact-loading" role="status"><span className="spinner" />Loading verified events…</div>}
       {(phase === "empty" || phase === "error") && <div className="impact-overlay quiet" role="status">{phase === "error" ? "Events could not be loaded." : "No verified events to show for this search."}</div>}
-      {camera.zoom > 1.01 && <button type="button" className="impact-reset" onClick={() => setWholeMap(true)}>Show whole map</button>}
+      {camera.zoom > 1.01 && <button type="button" className="impact-reset" onClick={() => setWholeMap(true)}>Show whole map{outOfFrame ? ` (${outOfFrame} marker${outOfFrame === 1 ? "" : "s"} out of frame)` : ""}</button>}
       {wholeMap && selectedEventId && <button type="button" className="impact-reset" onClick={() => setWholeMap(false)}>Frame selection</button>}
     </div>
   );
