@@ -13,6 +13,14 @@ INGEST_DOC = {"id": "case_doc", "date": "2026-08-01", "title": "A title", "snipp
 
 # (id, method, path, body, expected_status)
 INVALID = [
+    ("today-bad-date", "GET", "/api/today?as_of=2026-13-45", None, 422),
+    ("today-garbage-date", "GET", "/api/today?as_of=garbage!!", None, 422),
+    ("network-bad-scope", "GET", "/api/network/graph?scope=bogus", None, 422),
+    ("network-hops-9", "GET", "/api/network/graph?scope=all&hops=9", None, 422),
+    ("network-ego-no-center", "GET", "/api/network/graph?scope=ego", None, 422),
+    ("stress-empty-shock", "POST", "/api/stress/run", {"shock": []}, 422),
+    ("stress-hops-9", "POST", "/api/stress/run", {"shock": ["rf:EQUITY"], "max_hops": 9}, 422),
+    ("health-sources-bad-date", "GET", "/api/health/sources?as_of=garbage!!", None, 422),
     ("search-empty", "GET", "/api/search?q=", None, 422),
     ("search-missing", "GET", "/api/search", None, 422),
     ("search-too-long", "GET", f"/api/search?q={TOO_LONG}", None, 422),
@@ -87,6 +95,21 @@ INVALID = [
 
 # Valid requests that previously worked (or must keep working) - bodies must match too.
 VALID = [
+    ("today-defaults", "GET", "/api/today?as_of=2026-11-02", None, 200),
+    ("today-watchlist", "GET", "/api/today?as_of=2026-11-02&watchlist=CP_HF_001,CP_SOV_BETA", None, 200),
+    ("network-watchlist", "GET", "/api/network/graph", None, 200),
+    ("network-ego", "GET", "/api/network/graph?scope=ego&center=CP_HF_001&hops=2", None, 200),
+    ("network-all-channels", "GET", "/api/network/graph?scope=all&channels=supply,shared", None, 200),
+    ("cp-page-ccr", "GET", "/api/cp/CP_HF_001", None, 200),
+    ("cp-page-holdings", "GET", "/api/cp/CP_ALPHA", None, 200),
+    ("cp-page-unknown", "GET", "/api/cp/NOPE", None, 404),
+    ("stress-scenarios", "GET", "/api/stress/scenarios", None, 200),
+    ("stress-run", "POST", "/api/stress/run", {"shock": ["rf:INTEREST_RATE"]}, 200),
+    ("stress-run-unknown", "POST", "/api/stress/run", {"shock": ["nobody"]}, 404),
+    ("health-pipeline", "GET", "/api/health/pipeline", None, 200),
+    ("health-sources", "GET", "/api/health/sources?as_of=2026-11-02", None, 200),
+    ("health-models", "GET", "/api/health/models", None, 200),
+    ("impact-map-reaches", "GET", "/api/impact-map/NVDA/events?include_reaches=true", None, 200),
     ("distance-map-no-params", "GET", "/api/distance-map/counterparty/CP_ALPHA", None, 200),
     ("distance-map-min-rho-only", "GET", "/api/distance-map/counterparty/CP_ALPHA?min_rho=0", None, 200),
     ("entities-defaults", "GET", "/api/entities", None, 200),

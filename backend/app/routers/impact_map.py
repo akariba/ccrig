@@ -70,7 +70,8 @@ def events(entity_id: str,
            recency_days: int = Query(event_discovery.DEFAULT_RECENCY_DAYS, ge=1, le=730),
            as_of: Optional[str] = Query(None, min_length=10, max_length=10, pattern=r"^\d{4}-\d{2}-\d{2}$"),
            mode: Literal["curated", "discovered"] = Query("curated"),
-           include_studio: bool = False):
+           include_studio: bool = False,
+           include_reaches: bool = False):
     """mode=curated (default): the approved-source register. mode=discovered: the latest dynamic discovery run, if this deployment can run one."""
     entity_id = _issuer_or_404(entity_id)
     when = _when(as_of)
@@ -89,4 +90,9 @@ def events(entity_id: str,
         out = bridge.discovered_response(entity_id, limit=limit, recency_days=recency_days, as_of=when, graph=graph)
     else:
         out = event_discovery.discover(entity_id, limit=limit, recency_days=recency_days, as_of=when, graph=graph)
+    if include_reaches:                      # opt-in: the default response (and its recorded baseline) is unchanged
+        from ..core import reaches
+
+        for ev in out.get("events", []):
+            ev["reaches"] = reaches.reaches_for([entity_id] + [e["entity_id"] for e in ev.get("entities", [])])
     return {**out, "studio_overlay": studio} if studio else out

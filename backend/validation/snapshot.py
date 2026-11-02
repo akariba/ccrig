@@ -73,6 +73,8 @@ def capture(request: Request) -> dict:
         status, data = request(method, path, body)
         if keys is not None and isinstance(data, dict):
             data = {k: data[k] for k in keys if k in data}
+        if name == "provenance" and isinstance(data, dict) and "generated_at" in data:
+            data = {**data, "generated_at": "<clock>"}       # wall-clock output (today's date): masked, so the baseline does not expire at midnight
         out[name] = {"status": status, "body": data}
     return out
 
