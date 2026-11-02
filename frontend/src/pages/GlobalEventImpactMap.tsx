@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { api, apiErrorMessage } from "../api/client";
 import { DataBadge } from "../components/Badge";
 import { GeoStage, type Mode } from "../components/GeoStage";
@@ -11,10 +12,13 @@ import {
 const WINDOWS = [30, 90, 180, 365, 730];
 type Status = "idle" | "loading" | "error" | "ok";
 
-export function GlobalEventImpactMap() {
+export interface Reach { id: string; name: string; via: string; hops: number; channel: string; strength: number | null }
+/** variant="compact" is the embedded map (Today, Counterparty): the same page logic with the search bar, the footer and the legend left out. */
+export function GlobalEventImpactMap({ variant = "full", entityId: fixedEntity, eventIds }: { variant?: "full" | "compact"; entityId?: string; eventIds?: string[] } = {}) {
+  const compact = variant === "compact";
   const [params, setParams] = useSearchParams();
   const nav = useNavigate();
-  const [query, setQuery] = useState(params.get("q") ?? "NVIDIA");
+  const [query, setQuery] = useState(params.get("q") ?? fixedEntity ?? "NVIDIA");
   const [days, setDays] = useState(WINDOWS.includes(Number(params.get("days"))) ? Number(params.get("days")) : 180);
   const [status, setStatus] = useState<Status>("idle");
   const [data, setData] = useState<ImpactResponse | null>(null);
@@ -33,11 +37,12 @@ export function GlobalEventImpactMap() {
   function setMode(m: Mode) {
     setParams((prev) => { const next = new URLSearchParams(prev); if (m === "auto") next.delete("view"); else next.set("view", m); return next; }, { replace: true });
   }
-  useEffect(() => {                                     // the workspace is dark and full-bleed; the sidebar and navigation stay as they are
+  useEffect(() => {                                     // the full map is a full-bleed workspace; the embedded one sits inside its page
+    if (compact) return;
     const el = document.querySelector(".main-content");
     el?.classList.add("impact-dark");
     return () => el?.classList.remove("impact-dark");
-  }, []);
+  }, [compact]);
   const latest = useRef(0);
   const selectedEventId = params.get("event");
 
@@ -45,14 +50,15 @@ export function GlobalEventImpactMap() {
     const id = ++latest.current;
     setStatus("loading"); setError(null); setMessage(null); setSelectedEntity(null); setComparison(null);
     try {
-      const found = await api.impactMapSearch(q);
+      const found = fixedEntity && !chosen && q === fixedEntity ? { matches: [{ entity_id: fixedEntity, name: fixedEntity, event_coverage: true }], message: null } : await api.impactMapSearch(q);
       if (id !== latest.current) return;
       setMatches(found.matches);
       if (found.matches.length === 0) { setData(null); setEntityId(null); setMessage(found.message); setStatus("ok"); return; }
       const target = chosen ?? found.matches[0].entity_id;
       const wantsStudio = new URLSearchParams(window.location.search).get("studio") === "1";
-      const result: ImpactResponse = await api.impactMapEvents(target, { recency_days: windowDays, ...(src === "discovered" ? { mode: "discovered" } : {}), ...(wantsStudio ? { include_studio: "true" } : {}) });
+      const result: ImpactResponse = await api.impactMapEvents(target, { recency_days: windowDays, include_reaches: "true", ...(src === "discovered" ? { mode: "discovered" } : {}), ...(wantsStudio ? { include_studio: "true" } : {}) });
       if (id !== latest.current) return;
+      if (eventIds) result.events = result.events.filter((e) => eventIds.includes(e.id));          // the embedded map on a counterparty shows only the events that reach it
       setEntityId(target); setData(result); setStatus("ok");
       // The page opens in the Global Overview (nothing selected). A valid ?event= deep link opens that event; an unknown one is dropped.
       // (Read the live URL: a functional setParams would use the render-time params and could undo a change made while the request was in flight.)
@@ -109,8 +115,14 @@ export function GlobalEventImpactMap() {
   const selected: ImpactEvent | undefined = data?.events.find((e) => e.id === selectedEventId);
 
   return (
-    <div className="iw">
-      <header className="iw-toolbar">
+    <div className={`iw${compact ? " compact" : ""}`}>
+      {compact && (
+        <header className="iw-toolbar compact">
+          <div className="iw-title"><span className="u-sec">Global event map</span><span>{data ? `${data.entity.name} · ${data.events.length} verified event${data.events.length === 1 ? "" : "s"} · ${source === "curated" ? "curated register" : "dynamic discovery"}` : "Loading…"}</span></div>
+          <Link className="btn secondary" data-testid="open-full-map" to={{ pathname: "/events", search: `?tab=map${entityId ? `&q=${encodeURIComponent(data?.entity.name ?? entityId)}` : ""}${selectedEventId ? `&event=${encodeURIComponent(selectedEventId)}` : ""}` }}>Open full map</Link>
+        </header>
+      )}
+      {!compact && (<header className="iw-toolbar">
         <div className="iw-title">
           <h1>Global Event Impact Map</h1>
           <span>Verified events and documented relationships · impact is not estimated</span>
@@ -141,7 +153,7 @@ export function GlobalEventImpactMap() {
             {matches.map((m) => <span key={m.entity_id} className="pill" role="button" tabIndex={0} onClick={() => run(query, days, m.entity_id)}>{m.name}{m.event_coverage ? "" : " (no events)"}</span>)}
           </div>
         )}
-      </header>
+      </header>)}
 
       {error && (
         <div className="warning-box" role="alert" data-testid="impact-error">
@@ -175,7 +187,7 @@ export function GlobalEventImpactMap() {
       <div className="iw-body">
         <section className="iw-map" aria-label="Map">
           <GeoStage scene={scene} phase={phase} selectedEventId={selectedEventId} selectedEntityId={selectedEntity} hoverEventId={hoverEventId}
-            mode={mode} animate={animate} onMode={setMode} onAnimate={setAnimate}
+            mode={mode} variant={variant} animate={animate} onMode={setMode} onAnimate={setAnimate}
             canInvestigate={!!data && data.events.length > 0} onOverview={() => selectEvent(null)} onInvestigate={() => data?.events[0] && selectEvent(data.events[0].id)}
             onSelectEvent={selectEvent} onSelectEntity={(id) => { setSelectedEntity(id); }} onHoverEvent={setHoverEventId} />
         </section>
@@ -194,14 +206,14 @@ export function GlobalEventImpactMap() {
                   className={`impact-event-item${e.id === selectedEventId ? " selected" : ""}`} style={{ ["--cat" as string]: categoryStyle(e.category).color }} onClick={() => selectEvent(e.id === selectedEventId ? null : e.id)}
                   onMouseEnter={() => setHoverEventId(e.id)} onMouseLeave={() => setHoverEventId(null)} onFocus={() => setHoverEventId(e.id)} onBlur={() => setHoverEventId(null)}>
                   <span className="rank">{i + 1}</span>
-                  <span><b>{e.title}</b><span className="meta">{formatDate(e.published_date)} · {e.location.mapped ? e.location.label : "location not mapped"} · {categoryStyle(e.category).label}</span></span>
+                  <span><b>{e.title}</b><span className="meta">{formatDate(e.published_date)} · {e.location.mapped ? e.location.label : "location not mapped"} · {categoryStyle(e.category).label}</span>{e.reaches && e.reaches.length > 0 && <span className="meta reach-count" data-testid="reach-count">reaches {e.reaches.length} counterpart{e.reaches.length === 1 ? "y" : "ies"}</span>}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {selectedEntity && data && <EntityBlock data={data} entityId={selectedEntity} onOpen={() => nav(`/issuer/${selectedEntity}`)} onClose={() => setSelectedEntity(null)} />}
-          {selected ? <EventPanel event={selected} names={names} onClose={() => selectEvent(null)} /> : (
+          {selected && compact ? <CompactEvent event={selected} onClose={() => selectEvent(null)} /> : selected ? <EventPanel event={selected} names={names} onClose={() => selectEvent(null)} /> : (
             <div className="iw-card" data-testid="no-selection">
               <div className="iw-h">Global overview</div>
               {overview ? (
@@ -218,7 +230,7 @@ export function GlobalEventImpactMap() {
         </aside>
       </div>
 
-      <footer className="iw-foot">
+      {!compact && (<footer className="iw-foot">
         <div className="pill-list" data-testid="semantics-key" aria-label="What each kind of information means">
           <span className="pill" title="Events are read from a reviewed register or from a discovery run an operator made; this page never searches the live web">{source === "curated" ? "Curated register, not live news search" : "Operator-run discovery in approved sources, not live news search"}</span>
           {source === "discovered" && <span className="pill" title="The retrieved source contains the quoted text and date; that is not independent corroboration">Machine-verified, not corroborated</span>}
@@ -253,7 +265,7 @@ export function GlobalEventImpactMap() {
             <ul style={{ paddingLeft: 18, margin: "8px 0 0", fontSize: 12, color: "var(--text-muted)" }}>{data.limitations.map((l, i) => <li key={i}>{l}</li>)}</ul>
           </details>
         )}
-      </footer>
+      </footer>)}
     </div>
   );
 }
@@ -331,6 +343,8 @@ function EventPanel({ event, names, onClose }: { event: ImpactEvent; names: Reco
         </details>
       </div>
 
+      <ReachesBlock event={event} />
+
       <div className="impact-block neutral" data-testid="impact-block">
         <h4>Impact</h4>
         <dl className="impact-kv">
@@ -368,6 +382,35 @@ function ComparisonTable({ c }: { c: Comparison }) {
       </table>
       <p style={{ color: "var(--text-muted)", margin: "6px 0 0" }}>Matching rule: {c.basis}.</p>
       <ul style={{ margin: "6px 0 0", paddingLeft: 18, color: "var(--text-muted)" }}>{c.how_they_differ.map((t, i) => <li key={i}>{t}</li>)}</ul>
+    </div>
+  );
+}
+
+/** Counterparties with exposure to (or a reference on) a company the event names, or one documented supply step from one. A statement about connectivity, not about loss. */
+export function ReachesBlock({ event }: { event: ImpactEvent }) {
+  const r = event.reaches ?? [];
+  return (
+    <div className="impact-block" data-testid="reaches">
+      <h4>Reaches</h4>
+      {r.length === 0 ? <p style={{ fontSize: 12, margin: 0 }}>No counterparty in the data has exposure to the companies this event names.</p> : (
+        <div className="reach-row">{r.map((x) => <Link key={x.id} className="u-chip" data-testid="reach-chip" to={`/cp/${encodeURIComponent(x.id)}`} title={`${x.hops === 0 ? "exposure to" : "one supply step from"} ${x.via}`}>{x.name}<small> · {x.hops === 0 ? x.via : `via ${x.via}`}</small></Link>)}</div>
+      )}
+      <p className="impact-note" style={{ margin: "6px 0 0" }}>Connectivity only (synthetic exposure data). No impact is estimated.</p>
+    </div>
+  );
+}
+
+function CompactEvent({ event, onClose }: { event: ImpactEvent; onClose: () => void }) {
+  const loc = event.location;
+  return (
+    <div className="card" data-testid="event-panel" data-event-id={event.id}>
+      <div className="hstack" style={{ justifyContent: "space-between", alignItems: "flex-start" }}>
+        <h3 style={{ margin: 0, fontSize: 14 }}>{event.title}</h3>
+        <button type="button" className="btn secondary" onClick={onClose} aria-label="Close event details">Close</button>
+      </div>
+      <p className="impact-note">{formatDate(event.published_date)} · {loc.mapped ? loc.label : "location not mapped"} · {event.sources[0]?.publisher}</p>
+      {event.evidence[0] && <blockquote className="impact-quote">{event.evidence[0].quote}</blockquote>}
+      <ReachesBlock event={event} />
     </div>
   );
 }

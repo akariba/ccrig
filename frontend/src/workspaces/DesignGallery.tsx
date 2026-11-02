@@ -1,11 +1,13 @@
 // The design system on one page (Admin → /admin/ui): every shared component, in every state, with placeholder data.
 // Nothing here is real data; it exists so a component can be seen, tested in the browser and reviewed in both themes.
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { DataTable, type Column } from "../ui/DataTable";
 import { Heatmap, PropagationFlow } from "../ui/charts";
 import { CHANNELS, type Channel, type Severity } from "../ui/channels";
 import { ChannelChip, EmptyState, ErrorState, FilterBar, KpiTile, ProvenanceBadge, SeverityPill, Skeleton, Tabs } from "../ui/primitives";
-import { NetworkCanvas, type NetEdge, type NetNode, type NetSelection } from "../ui/NetworkCanvas";
+import { NetworkCanvas, type NetSelection, type NetworkHandle } from "../ui/NetworkCanvas";
+import { NodeGuide, ChannelLegend } from "../ui/NetworkCanvas/NodeGuide";
+import type { GEdge, GNode } from "../ui/NetworkCanvas/types";
 import { Timeline } from "../ui/Timeline";
 import { useInspector } from "../ui/InspectorDrawer";
 
@@ -19,13 +21,16 @@ const cols: Column<Row>[] = [
   { key: "move", header: "Key move", unit: "$mm", align: "right", value: (r) => r.move },
 ];
 const chans = Object.keys(CHANNELS) as Channel[];
-const nodes: NetNode[] = Array.from({ length: 24 }, (_, i) => ({ id: `n${i}`, label: i < 8 ? `Counterparty ${String.fromCharCode(65 + i)}` : `Issuer ${String.fromCharCode(65 + i - 8)}`, kind: i < 8 ? "counterparty" : "issuer", size: ((i * 7) % 10) / 10, importance: ((i * 7) % 10) / 10 }));
-const edges: NetEdge[] = Array.from({ length: 40 }, (_, i) => ({ id: `e${i}`, source: `n${i % 8}`, target: `n${8 + ((i * 5) % 16)}`, channel: chans[i % chans.length], strength: 0.3 + ((i * 3) % 7) / 10, confidence: 0.4 + ((i * 11) % 6) / 10, directed: i % 3 === 0 }));
+const PRI = ["CRITICAL", "HIGH", "MEDIUM", "LOW"] as const;
+const nodes: GNode[] = Array.from({ length: 24 }, (_, i) => i < 8
+  ? { id: `n${i}`, kind: "counterparty", label: `Counterparty ${String.fromCharCode(65 + i)}`, tag: `Counterparty ${String.fromCharCode(65 + i)}`, cp: { utilisation: 30 + ((i * 17) % 90), rating: i % 3 === 0 ? null : ["A", "BBB", "AA-"][i % 3], outlook: null, priority: PRI[i % 4], ews: i === 2 ? 0.8 : null, holdingsOnly: false, flags: { wwr: i % 4 === 1, overdue: i === 0, nearLimit: i % 3 === 2, negativeOutlook: null } } }
+  : { id: `n${i}`, kind: i % 5 === 0 ? "factor" : "issuer", label: `Issuer ${String.fromCharCode(65 + i - 8)}`, tag: `I${i}`, group: ["Technology", "Financials", "Energy"][i % 3] });
+const edges: GEdge[] = Array.from({ length: 40 }, (_, i) => ({ id: `e${i}`, source: `n${i % 8}`, target: `n${8 + ((i * 5) % 16)}`, channel: chans[i % chans.length], strength: 0.3 + ((i * 3) % 7) / 10, confidence: 0.4 + ((i * 11) % 6) / 10, directed: i % 3 === 0 }));
 const labels = Array.from({ length: 6 }, (_, i) => `Issuer ${String.fromCharCode(65 + i)}`);
 const cells: [number, number, number | null][] = labels.flatMap((_, y) => labels.map((__, x): [number, number, number | null] => [x, y, x === y ? 1 : x + y === 5 ? null : Math.round(((x * 7 + y * 3) % 10)) / 10]));
 
 export default function DesignGallery() {
-  const [tab, setTab] = useState("one"), [sel, setSel] = useState<NetSelection>(null), [open, setOpen] = useState<string | null>(null), insp = useInspector();
+  const net = useRef<NetworkHandle>(null), [tab, setTab] = useState("one"), [sel, setSel] = useState<NetSelection>(null), [open, setOpen] = useState<string | null>(null), insp = useInspector();
   const flow = useMemo(() => ({ nodes: [{ name: "Headline" }, { name: "Issuer A" }, { name: "Issuer B" }, { name: "Counterparty A" }, { name: "Counterparty B" }], links: [{ source: "Headline", target: "Issuer A", value: 0.8 }, { source: "Headline", target: "Issuer B", value: 0.4 }, { source: "Issuer A", target: "Counterparty A", value: 0.6 }, { source: "Issuer B", target: "Counterparty A", value: 0.2 }, { source: "Issuer B", target: "Counterparty B", value: 0.3 }] }), []);
   return (
     <div className="u-host"><div className="u-host-head"><h1>Design system</h1><p className="u-muted">Every shared component with placeholder data. Not product data.</p></div>
@@ -39,7 +44,7 @@ export default function DesignGallery() {
         <section className="card"><h2>Tabs and filters</h2><Tabs label="Example tabs" value={tab} onChange={setTab} tabs={[{ id: "one", label: "One" }, { id: "two", label: "Two", count: 4 }, { id: "three", label: "Three" }]} />
           <FilterBar active={open !== null} onClear={() => setOpen(null)}><select aria-label="Example filter" value={open ?? ""} onChange={(e) => setOpen(e.target.value || null)}><option value="">Any severity</option>{SEVS.map((s) => <option key={s}>{s}</option>)}</select></FilterBar></section>
         <section className="card"><h2>Data table (320 rows, virtualised, sort, filter, columns, CSV)</h2><DataTable label="Example counterparties" rows={rows.filter((r) => !open || r.sev === open)} rowKey={(r) => r.id} columns={cols} maxHeight={300} onRowClick={(r) => insp.openCustom({ title: r.name, facts: [["Utilisation", `${r.util}%`]], href: "/admin/ui" })} defaultSort={{ key: "util", dir: "desc" }} /></section>
-        <section className="card"><h2>Network canvas</h2><NetworkCanvas label="Example network" nodes={nodes} edges={edges} selected={sel} onSelect={setSel} height={380} />{sel && <p className="u-muted">Selected {sel.type}: {sel.id}</p>}</section>
+        <section className="card"><h2>Network canvas</h2><ChannelLegend visible={new Set(chans)} onToggle={() => undefined} /><div className="u-row"><button type="button" className="btn secondary" onClick={() => net.current?.highlight(["n0", "n9", "n12"])}>Highlight three nodes</button><button type="button" className="btn secondary" onClick={() => net.current?.highlight([])}>Clear highlight</button></div><NetworkCanvas ref={net} label="Example network" nodes={nodes} edges={edges} selected={sel} onSelect={setSel} height={380} guide={<NodeGuide />} />{sel && <p className="u-muted">Selected {sel.type}: {sel.id}</p>}</section>
         <section className="card"><h2>Heatmap and propagation flow</h2><div className="u-two"><Heatmap label="Example heatmap" xLabels={labels} yLabels={labels} cells={cells} height={320} /><PropagationFlow label="Example propagation flow" nodes={flow.nodes} links={flow.links} height={320} /></div></section>
         <section className="card"><h2>Timeline</h2><Timeline label="Example timeline" lanes={["Direct", "Via linked names"]} items={[{ id: "a", at: "2026-07-01", lane: "Direct", label: "Example item", severity: "high" }, { id: "b", at: "2026-07-09", lane: "Via linked names", label: "Another item", severity: "med" }, { id: "c", at: "2026-07-20", lane: "Direct", label: "Third item", severity: "crit" }]} /></section>
         <section className="card"><h2>States</h2><div className="u-two"><div><h3>Loading</h3><Skeleton /></div><div><h3>Empty</h3><EmptyState title="No items for this watchlist" hint="Change the watchlist or the date." /></div></div><h3>Error</h3><ErrorState message="The request failed (example)." onRetry={() => undefined} /></section>

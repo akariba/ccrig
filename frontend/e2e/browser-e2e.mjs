@@ -55,7 +55,7 @@ const settled = async (page) => { await page.waitForFunction(() => !document.que
 // The old 16 pages now live in workspaces; a "view" is (sidebar item, tab, the heading the old page still shows).
 const VIEWS = {
   "Relationships": ["Network", "Search relationships"], "Events": ["Events & News", "Analyse a headline"], "Event Impact Map": ["Events & News", "Map"], "Theme Radar": ["Events & News", "Themes"],
-  "Counterparties": ["Counterparty", null], "Controls": ["Today", "Controls"], "Inbox": ["Today", "Inbox"], "Exposure Movers": ["Today", "Exposure movers"],
+  "Counterparties": ["Counterparty", null], "Controls": ["@/?tab=controls", null], "Inbox": ["@/?tab=inbox", null], "Exposure Movers": ["@/?tab=movers", null],     // the detail tables sit behind ?tab= on Today now
   "Graph Explorer": ["Network", "Graph"], "Distance Map": ["Network", "Distance map"], "Model Lab": ["Models", "Weights"], "Backtest Lab": ["Models", "Backtest"], "Data Sources": ["Data sources", null], "Entity Explorer": ["@/issuer", null],     // an issuer page has no sidebar item: it is reached from search and links
 };
 const clientNav = async (page, path) => { await page.evaluate((u) => { history.pushState({}, "", u); window.dispatchEvent(new PopStateEvent("popstate")); }, new URL(BASE).pathname.replace(/\/$/, "") + path); };
@@ -95,8 +95,8 @@ try {
   await shot(page, "01_relationships");
 
   // ------------------------------------------------------------------ 2. navigation over all views
-  const NAV = [["Events", "Event Studio"], ["Event Impact Map", "Global Event Impact Map"], ["Counterparties", "Counterparty 360"], ["Controls", "Control Exceptions"], ["Inbox", "Inbox"],
-    ["Entity Explorer", "Entity 360"], ["Exposure Movers", "Exposure Movers"], ["Graph Explorer", "Interactive Graph Explorer"],
+  const NAV = [["Events", "Event Studio"], ["Event Impact Map", "Global Event Impact Map"], ["Counterparties", "Counterparty"], ["Controls", "Control Exceptions"], ["Inbox", "Inbox"],
+    ["Entity Explorer", "Entity 360"], ["Exposure Movers", "Exposure Movers"], ["Graph Explorer", "Network"],
     ["Distance Map", "Distance Map"], ["Theme Radar", "Dynamic Theme Radar"], ["Model Lab", "Model Lab"], ["Backtest Lab", "Backtest Lab"],
     ["Data Sources", "Data & Provenance Explorer"], ["Relationships", "Relationships"]];
   for (const [label, heading] of NAV) {
@@ -270,7 +270,7 @@ try {
     check("impact map: Retry recovers", (await page.getByTestId("event-marker").count()) >= 1);
   }
   // approved relationships (Data Studio overlay): off by default; where no Studio exists the page says so and shows only the canonical graph
-  await navAndWait(page, "Graph Explorer", "Interactive Graph Explorer");
+  await navAndWait(page, "Graph Explorer", "Network");
   check("graph explorer: approved relationships are off by default", (await page.getByTestId("include-studio").isChecked()) === false && (await page.getByTestId("studio-overlay-note").count()) === 0);
   await page.getByTestId("include-studio").click();
   await page.getByTestId("studio-overlay-note").waitFor({ timeout: SLOW });
@@ -390,17 +390,20 @@ try {
   await page.locator("select").first().selectOption({ index: 2 }).catch(() => {}); await settled(page);
   check("distance map: changing Min rho filter works", (await page.locator(".warning-box").allInnerTexts()).every((t) => !/422|Query/.test(t)));
 
-  // ------------------------------------------------------------------ 6. Counterparty 360
-  await navAndWait(page, "Counterparties", "Counterparty 360");
-  await page.getByText("Alpha Quant Capital LP").first().click();
+  // ------------------------------------------------------------------ 6. Counterparty page (both counterparty universes, honest about what each has)
+  await navAndWait(page, "Counterparties", "Counterparty");
+  await page.getByTestId("cp-select").selectOption("CP_ALPHA");
   await page.locator("h2", { hasText: "Alpha Quant Capital LP" }).waitFor({ timeout: SLOW });
+  await page.getByTestId("cp-links").locator("table tbody tr").first().waitFor({ timeout: SLOW });
   await settled(page);
   const cp360 = await page.locator("body").innerText();
-  check("counterparty 360: portfolio-holdings counterparty selected, shows its holdings and issuer-only indirect relationships",
-    /PORTFOLIO-HOLDINGS INTELLIGENCE/.test(cp360) && /NVDA[\s\S]{0,40}HOLDS_EQUITY[\s\S]{0,20}32%/.test(cp360) && /No CCR investigation record/.test(cp360), "");
-  const ccrOnly = await page.locator("main").getByText("Sovereign Debt Office — Nation Alpha").first().click().then(() => page.getByText(/No portfolio-holdings data for this counterparty \(CCR-only record\)/).waitFor({ timeout: SLOW })).then(() => true).catch(() => false);
-  check("counterparty 360: a CCR-only record says so instead of failing", ccrOnly);
-  await shot(page, "06_counterparty_360");
+  check("counterparty page: a holdings-only counterparty shows its holdings as exposure links to issuers, and says it has no CCR record",
+    /Holdings only \(no CCR record\)/.test(cp360) && /NVIDIA Corporation[\s\S]{0,40}Exposure/i.test(cp360) && /No exposure record/.test(cp360), "");
+  await page.getByTestId("cp-select").selectOption("CP_PUB_ALPHA");
+  await page.locator("h2", { hasText: "Sovereign Debt Office" }).first().waitFor({ timeout: SLOW }); await settled(page);
+  const ccrOnly = /No recorded relationships/.test(await page.locator("body").innerText()) && (await page.getByTestId("rating").innerText()).includes("Unavailable");
+  check("counterparty page: a CCR-only record with no links says so, and its missing rating reads Unavailable", ccrOnly);
+  await shot(page, "06_counterparty_page");
 
   // ------------------------------------------------------------------ 7. Backtest Lab (corrected methodology)
   await navAndWait(page, "Backtest Lab", "Backtest Lab");

@@ -7,7 +7,7 @@ export const PAGES: PageDef[] = [
   { id: "counterparty", label: "Counterparty", to: "/cp", icon: "building", group: "primary", blurb: "Everything about one counterparty." },
   { id: "relationship", label: "Relationship", to: "/rel", icon: "link", group: "primary", blurb: "Why are these two linked, how strongly, and since when?" },
   { id: "events", label: "Events & News", to: "/events", icon: "news", group: "primary", blurb: "What is happening to the names I follow, and who else does it touch?" },
-  { id: "stress", label: "Stress & Shocks", to: "/stress", icon: "bolt", group: "primary", blurb: "If X breaks, who gets hit, how hard, and which limits fail?", status: "planned" },
+  { id: "stress", label: "Stress & Shocks", to: "/stress", icon: "bolt", group: "primary", blurb: "If X breaks, who gets hit, how hard, and which limits fail?" },
   { id: "comovement", label: "Co-movement", to: "/comovement", icon: "wave", group: "primary", blurb: "Which names move together, in calm vs stress, and is that changing?", status: "planned" },
   { id: "models", label: "Models", to: "/models", icon: "sliders", group: "secondary", blurb: "Are the weights and rankings any good?" },
   { id: "sources", label: "Data sources", to: "/admin/sources", icon: "db", group: "secondary", blurb: "Where does every number come from?" },

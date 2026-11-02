@@ -102,6 +102,15 @@ export const api = {
     return req<any>(`/api/impact-map/${encodeURIComponent(entityId)}/compare${qs ? "?" + qs : ""}`);
   },
 
+  today: (asOf: string, watchlist: string[]) => req<any>(`/api/today?as_of=${asOf}${watchlist.length ? `&watchlist=${encodeURIComponent(watchlist.join(","))}` : ""}`),
+  counterpartyPage: (id: string) => req<any>(`/api/cp/${encodeURIComponent(id)}`),
+  networkGraph: (params: Record<string, string | number | boolean>) => req<any>(`/api/network/graph?${new URLSearchParams(Object.entries(params).map(([k, v]) => [k, String(v)])).toString()}`),
+  stressScenarios: () => req<any>("/api/stress/scenarios"),
+  stressRun: (body: { shock: string[]; max_hops?: number; label?: string }) => req<any>("/api/stress/run", { method: "POST", body: JSON.stringify(body) }),
+  healthPipeline: () => req<any>("/api/health/pipeline"),
+  healthSources: (asOf?: string) => req<any>(`/api/health/sources${asOf ? `?as_of=${asOf}` : ""}`),
+  healthModels: () => req<any>("/api/health/models"),
+
   distanceMapCounterparties: () => req<any>("/api/distance-map/counterparties"),
   distanceMapForCounterparty: (id: string, params: Record<string, string | number> = {}) => {
     const qs = new URLSearchParams(params as any).toString();

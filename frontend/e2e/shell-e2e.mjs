@@ -57,7 +57,7 @@ try {
   check("404: an unknown address shows a designed not-found page with a way back, and the document title says so", (await page.locator("main h1").innerText()) === "Page not found" && (await page.title()) === "Page not found · CCRIG" && (await page.getByRole("link", { name: "Go to Today" }).count()) === 1);
 
   // ------------------------------------------------------------ URL state: tabs, reload, back button
-  await visit(page, ""); await page.getByRole("tab", { name: "Controls" }).click(); await settle(page);
+  await visit(page, "?tab=inbox"); await page.getByRole("tab", { name: "Controls" }).click(); await settle(page);
   check("url state: the selected tab is in the URL", pathOf(page) === "/?tab=controls");
   await page.reload({ waitUntil: "load" }); await settle(page);
   check("url state: a reload keeps the tab (shareable view)", (await page.getByRole("tab", { name: "Controls" }).getAttribute("aria-selected")) === "true");
@@ -89,9 +89,9 @@ try {
   check("palette: Escape closes it and focus returns to the page", (await dlg.count()) === 0);
 
   // ------------------------------------------------------------ watchlist and as-of (shell state in the URL)
-  await visit(page, ""); await page.waitForSelector(".u-chips .u-chip", { timeout: 15000 });
+  await visit(page, "?tab=inbox"); await page.waitForSelector(".u-chips .u-chip", { timeout: 15000 });
   const chips0 = await page.locator(".u-chips .u-chip").count();
-  check("watchlist: defaults to the highest-priority counterparties (chips shown, no parameter in the URL)", chips0 === 3 && !/wl=/.test(page.url()));
+  check("watchlist: defaults to the highest-priority counterparties (chips shown, no parameter in the URL)", chips0 === 2 && !/wl=/.test(page.url()));
   await page.locator(".u-chip-more").click();
   const boxes = page.locator(".u-pop-list input[type=checkbox]");
   const total = await boxes.count(), checked0 = await page.locator(".u-pop-list input:checked").count();
@@ -128,7 +128,7 @@ try {
   check("theme: System removes the override", (await page.evaluate(() => document.documentElement.dataset.theme)) === undefined);
   await ctx.close();
   ({ ctx, page } = await open("", { scheme: "dark" }));
-  check("theme: with no choice, the OS dark scheme is followed", (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === "rgb(14, 20, 24)");
+  check("theme: with no choice, the OS dark scheme is followed", (await page.evaluate(() => getComputedStyle(document.body).backgroundColor)) === "rgb(6, 17, 26)");
   await ctx.close();
 
   // ------------------------------------------------------------ design system gallery
@@ -152,8 +152,8 @@ try {
   await page.getByRole("button", { name: "View as table" }).first().click();
   check("charts: 'View as table' shows the same data as text", (await page.getByRole("table", { name: /\(table\)/ }).first().locator("tbody tr").count()) > 3);
   await page.getByRole("button", { name: "View chart" }).first().click();
-  await page.waitForSelector(".u-net-canvas canvas", { timeout: 30000 });
-  check("network canvas: the graph renders; the list view gives a text alternative", (await page.locator(".u-net-canvas canvas").count()) >= 1 && await (async () => { await page.getByRole("button", { name: "List view" }).click(); return (await page.getByRole("table", { name: /nodes/ }).count()) === 1; })());
+  await page.waitForSelector(".nc-canvas", { timeout: 30000 });
+  check("network canvas: the graph renders; the list view gives a text alternative", (await page.locator(".nc-canvas").count()) >= 1 && await (async () => { await page.getByRole("button", { name: "List view" }).click(); return (await page.getByRole("table", { name: /nodes/ }).count()) === 1; })());
   await page.getByRole("button", { name: "View graph" }).click();
   await page.screenshot({ path: SHOTS + "05-design-gallery-light.png", fullPage: false });
   await page.getByRole("group", { name: "Colour theme" }).getByRole("button", { name: "Dark", exact: true }).click(); await settle(page);
