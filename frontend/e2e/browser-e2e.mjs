@@ -284,7 +284,7 @@ try {
   const studioReqs = [];
   const onReq = (r) => { if (/\/api\/studio\/(flow|jobs|datasets)/.test(r.url())) studioReqs.push(r.url()); };
   page.on("request", onReq);
-  check("admin: operator tools are not in the analyst navigation when the operator switch is off", (await page.locator("nav a", { hasText: /Data Intelligence Studio|Ingest Bench/ }).count()) === 0);
+  check("admin: the Studio is not in the analyst navigation when the operator switch is off, the Ingest Bench is", (await page.locator("nav a", { hasText: /Data Intelligence Studio/ }).count()) === 0 && (await page.locator("nav a", { hasText: /^Ingest Bench$/ }).count()) === 1);
   await clientNav(page, "/admin/studio");
   await page.getByTestId("studio-page").waitFor({ timeout: SLOW });
   await page.waitForFunction(() => document.querySelector('[data-testid="studio-page"]')?.dataset.source === "recording", null, { timeout: SLOW });

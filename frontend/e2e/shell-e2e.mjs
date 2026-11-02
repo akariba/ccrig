@@ -33,15 +33,15 @@ try {
   let { ctx, page } = await open("");
   check("shell: workspaces in the sidebar match the spec, in order, with the labels used as page titles", JSON.stringify(await page.locator("nav a").evaluateAll((a) => a.slice(0, 7).map((x) => x.textContent.replace(/soon$/, "")))) === JSON.stringify(["Today", "Network", "Counterparty", "Relationship", "Events & News", "Stress & Shocks", "Co-movement"]));
   check("shell: every sidebar item is a real link (href) and keyboard focusable", await page.locator("nav a").evaluateAll((a) => a.every((x) => x.getAttribute("href")?.startsWith("/") && x.tabIndex >= 0)));
-  const titles = [["/", "Today"], ["/network", "Network"], ["/cp", "Counterparty"], ["/rel", "Relationship"], ["/events", "Events & News"], ["/stress", "Stress & Shocks"], ["/comovement", "Co-movement"], ["/models", "Models"], ["/admin/sources", "Data sources"]];
+  const titles = [["/", "Today"], ["/network", "Network"], ["/cp", "Counterparty"], ["/rel", "Relationship"], ["/events", "Events & News"], ["/stress", "Stress & Shocks"], ["/comovement", "Co-movement"], ["/models", "Models"], ["/admin/sources", "Data sources"], ["/admin/ingest", "Ingest Bench"]];
   let titlesOk = true, detail = "";
   for (const [p, label] of titles) {
     await page.locator(`nav a[href="${p}"]`).click(); await page.waitForFunction((l) => document.title === `${l} · CCRIG`, label, { timeout: 15000 }).catch(() => {});
     const h = await page.locator("main h1").first().innerText().catch(() => ""), t = await page.title();
-    if (!(t === `${label} · CCRIG` && (h === label || (label === "Data sources" && /Data & Provenance/.test(h))))) { titlesOk = false; detail += ` ${p}:[${t}|${h}]`; }
+    if (!(t === `${label} · CCRIG` && (h === label || (label === "Data sources" && /Data & Provenance/.test(h)) || (label === "Ingest Bench" && /Haiku/.test(h))))) { titlesOk = false; detail += ` ${p}:[${t}|${h}]`; }
   }
   check("shell: for every workspace the sidebar label, the URL, the document title and the page heading agree", titlesOk, detail);
-  check(`shell: the Admin group is ${operator ? "shown" : "hidden"} (operator switch ${operator ? "on" : "off"})`, (await page.locator("nav a", { hasText: /Data Intelligence Studio|Ingest Bench/ }).count()) === (operator ? 2 : 0));
+  check(`shell: the Admin group is ${operator ? "shown" : "hidden"} (operator switch ${operator ? "on" : "off"})`, (await page.locator("nav a", { hasText: /Data Intelligence Studio/ }).count()) === (operator ? 1 : 0) && (await page.locator("nav a", { hasText: /^Ingest Bench$/ }).count()) === 1);
   await visit(page, ""); await page.keyboard.press("Tab"); await page.keyboard.press("Enter");
   check("accessibility: the skip link is the first tab stop and moves focus to the main content", await page.evaluate(() => document.activeElement?.id === "main"));
   await page.screenshot({ path: SHOTS + "01-today-light.png" });

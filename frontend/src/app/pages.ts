@@ -11,10 +11,10 @@ export const PAGES: PageDef[] = [
   { id: "comovement", label: "Co-movement", to: "/comovement", icon: "wave", group: "primary", blurb: "Which names move together, in calm vs stress, and is that changing?", status: "planned" },
   { id: "models", label: "Models", to: "/models", icon: "sliders", group: "secondary", blurb: "Are the weights and rankings any good?" },
   { id: "sources", label: "Data sources", to: "/admin/sources", icon: "db", group: "secondary", blurb: "Where does every number come from?" },
+  { id: "ingest", label: "Ingest Bench", to: "/admin/ingest", icon: "gauge", group: "secondary", blurb: "Watch data being loaded: an animated console (a labelled simulation unless a live run exists)." },
 ];
 export const ADMIN_PAGES: PageDef[] = [
   { id: "studio", label: "Data Intelligence Studio", to: "/admin/studio", icon: "layers", group: "secondary", blurb: "Governed ingestion with review and rollback." },
-  { id: "ingest", label: "Ingest Bench", to: "/admin/ingest", icon: "gauge", group: "secondary", blurb: "Animated load console." },
 ];
 /** Document title for a path, e.g. "Today · CCRIG". */
 export function titleFor(pathname: string): string {
