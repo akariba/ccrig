@@ -26,6 +26,7 @@ export interface ImpactEvent {
   impact: { status: string; estimate: number | null; reason: string };
   verified_exposure: { status: string; reason: string };
   limitations: string[];
+  reaches?: { id: string; name: string; via: string; hops: number; channel: string; strength: number | null }[];
   discovery?: { provider_id: string; category_method: string; review_status: string; also_reported_by: string[]; source_sha256: string; text_method: string };
 }
 export interface DiscoveryProvenance {

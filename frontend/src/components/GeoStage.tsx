@@ -5,6 +5,8 @@ import {
   arcControl, cableStyle, categoryStyle, clampFlat, fitFlat, placeCallout, quadPoint, spreadOverlaps,
   type Cable, type Marker, type Phase, type Pt, type Rect, type Scene,
 } from "../impactmap/model";
+import { cssVar } from "../design/theme";
+import { useThemeVersion } from "../ui/chartTokens";
 import { arcPolyline, baseRadius, chooseProjection, globeTarget, orthoProject, pointAlong, stepCam, type ArcPoint, type GlobeCam } from "../impactmap/globe";
 
 // The geospatial stage of the Global Event Impact Map: an interactive globe (default) or a flat Equal Earth map, drawn on a plain 2D canvas
@@ -28,6 +30,14 @@ function buildGeo(world: any): Geo {
   return { land: feature(world, obj as any), coast: mesh(world, obj as any, (a: any, b: any) => a === b), borders: mesh(world, obj as any, (a: any, b: any) => a !== b) };
 }
 
+/** Map colours come from the shared tokens (dark and light), read when the base layer is drawn. */
+function mapColors() {
+  const v = (n: string, f: string) => cssVar(n, f);
+  return { sea1: v("--map-sea-1", "#143247"), sea2: v("--map-sea-2", "#0a1c2c"), sea3: v("--map-sea-3", "#050d16"), land: v("--map-land", "#173f56"), coast: v("--map-coast", "rgba(120,215,235,0.55)"),
+    border: v("--map-border", "rgba(140,200,235,0.16)"), grat: v("--map-graticule", "rgba(110,175,215,0.075)"), limb: v("--map-limb", "rgba(2,6,12,0.78)"), accent: v("--accent", "#4CC9E0"), dark: document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches) };
+}
+const shade = (hex: string, amt: number) => { const m = /^#([0-9a-f]{6})$/i.exec(hex); if (!m) return hex; const n = parseInt(m[1], 16); const c = (sh: number) => Math.max(0, Math.min(255, Math.round(((n >> sh) & 255) + amt))); return `rgb(${c(16)},${c(8)},${c(0)})`; };
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(() => typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches);
   useEffect(() => {
@@ -50,10 +60,13 @@ interface Props {
   onOverview: () => void; onInvestigate: () => void;
   onMode: (m: Mode) => void; onAnimate: (on: boolean) => void;
   onSelectEvent: (id: string | null) => void; onSelectEntity: (id: string) => void; onHoverEvent: (id: string | null) => void;
+  /** compact: the embedded map (Today, Counterparty). Same stage, fewer controls: projection and animation stay, the legend and the overview/zoom chrome go. */
+  variant?: "full" | "compact";
 }
 
 export function GeoStage(props: Props) {
   const { scene, phase, selectedEventId, selectedEntityId, hoverEventId, mode: setting, animate, canInvestigate, onOverview, onInvestigate, onMode, onAnimate, onSelectEvent, onSelectEntity, onHoverEvent } = props;
+  const compact = props.variant === "compact", themeKey = useThemeVersion();
   const wrap = useRef<HTMLDivElement>(null), canvasRef = useRef<HTMLCanvasElement>(null), els = useRef(new Map<string, HTMLElement>());
   const [size, setSize] = useState({ w: 900, h: 600 });
   const [geo110, setGeo110] = useState<Geo | null>(null), [geo50, setGeo50] = useState<Geo | null>(null);
@@ -167,39 +180,40 @@ export function GeoStage(props: Props) {
   // ------------------------------------------------------------------ drawing
   function drawBase(ctx: CanvasRenderingContext2D, w: number, h: number, g: GlobeCam, f: FlatCam, m: "globe" | "flat", geo: Geo | null) {
     ctx.clearRect(0, 0, w, h);
+    const C = mapColors();
     const proj: any = m === "globe" ? geoOrthographic().rotate([-g.lon, -g.lat]).scale(g.k).translate([w / 2, h / 2]).clipAngle(90).precision(0.6) : flatProjection(w, h, f).precision(0.6);
     const trace = (obj: any) => { const p = new Path2D(); geoPath(proj, p as any)(obj); return p; };
     if (m === "globe") {
       const cx = w / 2, cy = h / 2, k = g.k;
       const glow = ctx.createRadialGradient(cx, cy, k * 0.98, cx, cy, k * 1.28);
-      glow.addColorStop(0, "rgba(80,170,235,0.30)"); glow.addColorStop(0.35, "rgba(60,140,210,0.10)"); glow.addColorStop(1, "rgba(40,100,180,0)");
+      glow.addColorStop(0, C.dark ? "rgba(80,170,235,0.30)" : "rgba(30,120,170,0.22)"); glow.addColorStop(0.35, C.dark ? "rgba(60,140,210,0.10)" : "rgba(30,120,170,0.07)"); glow.addColorStop(1, "rgba(40,100,180,0)");
       ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, cy, k * 1.28, 0, Math.PI * 2); ctx.fill();
       const sea = ctx.createRadialGradient(cx - k * 0.35, cy - k * 0.4, k * 0.1, cx, cy, k * 1.02);
-      sea.addColorStop(0, "#143247"); sea.addColorStop(0.6, "#0a1c2c"); sea.addColorStop(1, "#050d16");
+      sea.addColorStop(0, C.sea1); sea.addColorStop(0.6, C.sea2); sea.addColorStop(1, C.sea3);
       ctx.fillStyle = sea; ctx.beginPath(); ctx.arc(cx, cy, k, 0, Math.PI * 2); ctx.fill();
     } else {
       const sea = ctx.createLinearGradient(0, 0, 0, h);
-      sea.addColorStop(0, "#0d2234"); sea.addColorStop(1, "#050d16");
+      sea.addColorStop(0, C.sea1); sea.addColorStop(1, C.sea3);
       ctx.fillStyle = sea; ctx.beginPath(); ctx.rect(0, 0, w, h); ctx.fill();
     }
-    ctx.lineWidth = 0.6; ctx.strokeStyle = "rgba(110,175,215,0.075)"; ctx.stroke(trace(geoGraticule10()));
-    ctx.lineWidth = 0.8; ctx.strokeStyle = "rgba(120,190,230,0.16)"; ctx.stroke(trace(geoGraticule().step([30, 30]).lines().reduce((acc: any, l: any) => ({ type: "MultiLineString", coordinates: [...(acc.coordinates ?? []), ...l.coordinates] }), {})));
+    ctx.lineWidth = 0.6; ctx.strokeStyle = C.grat; ctx.stroke(trace(geoGraticule10()));
+    ctx.lineWidth = 0.8; ctx.strokeStyle = C.grat; ctx.stroke(trace(geoGraticule().step([30, 30]).lines().reduce((acc: any, l: any) => ({ type: "MultiLineString", coordinates: [...(acc.coordinates ?? []), ...l.coordinates] }), {})));
     if (geo) {
       const land = trace(geo.land);
-      ctx.save(); ctx.translate(1.6, 2.6); ctx.fillStyle = "rgba(0,0,0,0.5)"; ctx.fill(land); ctx.restore();   // raised-land shadow: light from the upper left
+      ctx.save(); ctx.translate(1.6, 2.6); ctx.fillStyle = C.dark ? "rgba(0,0,0,0.5)" : "rgba(20,60,85,0.18)"; ctx.fill(land); ctx.restore();   // raised-land shadow: light from the upper left
       const lit = m === "globe"
-        ? (() => { const gr = ctx.createRadialGradient(w / 2 - g.k * 0.4, h / 2 - g.k * 0.45, g.k * 0.05, w / 2, h / 2, g.k * 1.05); gr.addColorStop(0, "#2d6483"); gr.addColorStop(0.55, "#17435d"); gr.addColorStop(1, "#0d2a3e"); return gr; })()
-        : "#173f56";
+        ? (() => { const gr = ctx.createRadialGradient(w / 2 - g.k * 0.4, h / 2 - g.k * 0.45, g.k * 0.05, w / 2, h / 2, g.k * 1.05); gr.addColorStop(0, shade(C.land, C.dark ? 40 : 6)); gr.addColorStop(0.55, C.land); gr.addColorStop(1, shade(C.land, C.dark ? -24 : -18)); return gr; })()
+        : C.land;
       ctx.fillStyle = lit; ctx.fill(land);
-      ctx.lineWidth = 0.5; ctx.strokeStyle = "rgba(140,200,235,0.16)"; ctx.stroke(trace(geo.borders));
-      ctx.lineWidth = 1; ctx.strokeStyle = "rgba(120,215,235,0.55)"; ctx.stroke(trace(geo.coast));
+      ctx.lineWidth = 0.5; ctx.strokeStyle = C.border; ctx.stroke(trace(geo.borders));
+      ctx.lineWidth = 1; ctx.strokeStyle = C.coast; ctx.stroke(trace(geo.coast));
     }
     if (m === "globe") {                       // limb darkening and rim light give the sphere its depth
       const cx = w / 2, cy = h / 2, k = g.k;
       const limb = ctx.createRadialGradient(cx, cy, k * 0.55, cx, cy, k);
-      limb.addColorStop(0, "rgba(2,6,12,0)"); limb.addColorStop(0.8, "rgba(2,6,12,0.28)"); limb.addColorStop(1, "rgba(2,6,12,0.78)");
+      limb.addColorStop(0, "rgba(2,6,12,0)"); limb.addColorStop(0.8, C.dark ? "rgba(2,6,12,0.28)" : "rgba(20,60,85,0.10)"); limb.addColorStop(1, C.limb);
       ctx.fillStyle = limb; ctx.beginPath(); ctx.arc(cx, cy, k, 0, Math.PI * 2); ctx.fill();
-      ctx.lineWidth = 1.4; ctx.strokeStyle = "rgba(125,205,245,0.45)"; ctx.beginPath(); ctx.arc(cx, cy, k, 0, Math.PI * 2); ctx.stroke();
+      ctx.lineWidth = 1.4; ctx.strokeStyle = C.coast; ctx.beginPath(); ctx.arc(cx, cy, k, 0, Math.PI * 2); ctx.stroke();
     }
   }
 
@@ -250,7 +264,7 @@ export function GeoStage(props: Props) {
 
     // static layers (sphere, graticule, coastlines) are re-drawn only when the camera or assets changed
     const lod = !s.moving && p.geo50 ? "50" : p.geo110 ? "110" : "-";
-    const key = `${p.mode}|${w}x${h}|${lod}|${p.mode === "globe" ? `${s.cam.lon.toFixed(2)},${s.cam.lat.toFixed(2)},${s.cam.k.toFixed(1)}` : `${s.flat.zoom.toFixed(3)},${s.flat.tx.toFixed(1)},${s.flat.ty.toFixed(1)}`}`;
+    const key = `${themeKey}|${p.mode}|${w}x${h}|${lod}|${p.mode === "globe" ? `${s.cam.lon.toFixed(2)},${s.cam.lat.toFixed(2)},${s.cam.k.toFixed(1)}` : `${s.flat.zoom.toFixed(3)},${s.flat.tx.toFixed(1)},${s.flat.ty.toFixed(1)}`}`;
     if (key !== s.baseKey) {
       if (!s.base) { s.base = document.createElement("canvas"); s.base.width = c.width; s.base.height = c.height; }
       const bctx = s.base.getContext("2d")!;
@@ -334,7 +348,7 @@ export function GeoStage(props: Props) {
   }
   useEffect(() => () => { cancelAnimationFrame(S.current.raf); S.current.raf = 0; }, []);   // (reset: React StrictMode runs this once before the real mount)
   useEffect(() => { S.current.lastInteract = performance.now(); S.current.baseKey = ""; schedule(); },     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [selectedEventId, hoverEventId, mode, animate, reduced, phase, scene, geo110, geo50]);
+    [selectedEventId, hoverEventId, mode, animate, reduced, phase, scene, geo110, geo50, themeKey]);
 
   // ------------------------------------------------------------------ user camera control
   const touch = () => { S.current.lastInteract = performance.now(); schedule(); };
@@ -415,25 +429,27 @@ export function GeoStage(props: Props) {
       {unsupported && <div className="gs-overlay quiet" role="status">The map cannot be drawn in this browser. The event list and evidence panel still work.</div>}
 
       <div className="gs-controls" role="toolbar" aria-label="Map controls">
-        <div className="seg" role="group" aria-label="View">
+        {!compact && <div className="seg" role="group" aria-label="View">
           <button type="button" aria-pressed={!investigating} onClick={onOverview}>Overview</button>
           <button type="button" aria-pressed={investigating} disabled={!canInvestigate} onClick={onInvestigate}>Investigation</button>
-        </div>
+        </div>}
         <div className="seg" role="group" aria-label="Projection">
           <button type="button" aria-pressed={setting === "auto"} onClick={() => onMode("auto")} title="Globe when everything in view fits one hemisphere, otherwise the flat map">Auto</button>
           <button type="button" aria-pressed={setting === "globe"} onClick={() => onMode("globe")}>Globe</button>
           <button type="button" aria-pressed={setting === "flat"} onClick={() => onMode("flat")}>Flat</button>
         </div>
-        <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1.35)}>+</button>
-        <button type="button" aria-label="Zoom out" onClick={() => zoomBy(1 / 1.35)}>−</button>
-        <button type="button" onClick={() => { frameSelection(); }} title="Re-centre on the selected event and its companies">Frame</button>
+        {!compact && <>
+          <button type="button" aria-label="Zoom in" onClick={() => zoomBy(1.35)}>+</button>
+          <button type="button" aria-label="Zoom out" onClick={() => zoomBy(1 / 1.35)}>−</button>
+          <button type="button" onClick={() => { frameSelection(); }} title="Re-centre on the selected event and its companies">Frame</button>
+        </>}
         <button type="button" aria-pressed={animate && !reduced} disabled={reduced} onClick={() => onAnimate(!animate)} title={reduced ? "Your system asks for reduced motion" : "Particles on documented relationships and camera glides"}>
           {reduced ? "Motion off" : animate ? "Animation on" : "Animation off"}
         </button>
       </div>
       {hiddenCount > 0 && phase === "ready" && <div className="gs-note" data-testid="hidden-note">{hiddenCount} marker{hiddenCount === 1 ? " is" : "s are"} {mode === "globe" ? "on the far side of the globe" : "out of frame"}; use the list{mode === "globe" ? ", drag the globe or switch to Flat" : " or Frame"}.</div>}
 
-      <details className="gs-legend" aria-label="Legend" open={size.w >= 900}>
+      {!compact && <details className="gs-legend" aria-label="Legend" open={size.w >= 900}>
         <summary>Legend</summary>
         <ul>
           {categories.map((c) => <li key={c}><i className="ring" style={{ ["--cat" as string]: categoryStyle(c).color }} />{categoryStyle(c).label}</li>)}
@@ -443,7 +459,7 @@ export function GeoStage(props: Props) {
           <li><i className="region" />Country named in the evidence</li>
           <li className="muted">Event markers are all one size: no impact is estimated.</li>
         </ul>
-      </details>
+      </details>}
     </div>
   );
 }

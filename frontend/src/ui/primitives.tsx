@@ -38,7 +38,7 @@ export function KpiTile({ label, value, unit, delta, deltaUnit, goodWhen = "down
   const body = (
     <>
       <span className="u-kpi-label">{label}</span>
-      <span className="u-kpi-value">{value}{unit && <span className="u-kpi-unit"> {unit}</span>}</span>
+      <span className={`u-kpi-value${typeof value === "string" && !/^[-+\d.,%$ ]/.test(value) ? " text" : ""}`}>{value}{unit && <span className="u-kpi-unit"> {unit}</span>}</span>
       <span className="u-kpi-foot">
         {delta !== null && delta !== undefined && <span className={`u-delta ${good === null ? "" : good ? "good" : "bad"}`} aria-label={`${dir === "flat" ? "unchanged" : dir === "up" ? "up" : "down"} ${Math.abs(delta)}${deltaUnit ?? ""} versus the previous date`}>{dir === "up" ? "▲" : dir === "down" ? "▼" : "■"} {Math.abs(delta)}{deltaUnit}</span>}
         {spark && <Sparkline values={spark} />}

@@ -46,8 +46,8 @@ export function TopBar({ onSearch }: { onSearch: () => void }) {
       <button type="button" className="u-search-btn" onClick={onSearch} aria-label="Search names, themes and pages (shortcut: Command or Control plus K)"><Icon name="search" size={16} /><span>Search names, themes, pages…</span><kbd>{mac ? "⌘K" : "Ctrl K"}</kbd></button>
       <div className="u-watch" aria-label="Watchlist">
         <span className="u-label">Watchlist{customWatchlist ? " (custom)" : ""}</span>
-        <ul className="u-chips">{names.slice(0, 3).map((r) => <li key={r.id}><button type="button" className="u-chip" onClick={() => insp.openEntity("counterparty", r.id, r.name)} title={r.name}>{r.name}</button></li>)}</ul>
-        <button type="button" className="u-chip u-chip-more" aria-expanded={edit} aria-haspopup="dialog" onClick={() => setEdit((v) => !v)}>{names.length > 3 ? `+${names.length - 3} · ` : ""}{names.length} names · edit</button>
+        <ul className="u-chips">{names.slice(0, 2).map((r) => <li key={r.id}><button type="button" className="u-chip" onClick={() => insp.openEntity("counterparty", r.id, r.name)} title={r.name}>{r.name}</button></li>)}</ul>
+        <button type="button" className="u-chip u-chip-more" aria-expanded={edit} aria-haspopup="dialog" onClick={() => setEdit((v) => !v)}>{names.length > 2 ? `+${names.length - 2} · ` : ""}{names.length} names · edit</button>
         {edit && <WatchlistEditor onClose={() => setEdit(false)} />}
       </div>
       <span className="u-spacer" />

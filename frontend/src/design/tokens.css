@@ -1,58 +1,53 @@
-/* One token system for the whole app, light and dark. Direction: a precise, technical risk console in calm neutrals,
-   one accent (the existing petrol), semantic severity colours, and fixed relationship-channel colours that mean the same
-   thing in the graph, the chips and the charts. Admin skins (Data Studio, Ingest Bench) keep their own tokens. */
+/* One token system for the whole app, dark and light. Direction: a "petrol chart" console: deep blue-black, faint chart grid, one cyan accent,
+   semantic severity colours, and fixed relationship-channel colours that mean the same thing in the graph, the chips, the charts and the map.
+   Glow is reserved for critical items, the selected node and active simulations. Admin skins (Data Studio, Ingest Bench) keep their own tokens. */
 :root {
-  /* neutrals */
-  --bg: #f6f5f1; --surface: #ffffff; --surface-2: #f0efe9; --border: #e0ddd3;
-  --text: #232019; --text-2: #5f5c54; --text-3: #6f6c63;
-  /* accent */
-  --accent: #2c5b6b; --accent-hover: #1d4551; --accent-weak: #dfeaee; --on-accent: #ffffff;
-  /* severity (+ tints) */
-  --crit: #a3293f; --high: #b45309; --med: #8a6a12; --low: #2f6b3c; --info: #2c5b6b;
-  --crit-bg: #f7e3e7; --high-bg: #f8e9d8; --med-bg: #f4ecd1; --low-bg: #e1efe4; --info-bg: #dfeaee;
-  /* relationship channels: the same everywhere, including the graph */
-  --ch-ownership: #7a4fa3; --ch-supply: #2f6fb0; --ch-shared: #b07a12; --ch-historical: #2f8a72; --ch-hidden: #737d89; --ch-exposure: #b2573a;
-  /* provenance */
-  --real: #2f6b3c; --synthetic: #8a5a1c; --derived: #2c5b6b; --ai: #3f7078;
-  /* chart categorical (kept from the current build) */
-  --chart-1: #2c5b6b; --chart-2: #96591c; --chart-3: #5c7686; --chart-4: #3f7078; --chart-5: #83495a; --chart-6: #b98a2e; --chart-7: #6a7757; --chart-8: #86663d;
-  /* shape and type */
-  --radius: 6px; --radius-lg: 10px; --shadow: 0 8px 28px rgba(35, 32, 25, .16);
-  --topbar-h: 52px; --sidebar-w: 220px; --focus: #1b6fd1;
+  --bg: #EDF3F6; --bg-2: #E3ECF1; --surface: #FFFFFF; --surface-glass: rgba(255, 255, 255, .9); --surface-2: #F2F7F9; --border: rgba(20, 70, 95, .16); --border-strong: rgba(20, 70, 95, .3);
+  --text: #0B1E2B; --text-2: #3E5868; --text-3: #5A7384;
+  --accent: #087B91; --accent-hover: #05596A; --accent-weak: rgba(8, 123, 145, .1); --on-accent: #FFFFFF;
+  --crit: #CC3322; --high: #B5700A; --med: #8A7208; --low: #12805C; --info: #087B91;
+  --crit-bg: rgba(204, 51, 34, .1); --high-bg: rgba(181, 112, 10, .1); --med-bg: rgba(138, 114, 8, .1); --low-bg: rgba(18, 128, 92, .1); --info-bg: rgba(8, 123, 145, .09);
+  --ch-ownership: #7C5CE0; --ch-exposure: #5F7691; --ch-supply: #087B91; --ch-shared: #B07A0A; --ch-comovement: #2468C9; --ch-hidden: #C23A86;
+  --real: #12805C; --synthetic: #B5700A; --derived: #087B91; --ai: #7C5CE0;
+  --chart-1: #087B91; --chart-2: #B5700A; --chart-3: #5F7691; --chart-4: #12805C; --chart-5: #C23A86; --chart-6: #8A7208; --chart-7: #7C5CE0; --chart-8: #2468C9;
+  --grid: rgba(10, 70, 100, .055); --glass: rgba(255, 255, 255, .92); --glass-accent: rgba(225, 240, 246, .96);
+  --map-sea-1: #d4e6ee; --map-sea-2: #c4dbe5; --map-sea-3: #b6d1de; --map-land: #f3f7f9; --map-coast: rgba(8, 95, 120, .6); --map-border: rgba(40, 90, 115, .22); --map-graticule: rgba(30, 90, 120, .12); --map-limb: rgba(30, 80, 105, .35);
+  --shadow: 0 10px 30px rgba(15, 50, 70, .18); --glow-crit: 0 0 10px rgba(204, 51, 34, .35); --focus: #0B6FD1; color-scheme: light;
+
+  --radius: 5px; --radius-lg: 8px; --topbar-h: 52px; --sidebar-w: 220px;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: "JetBrains Mono", Consolas, monospace;
-  color-scheme: light;
-
   /* legacy names, so the pages that predate the tokens follow the theme without edits */
   --surface-alt: var(--surface-2); --text-muted: var(--text-2); --text-faint: var(--text-3);
   --primary: var(--accent); --primary-hover: var(--accent-hover);
   --error: var(--crit); --warning: var(--high); --success: var(--low);
+  --ch-historical: var(--ch-comovement);
 }
 :root[data-theme="dark"] {
-  --bg: #0e1418; --surface: #151d23; --surface-2: #1b252c; --border: #2a3842;
-  --text: #e4e9ed; --text-2: #a5b1bb; --text-3: #8a97a2;
-  --accent: #5fb0c8; --accent-hover: #86c6da; --accent-weak: #1c3440; --on-accent: #06222c;
-  --crit: #ff8a9a; --high: #f0a561; --med: #e2c15c; --low: #7fd69a; --info: #7fc3d6;
-  --crit-bg: #3a1b24; --high-bg: #3a2915; --med-bg: #353014; --low-bg: #17301f; --info-bg: #17303a;
-  --ch-ownership: #b995e0; --ch-supply: #6fa8e6; --ch-shared: #e0b04e; --ch-historical: #5fcfae; --ch-hidden: #9aa5b1; --ch-exposure: #e48c6c;
-  --real: #7fd69a; --synthetic: #e0a85f; --derived: #7fc3d6; --ai: #7fc9c9;
-  --chart-1: #5fb0c8; --chart-2: #e0a85f; --chart-3: #8aa7b8; --chart-4: #6fc0c4; --chart-5: #d58ba0; --chart-6: #e2c15c; --chart-7: #a3b98a; --chart-8: #c9a06a;
-  --shadow: 0 8px 28px rgba(0, 0, 0, .5);
-  --focus: #6cb2ff;
-  color-scheme: dark;
+  --bg: #06111A; --bg-2: #0A1823; --surface: #0A1925; --surface-glass: rgba(10, 25, 37, .86); --surface-2: #0F2231; --border: rgba(110, 180, 205, .14); --border-strong: rgba(110, 180, 205, .28);
+  --text: #E4EEF4; --text-2: #9FB4C2; --text-3: #7A93A3;
+  --accent: #4CC9E0; --accent-hover: #86DCEC; --accent-weak: rgba(76, 201, 224, .14); --on-accent: #032029;
+  --crit: #FF6B5B; --high: #F5A524; --med: #E9CF5B; --low: #3DD6A0; --info: #4CC9E0;
+  --crit-bg: rgba(255, 107, 91, .14); --high-bg: rgba(245, 165, 36, .14); --med-bg: rgba(233, 207, 91, .13); --low-bg: rgba(61, 214, 160, .13); --info-bg: rgba(76, 201, 224, .13);
+  --ch-ownership: #A78BFA; --ch-exposure: #9FB3C8; --ch-supply: #4CC9E0; --ch-shared: #F2B740; --ch-comovement: #5AA9FF; --ch-hidden: #F472B6;
+  --real: #3DD6A0; --synthetic: #F5A524; --derived: #4CC9E0; --ai: #A78BFA;
+  --chart-1: #4CC9E0; --chart-2: #F5A524; --chart-3: #8AA7B8; --chart-4: #3DD6A0; --chart-5: #F472B6; --chart-6: #E9CF5B; --chart-7: #A78BFA; --chart-8: #5AA9FF;
+  --grid: rgba(110, 180, 205, .05); --glass: rgba(6, 17, 26, .88); --glass-accent: rgba(12, 42, 58, .92);
+  --map-sea-1: #143247; --map-sea-2: #0a1c2c; --map-sea-3: #050d16; --map-land: #173f56; --map-coast: rgba(120, 215, 235, .55); --map-border: rgba(140, 200, 235, .16); --map-graticule: rgba(110, 175, 215, .075); --map-limb: rgba(2, 6, 12, .78);
+  --shadow: 0 10px 32px rgba(0, 0, 0, .55); --glow-crit: 0 0 14px rgba(255, 107, 91, .55); --focus: #86DCEC; color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]):not([data-theme="dark"]) {
-    --bg: #0e1418; --surface: #151d23; --surface-2: #1b252c; --border: #2a3842;
-    --text: #e4e9ed; --text-2: #a5b1bb; --text-3: #8a97a2;
-    --accent: #5fb0c8; --accent-hover: #86c6da; --accent-weak: #1c3440; --on-accent: #06222c;
-    --crit: #ff8a9a; --high: #f0a561; --med: #e2c15c; --low: #7fd69a; --info: #7fc3d6;
-    --crit-bg: #3a1b24; --high-bg: #3a2915; --med-bg: #353014; --low-bg: #17301f; --info-bg: #17303a;
-    --ch-ownership: #b995e0; --ch-supply: #6fa8e6; --ch-shared: #e0b04e; --ch-historical: #5fcfae; --ch-hidden: #9aa5b1; --ch-exposure: #e48c6c;
-    --real: #7fd69a; --synthetic: #e0a85f; --derived: #7fc3d6; --ai: #7fc9c9;
-    --chart-1: #5fb0c8; --chart-2: #e0a85f; --chart-3: #8aa7b8; --chart-4: #6fc0c4; --chart-5: #d58ba0; --chart-6: #e2c15c; --chart-7: #a3b98a; --chart-8: #c9a06a;
-    --shadow: 0 8px 28px rgba(0, 0, 0, .5);
-    --focus: #6cb2ff;
-    color-scheme: dark;
+  --bg: #06111A; --bg-2: #0A1823; --surface: #0A1925; --surface-glass: rgba(10, 25, 37, .86); --surface-2: #0F2231; --border: rgba(110, 180, 205, .14); --border-strong: rgba(110, 180, 205, .28);
+  --text: #E4EEF4; --text-2: #9FB4C2; --text-3: #7A93A3;
+  --accent: #4CC9E0; --accent-hover: #86DCEC; --accent-weak: rgba(76, 201, 224, .14); --on-accent: #032029;
+  --crit: #FF6B5B; --high: #F5A524; --med: #E9CF5B; --low: #3DD6A0; --info: #4CC9E0;
+  --crit-bg: rgba(255, 107, 91, .14); --high-bg: rgba(245, 165, 36, .14); --med-bg: rgba(233, 207, 91, .13); --low-bg: rgba(61, 214, 160, .13); --info-bg: rgba(76, 201, 224, .13);
+  --ch-ownership: #A78BFA; --ch-exposure: #9FB3C8; --ch-supply: #4CC9E0; --ch-shared: #F2B740; --ch-comovement: #5AA9FF; --ch-hidden: #F472B6;
+  --real: #3DD6A0; --synthetic: #F5A524; --derived: #4CC9E0; --ai: #A78BFA;
+  --chart-1: #4CC9E0; --chart-2: #F5A524; --chart-3: #8AA7B8; --chart-4: #3DD6A0; --chart-5: #F472B6; --chart-6: #E9CF5B; --chart-7: #A78BFA; --chart-8: #5AA9FF;
+  --grid: rgba(110, 180, 205, .05); --glass: rgba(6, 17, 26, .88); --glass-accent: rgba(12, 42, 58, .92);
+  --map-sea-1: #143247; --map-sea-2: #0a1c2c; --map-sea-3: #050d16; --map-land: #173f56; --map-coast: rgba(120, 215, 235, .55); --map-border: rgba(140, 200, 235, .16); --map-graticule: rgba(110, 175, 215, .075); --map-limb: rgba(2, 6, 12, .78);
+  --shadow: 0 10px 32px rgba(0, 0, 0, .55); --glow-crit: 0 0 14px rgba(255, 107, 91, .55); --focus: #86DCEC; color-scheme: dark;
   }
 }

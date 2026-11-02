@@ -13,7 +13,7 @@ export function readChartTokens(): ChartTokens {
     text: v("--text", "#232019"), text2: v("--text-2", "#5f5c54"), text3: v("--text-3", "#6f6c63"), border: v("--border", "#e0ddd3"), surface: v("--surface", "#fff"), surface2: v("--surface-2", "#f0efe9"), accent: v("--accent", "#2c5b6b"),
     series: [1, 2, 3, 4, 5, 6, 7, 8].map((i) => v(`--chart-${i}`)), crit: v("--crit"), high: v("--high"), med: v("--med"), low: v("--low"),
     font: v("--font-body", "Inter, sans-serif"), mono: v("--font-mono", "monospace"),
-    channel: Object.fromEntries(["ownership", "supply", "shared", "historical", "hidden", "exposure"].map((c) => [c, v(`--ch-${c}`)])),
+    channel: Object.fromEntries(["ownership", "exposure", "supply", "shared", "comovement", "hidden"].map((c) => [c, v(`--ch-${c}`)])),
   };
 }
 

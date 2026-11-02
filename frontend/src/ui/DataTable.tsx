@@ -10,11 +10,11 @@ export interface Column<T> {
 export interface DataTableProps<T> {
   columns: Column<T>[]; rows: T[]; rowKey: (row: T) => string; label: string;     // label names the table for screen readers and the CSV file
   onRowClick?: (row: T) => void; renderExpanded?: (row: T) => ReactNode; expandedKey?: string | null; onToggleExpand?: (key: string | null) => void;
-  defaultSort?: Sort; searchable?: boolean; maxHeight?: number; rowHeight?: number; emptyTitle?: string; emptyHint?: string; toolbar?: ReactNode;
+  defaultSort?: Sort; selectedKey?: string | null; searchable?: boolean; maxHeight?: number; rowHeight?: number; emptyTitle?: string; emptyHint?: string; toolbar?: ReactNode;
 }
 const VIRTUAL_AFTER = 150;
 
-export function DataTable<T>({ columns, rows, rowKey, label, onRowClick, renderExpanded, expandedKey, onToggleExpand, defaultSort, searchable = true, maxHeight = 520, rowHeight = 38, emptyTitle = "Nothing to show", emptyHint, toolbar }: DataTableProps<T>) {
+export function DataTable<T>({ columns, rows, rowKey, label, onRowClick, renderExpanded, expandedKey, onToggleExpand, defaultSort, selectedKey, searchable = true, maxHeight = 520, rowHeight = 38, emptyTitle = "Nothing to show", emptyHint, toolbar }: DataTableProps<T>) {
   const [sort, setSort] = useState<Sort | null>(defaultSort ?? null);
   const [query, setQuery] = useState("");
   const [hidden, setHidden] = useState<Set<string>>(() => new Set(columns.filter((c) => c.hidden).map((c) => c.key)));
@@ -70,7 +70,7 @@ export function DataTable<T>({ columns, rows, rowKey, label, onRowClick, renderE
                 const k = rowKey(row), open = renderExpanded && expandedKey === k;
                 return (
                   <Fragment key={k}>
-                    <tr style={virtual ? { height: rowHeight } : undefined} className={onRowClick || renderExpanded ? "clickable" : undefined} aria-expanded={renderExpanded ? !!open : undefined}
+                    <tr style={virtual ? { height: rowHeight } : undefined} className={`${onRowClick || renderExpanded ? "clickable" : ""}${selectedKey === k ? " selected" : ""}`.trim() || undefined} aria-selected={selectedKey === undefined ? undefined : selectedKey === k} aria-expanded={renderExpanded ? !!open : undefined}
                       onClick={() => { if (renderExpanded) onToggleExpand?.(open ? null : k); onRowClick?.(row); }}
                       tabIndex={onRowClick || renderExpanded ? 0 : undefined}
                       onKeyDown={onRowClick || renderExpanded ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (renderExpanded) onToggleExpand?.(open ? null : k); onRowClick?.(row); } } : undefined}>
